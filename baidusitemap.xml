@@ -1,0 +1,1051 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
+  <url>
+    <loc>http://www.light3moon.com/2015/01/13/Linux%20shell%20%E7%8E%AF%E5%A2%83%E8%84%9A%E6%9C%AC%E5%88%86%E6%9E%90/</loc>
+    <lastmod>2015-01-16T14:38:17.000Z</lastmod>
+    <data>
+        <display>
+        <title>Linux shell 环境脚本分析</title>
+        <pubTime>2015-01-13T12:50:16.000Z</pubTime>
+        
+        <tag>linux </tag>
+         
+         <content><![CDATA[<p>侯哥之前帮我在编译服务器上弄了个工作环境，vim啊，调试不同的minigui版本都挺好用的。不过总想弄明白这些脚本是咋回事。在不停的提问、百度、google之下，稍微明白了点；赶紧记下来吧，免得又忘记了。</p>
+<h2 id="bashrc">bashrc</h2>
+<p>目前的工作环境的目录安排是这样的（以下目录分别是在/home/xx/下）：</p>
+<ul>
+<li>source：源代码存放目录.</li>
+<li>build：编译产生的中间文件目录.</li>
+<li>target：minigui的库路径.</li>
+</ul>
+<p>每个不同的minigui版本在source下存放不同的源代码（例如rel－3－0）；在build下用mkdir建立相应的目录（build/rel-3-0），然后build/rel-3-0下有可以建立minigui目录（用于编译此版本的minigui），mg－sample（编译此版本的实例程序）；在target也建立相应的目录（target/rel-3-0）。以上目录建立完成后就可以用命令：</p>
+<pre>
+envbuild rel－3－0
+</pre>
+
+<p>来自动切换到rel－3－0版本的编译环境。此时会自动进入到build/rel－3－0目下。然后可以用lndir命令把source下rel－3－0的源代码链接过来，这样就能保证源代码目录的“干净”（编译都在build下）。把源码链接过来后，就可以用acfg命令配置生成makefile文件；然后用mi命令就编译，把编译好的库安装到相应的target/rel-3-0目录下。之后在build可以把mg－sample的链接过来，然后配置自动生成makefile文件，编译、运行实例程序了（这个时候会链接正确的minigui库哦）。</p>
+<p>以上这些功能是怎样通过脚本来实现的呢，那从.bashrc看起吧。</p>
+<pre config="brush:bash;toolbar:false;">
+ss=/home/mingming/source
+bb=/home/mingming/build
+tt=/home/mingming/target
+ftp=/home/ftp/pub
+alias make='make -j5'
+alias mc='make clean'
+alias mi='make -j5 install'
+alias mci='make clean; make -j5 install'
+alias cfg='./configure --prefix=${TARGET_CFG}'
+alias acfg='./autogen.sh;./configure --prefix=${TARGET_CFG}'
+alias acmci='./autogen.sh;./configure --prefix=${TARGET_CFG}; mci'
+#alias envbuild=". ${bb}/env.rc $*; cd ${bb}/${TARGET}"
+#alias envsource="$ss/cd.sh $*"
+alias buildtarget3="${ss}/build-target-3.sh $*"
+alias envbuild=". ${bb}/env.sh $*"
+alias envtarget=". ${tt}/set-env.sh $*"
+alias cpexe="${bb}/cpexe1.sh $*"
+export ss bb tt ftp
+</pre>
+
+<p>.bashrc这个脚本其实它的很具体的一些的东西我还是不太清楚，但是我目前知道的一点就是它是bash shell的环境配置文件（ubuntu上默认的shell是bash）。在它里面设置的一些环境信息会在用户登录的时候读入到shell中。我们先来看看上面这段.bashrc里的内容。ss、bb、tt分别就是上面我说的建立的source、build、target目录。后面的几个alias就能知道前面的acfg、mi的真正面目啦（alias这个命令看网上的说法应该是定义一个命令的别名，可以说是相当于简写？）。后面就定义了envbuild和envtarget命令啦。这里可以看到envbuild和envtarget还分别用到了build/env.sh和target/set-env.sh，这个2个脚本我们后面再看。这里可以看到这2个命令最后还有一个 $<em> 的符号。我虽然没确切的明白这个符号什么意思，但是我猜应该是传递envbuild xx这个命令后接的所有参数的意思（例如envbuild rel－3－0，那 $</em> 应该就只有一个参数：rel－3－0）。我可是根据后面的脚本这样猜的咧，应该是对的吧。</p>
+<h2 id="env-sh">env.sh</h2>
+<pre config="brush:bash;toolbar:false;">
+#!/bin/sh
+
+if test $# -eq 0; then
+echo "target is not specify!"
+echo "configure failed!"
+exit 1
+fi
+
+export TARGET_NAME=$1
+export TARGET=$1
+TT=$tt
+BB=$bb
+TARGET_HOME=$TT
+DEBUG=$2
+
+if test -z $DEBUG; then
+DEBUG="-O2 -Wall"
+
+else
+shift
+a=""
+for i in $@; do
+a="$a $i"
+echo $a
+done
+DEBUG=$a
+fi
+
+CFLAGS="-I${TARGET_HOME}/${TARGET_NAME}/include $DEBUG" 
+CPPFLAGS="-I${TARGET_HOME}/${TARGET_NAME}/include $DEBUG" 
+LDFLAGS="-L${TARGET_HOME}/${TARGET_NAME}/lib" 
+
+export CFLAGS CPPFLAGS LDFLAGS
+</pre>
+
+<p>env.sh脚本刚开始是一个测试命令。test这个命令，会检测后面的表达式，若条件成立，则由$?返回0值，否则返回非0值（一般是1）；然后if由$?的返回值决定执行流程，若$?为0则执行then后面的语句。这里就可以看得到出这个检测命令的意思就是如果evnbuild后面什么参数（就是你的环境目录啦）都没给的话（$# -eq 0）就会提示错误信息，然后退出。</p>
+<p>然后是又定义了几个变量，其中有用到 $1、$2 的值的。这2个我网上查到的信息是第1个和第2个参数的值。这个是env.sh的参数哦，可是我们好像没有显示的给env.sh什么参数啊；但是结合前面envbuild的定义就可以看得出了：env.sh $<em> 。所以我前面猜这个 $</em> 是后面所有参数的意思，这里看来应该是这样了。这里把TARGET_NAME＝$1（我们假设之前的envbuild命令后面接的是rel－3－0），TARGET_HOME＝$TT（TT=$tt）然后后面的：</p>
+<pre>
+LDFLAGS="-L${TARGET_HOME}/${TARGET_NAME}/lib" 
+CFLAGS="-I${TARGET_HOME}/${TARGET_NAME}/include $DEBUG"
+</pre>
+
+<p>就可以知道为什么编译mg－sample能够链接到正确的库路径了。这里解析得到的就是：/home/mingming/target/rel-3-0/lib；正好就是之前minigui库的安装路径。如果换成rel-3-0-arena的版本的话，也能正确的找到minigui的库路径。</p>
+<p>这里还有个 if test -z $DEBUG 的测试命令。DEBUG＝$2，这个我猜应该是envbuild后接了minigui的版本名字，后面再接一些特定的调试开关命令用的。因为$1是minigui的版本名字。这样就很好理解了，如果你什么调试开关都不写的话（这样test -z $DEBUG就成立），就用默认调试开关DEBUG＝”-O2 -Wall”；否则就将你输入的调试开关赋给DEBUG。然后可以看到CFLAGS最后将DEBUG给拼接上去了。</p>
+<pre config="brush:bash;toolbar:false;">
+#change TARGET for copy file.
+TARGET_CFG=$TT/$TARGET_NAME
+export TARGET_CFG
+export TARGET_HOME
+
+export PS1="\[\033[01;31m\]$TARGET_NAME\[\033[01;34m\] \w \$\[\033[00m\] "
+#echo "Target is $1..."
+export PATH=$TARGET_CFG/bin:$PATH
+
+target=$TARGET_NAME
+export TARGET_NAME=$target
+
+if test -d $BB/$target; then
+cd $BB/$target
+if test  -f self.sh; then
+. ./self.sh
+fi
+fi
+
+if test -d $TT/$target; then
+envtarget $TARGET_NAME
+cd $TT/$target
+if test  -f self.sh; then
+. ./self.sh
+fi
+fi
+cd $BB/$target
+
+
+
+#./configure --prefix=${TARGET_CFG}
+</pre>
+
+<p>这里的PS1是根据当前的mingiui版本名字（也就是envbuild命令后面给的名字）改变shell的提示符。具体的代码含义可以去 其志 的个人wiki地盘去看 ^_^。PATH变量也增加了当前minigui库安装路径的bin目录。这里说下 export PATH=$TARGET_CFG/bin:$PATH 这样的用法，就是相当于在当前变量的基础上增加某些表达式，在设置某些查找库、二进制文件的路径上很有用。</p>
+<p>接下来的 test -d $BB/$target 这个测试，应该是当/home/mingming/build/rel-3-0目录存在（假设是envbuild rel-3-0），并且该目录下有self.sh这个脚本文件，就去执行这个self.sh的脚本。这个应该估计是针对某些特殊minigui版本配置用的脚本，目前我还没用这个。</p>
+<p>然后是 test -d $TT/$target 这个测试。这个测试是当/home/mingming/target/rel-3-0目录存在（同之前的假设），就会执行 envtarget $TARGET_NAME 这个命令。最后我们可以再看一下set-env.sh这个脚本了。（环环相扣啊）</p>
+<h2 id="set-env-sh">set-env.sh</h2>
+<pre config="brush:bash;toolbar:false;">
+#/bin/bash
+if test $# -eq 0; then
+echo "error:Target is not specic."
+exit 0
+fi
+
+TT=$tt
+SS=$ss
+TT_DIR=$TT/$1
+
+export MG_CFG_PATH=$TT_DIR/etc
+export MG_RES_PATH=$SS/res-trunk/
+export LD_LIBRARY_PATH=$TT_DIR/lib:$LD_LIBRAY_PATH
+export PATH=$TT_DIR/bin:$PATH
+export BOOTCLASSPATH=$TT_DIR/usr/local/share/jamvm/classes.zip:$TT_DIR/usr/share/classpath/glibj.zip:$TT_DIR/usr/local/share/mgjni/mgjni.zip
+export CLASSPATH=.:$TT_DIR/usr/share/jamvm/classes.zip:$TT_DIR/usr/share/classpath/glibj.zip
+
+echo "Target is $1..."
+export PS1="\[\033[01;31m\]$1\[\033[01;34m\] \w \$\[\033[00m\] "
+
+cd $TT_DIR
+if test  -f ./self.sh; then
+source self.sh
+fi
+
+cd $TT_DIR/bin
+</pre>
+
+<p>哈哈，到这里就可以可以看到所有的minigui的一些环境信息都设置好了：</p>
+<ul>
+<li>MG_CFG_PATH：Minigui.cfg配置文件的路径</li>
+<li>MG_RES_PATH：minigui资源文件的路径</li>
+<li>LD_LIBRARY_PATH：minigui的链接库路径</li>
+</ul>
+<p>有一些java运行时的，暂时没用到；其它的是和前面重复定义了的 -_-||。最后执行完set-env.sh（应该说是执行完envtarget命令）后，env.sh最后会 cd $BB/$target 进入到相应的环境build目录下。</p>
+<p>现在我大致上知道我现在用的这些脚本在后面干了些什么事了。不过上次听万大师的介绍，他用的脚本更强了，可以根据环境的不同配置不同的mingiui的configure。不过这个好像更麻烦，以后有空再研究下了。</p>
+<h2 id="改进">改进</h2>
+<p>有些项目用默认的 MiniGUI configure 不行了，所以就要手动改 configure 配置。这里可以在 .bashrc 里加2个映射命令：</p>
+<pre>
+alias cb='cd ${bb}/${TARGET_NAME};./build.sh;cd ${bb}/${TARGET_NAME}/minigui'
+alias acb='./autogen.sh;cd ${bb}/${TARGET_NAME};./build.sh;cd ${bb}/${TARGET_NAME}/minigui'
+</pre>
+
+<p>然后在 /build/ 目录下放一个 build.sh 的 configure 脚本，MiniGUI 的编译源代码要放到 /build/minigui/ 下（一般我都是这么做的）。要用指定配置选项的时候就用 cb, acb 命令，要用默认配置选项的时候就用 cfg, acfg 命令。手法很简陋，但是自己用着还是蛮顺手的。</p>
+<h2 id="附件">附件</h2>
+<p><a href="http://pan.baidu.com/s/1hq6BqWO" target="_blank" rel="external">set.zip</a></p>
+]]></content>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.light3moon.com/2015/01/13/Git%20%E4%BD%BF%E7%94%A8%E5%A4%87%E5%BF%98/</loc>
+    <lastmod>2015-01-16T14:38:17.000Z</lastmod>
+    <data>
+        <display>
+        <title>Git 使用备忘</title>
+        <pubTime>2015-01-13T12:13:16.000Z</pubTime>
+        
+        <tag>linux </tag>
+         
+         <content><![CDATA[<p>简单的 git 使用教程。</p>
+<h2 id="常用命令">常用命令</h2>
+<ul>
+<li>git clone</li>
+</ul>
+<p>从服务拷贝代码副本到本地（类似 svn checkout）</p>
+<ul>
+<li>git add</li>
+</ul>
+<p>添加本机文件到服务器</p>
+<ul>
+<li>查看git仓库路径</li>
+</ul>
+<p>这个好像没直接的命令可以查看，可以去 git 代码的根目录下的 .git/config 里去看。</p>
+<ul>
+<li>git checkout</li>
+</ul>
+<p>切换分支。一般在切换分支前需要 git pull 更新到最新。这个命令，还有另外一个用处，当你想恢复一个文件时候，可以使用 git checkout xx （你还可以先把这个文件先删掉）。</p>
+<ul>
+<li><p>git branch</p>
+<ul>
+<li>git branch name ：创建新的分支（name）。</li>
+<li>git branch -a ：查看所有的分支信息。</li>
+<li>git branch -d name ：删除本地分支 name。</li>
+<li>git push origin :name ：删除远程分支 name。</li>
+</ul>
+</li>
+<li><p>git diff</p>
+</li>
+</ul>
+<p>和 svn diff 类似的东西。</p>
+<ul>
+<li>git merge-base branch-A branch-B</li>
+</ul>
+<p>找到2个分支最近一次的公共 commit 。</p>
+<ul>
+<li>git merge branch-A</li>
+</ul>
+<p>把 branch-A 合并到当前分支。</p>
+<ul>
+<li>git init</li>
+</ul>
+<p>创建仓库。如果是在远程的服务器上，一般要用 git init —bare 来创建仓库。 创建仓库的话需要配置一下仓库访问权限，否则别人无法提交代码到你创建的仓库。</p>
+<p>1: 修改 config ： 加上 sharedrepositiory = 1 这个属性。</p>
+<pre config="brush:bash;toolbar:false;">
+[core]
+    repositoryformatversion = 0
+    filemode = true
+    bare = true
+    sharedrepository = 1
+[receive]
+    enyNonFastforwards = true
+</pre>
+
+<p>2: 把 object 和 refs 目录（当然你改全部的也行）权限改成其它的人（同一组或者指定组的人）可以有写的权限（chmod 777 就可以）。</p>
+<ul>
+<li>git log</li>
+</ul>
+<p>git log 查看 log， git log -p xx 可以单独查看这个文件的修改记录。</p>
+<ul>
+<li>git tag</li>
+</ul>
+<p>打标签，查看标签。</p>
+<ul>
+<li>git show</li>
+</ul>
+<p>显示一个 commit 的详细信息，还可以显示一个 tag 的详细信息。</p>
+<h2 id="初始化配置">初始化配置</h2>
+<h3 id="1-">1.</h3>
+<p>下面的命令将修改/home/[username]/.gitconfig文件，也就是说下面的配置只对每一个ssh的用户可见，所以每个人都需要做。</p>
+<ul>
+<li><p>提交代码的log里面会显示提交者的信息</p>
+<pre>
+[user]
+  git config --global user.name [username]
+  git config --global user.email [email]
+</pre>
+</li>
+<li><p>在git命令中开启颜色显示</p>
+<pre>
+[color]
+  git config --global color.ui true
+</pre>
+
+</li>
+</ul>
+<p>如果不太确定 .gitconfig 的位置的，可以用 git config  —global 命令来配置，git 会自动保存配置文件的。</p>
+<h3 id="2-">2.</h3>
+<p>下面的命令将修改/etc/gitconfig文件，这是全局配置，所以admin来做一次就可以了。</p>
+<pre config="brush:bash;toolbar:false;">
+// 配置一些git的常用命令alias
+sudo git config --system alias.st status     // git st
+sudo git config --system alias.ci commit     // git commit
+sudo git config --system alias.co checkout   // git co
+sudo git config --system alias.br  branch    // git branch
+</pre>
+
+<h3 id="3-">3.</h3>
+<p>也可以进入工作根目录，运行git config -e，这样就只会修改工作区的.git/config文件，但是暂时还用不着. git config文件的override顺序是3&gt;1&gt;2.</p>
+<h2 id="代码提交流程里">代码提交流程里</h2>
+<ul>
+<li><p>先确定下本地的修改： git status</p>
+</li>
+<li><p>看下diff: git diff</p>
+</li>
+<li><p>提交修改代码：git add xx</p>
+</li>
+<li><p>确认提交修改：git commit -m”xx” （-m 是注释信息，偷懒的话可以使用 git commit -am”xx”，可以把上面那一步也省了，不过好像不太好）</p>
+</li>
+<li><p>然后合并别人的代码：git pull （如果有冲突的话，需要解决冲突；有时候无法找到默认的分子，可以用 git pull origin xx 更新指定的分支，这个 origin 是仓库的名字，可以通过 git branch -a 看到，一般是 /remote/xx/branch，xx 就是，默认是 origin）</p>
+</li>
+<li><p>最后提交本地修改代码： git push (如果也是找不到默认分支的话，可以使用 git push origin xx(分支名)，如果不想每次都这么写，可以在第一次提交的时候使用 -u 参数，以后会默认提交到上次提交的分支 )</p>
+</li>
+<li><p>可以查看下提交记录： git log</p>
+</li>
+</ul>
+<h2 id="忽略规则配置">忽略规则配置</h2>
+<p>在仓库代码目录下可以新建一个叫 .gitignore 的文件来配置提交代码时忽略的文件类型：</p>
+<pre>
+*.class
+*.apk
+*.ap_
+*.swp
+tags
+bin/
+gen/
+doc/
+local.properties
+proguard/
+build.xml
+</pre>
+
+<h2 id="创建远程分支">创建远程分支</h2>
+<p>要创建一个新的远程分支，首先要创建一个本地分支（git branch xx），例如 git branch test。然后再把这个本地分支 push 到服务器上去：</p>
+<pre>
+# ：号左边的是本地的分支，右边的是远程分支
+# 当然你可以把本地分支 push 到服务器用不同的名字，但是我觉得还是一样的比较好
+git push origin test:test
+</pre>
+
+<p>然后如果要删掉某个远程分支的话，这么弄就行了：</p>
+<pre>
+# 把本地的留空就是删除了
+git push origin :test
+</pre>
+
+<h2 id="删除误添加的文件">删除误添加的文件</h2>
+<p>如果在 git all —all 不小心添加了不想提交的文件（在 git status 中可以可得到添加的文件）。可以使用 git rm —cached xx 删掉误添加的文件。当然这个是还没 commit 的时候，可以这样简单的就删除掉，如果已经 commit 了，就不是这么简单的弄了。所以每次提交的时候都要 status 检查下本次提交的内容。</p>
+<h2 id="撤销_add_的文件">撤销 add 的文件</h2>
+<p>使用 git reset xx ，撤销 add 的问题，特别适用于使用 add —all 但是发现多添加了文件。注意这个是 add 但是还没 commit 的时候。</p>
+<h1 id="撤销_commit">撤销 commit</h1>
+<p>如果只是本地 commit 还没 push 到服务器，可以使用 git reset —hard xx（回到某个提交，xx 可以是 commit 的 id）。如果 push 到服务器的，要稍微麻烦点。但是最后每次提交前确定一下，这种操作还是少一点比较好。</p>
+]]></content>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.light3moon.com/2015/01/10/Linux%20%E5%91%BD%E4%BB%A4%E5%A4%87%E5%BF%98/</loc>
+    <lastmod>2015-01-16T14:38:17.000Z</lastmod>
+    <data>
+        <display>
+        <title>Linux 命令备忘</title>
+        <pubTime>2015-01-10T15:55:16.000Z</pubTime>
+        
+        <tag>linux </tag>
+         
+         <content><![CDATA[<p>百度、google都能搜得到，但是很杂。这里记录下我记不清的，但是又比较常用的一些linux命令用法。</p>
+<h2 id="mount">mount</h2>
+<p>挂载设备命令，一般挂载存储设备就用这个了（硬盘、U盘等）。</p>
+<pre>
+mount [-t vfstype] [-o options] device dir
+</pre>
+
+<p>其中：</p>
+<ul>
+<li><p>-t vfstype 指定文件系统的类型，通常不必指定。mount 会自动选择正确的类型。常用类型有：</p>
+<ul>
+<li>光盘或光盘镜像：iso9660</li>
+<li>DOS fat16文件系统：msdos</li>
+<li>Windows 9x fat32文件系统：vfat （一般U盘的是这种文件系统）</li>
+<li>Windows NT ntfs文件系统：ntfs</li>
+<li>Mount Windows文件网络共享：smbfs</li>
+<li>UNIX(LINUX) 文件网络共享：nfs</li>
+</ul>
+</li>
+<li><p>-o options 主要用来描述设备或档案的挂接方式。常用的参数有：</p>
+<ul>
+<li>loop：用来把一个文件当成硬盘分区挂接上系统</li>
+<li>ro：采用只读方式挂接设备</li>
+<li>rw：采用读写方式挂接设备</li>
+<li>iocharset：指定访问文件系统所用字符集</li>
+</ul>
+</li>
+<li><p>device 要挂接(mount)的设备。</p>
+</li>
+<li><p>dir设备在系统上的挂接点(mount point)。</p>
+</li>
+</ul>
+<p>具体的可以去看 man mount 。在挂载 samba 的时候如果说啥 mount 格式错误，一般是没有装 smbfs ， apt-get install 装一个就好。<br>查看电脑上的文件系统：fdisk -l 或 more /proc/partitions （一般要有root权限）。一般的用法是：</p>
+<pre config="brush:bash;toolbar:false;">
+// /mnt/windows 必须存在
+// 用完了卸载用 sudo umount /mnt/windows
+sudo mount -t ntfs /dev/sda1 /mnt/windows 
+
+// 挂载 samba 网络设备（以 192.168.0.8 为例）
+sudo mount -t smbfs -o username=****,password="****" 192.168.0.8:/xx /mnt/samba
+</pre>
+
+<p>要想在一开机就让linux自己挂载某个硬盘分区可以这样：编辑/etc/fstab，加入以下一行：</p>
+<pre>
+/dev/sda1 /mnt/windows ntfs defaults 0 0
+</pre>
+
+<p>卸载命令是：umount </p>
+<h2 id="find">find</h2>
+<p>查找文件命令。常用的形式： find path -type f -name filename -depth 。</p>
+<ul>
+<li>path: 路径，一般当前路径可以用 “.” 表示。</li>
+<li>-type：查找的文件类型，f 表示普通文件。其他的可以看 man find。</li>
+<li>-name：查找文件的名字，可以用正则表达式（不过我基本上只会用*而已）。</li>
+<li>-depth：表示递归查找（查找子目录），好像可以设置深度的，具体的看 man 吧。</li>
+</ul>
+<h2 id="grep">grep</h2>
+<p>查找文件内容命令。常用的形式： grep -Irn findstrings filenames。</p>
+<ul>
+<li>I：表示忽略小写。</li>
+<li>r: 表示查找子目录。</li>
+<li>n：表示显示行号。</li>
+<li>v：这个表示方向查找，就是显示不包含查找内容的文件。例如 grep -Irn xx . | grep -v svn 就可以不去查找可恶的svn目录下的的东西。</li>
+<li>l：表示只显示文件名字，例如 grep -lr xx . 搜索结果就只显示文件名。</li>
+<li>findstrings：要查找的字符串，同样支持正则表达式。字符串可以加“”这样遇到要查找一些特殊字符不要加转意字符()，否则一些字符是命令的需要加转意字符。例如 grep -Irn “path\list” .</li>
+<li>filenames：要查找的文件。</li>
+</ul>
+<h2 id="sed">sed</h2>
+<p>流编辑器，功能十分强大，但是我目前就会用它的一点点功能而已，简单的说它能将输入文件一行一行的做处理。这样它和 grep , find 配合起来做替换的话，就十分方便了。常用形式：sed ‘s/old/new/g’ -i files 。</p>
+<ul>
+<li>‘s’：这个是替换命令，和vim的替换命令差不多。</li>
+<li>-i：将输出写入原文件，也就是修改原文件的内容；如果不加的话就会输出到标准输出（一般是终端）。</li>
+<li>files：输入的文件，可以是多个。</li>
+</ul>
+<p>这里与 grep 配合一个就可以在一个工程项目里做全局的替换了：（在工程的根目录弄） </p>
+<pre>
+# grep -r old * | sed 's/old/new/g' -i
+</pre>
+
+<h2 id="apt-get_install">apt-get install</h2>
+<p>从网上下载并安装软件包。用法很简单，一般就是 sudo apt-get install xx ，但是一般会记不住包的名字。可以使用 aptitude search 关键字 （apt-cache search xx）来搜索。软件源可以修改 /etc/apt/source.list （不过一般用图形界面比较方便点），然后使用 sudo apt-get update 来更新。还有 apt-get install xx 的下载包的缓存地址在 /var/cache/apt/archives 里，这里其实可以备份起来，下次重装系统的时候就不用再重新下载了。</p>
+<p>aptitude dist-upgrade xx 可以单独更新某个包。</p>
+<h2 id="chmod_和_chown">chmod 和 chown</h2>
+<p>chmod 是修改文件权限的，例如添加所属组的读写权限、添加其它用户的读写权限等。chown 是修改文件的拥有者，拥有者对该文件拥有所有权限。</p>
+<h2 id="mkswap,_swapon">mkswap, swapon</h2>
+<p>用来创建和挂载swap分区（linux下的虚拟内存），一般在板子上开发时，可以拿U盘做swap分区（事先要格式化成swap分区格式的）。一般用法是： mkswap /dev/sda 创建swap分区（假设/dev/sda是你的U盘），然后 swapon /dev/sda 挂载上就可以了。然后可以用 free 查看结果。</p>
+<h2 id="删除不需要的内核">删除不需要的内核</h2>
+<ul>
+<li>dpkg —get-selections | grep linux ：可以查看自己安装了多少内核。用 uname -a 可以看到自己目前用的是哪个内核。</li>
+<li>然后用 apt-get remove xxxx 就可以把自己不要的内核删掉（删掉后会自动把 grub 中对应的启动项目也删掉）。</li>
+<li>不过某些时候 grub 会检测到一些没有办法启动的启动项目，这个时候可以修改 grub 的菜单文件把无用的项目去掉：<ul>
+<li>grub1（ubuntu 9.10 之前）：/boot/grub/menu.lst</li>
+<li>grub2（ubuntu 10.04 之后）：  /boot/grub/grub.cfg</li>
+</ul>
+</li>
+</ul>
+<h2 id="patch">patch</h2>
+<p>linux打补丁命令。由 vim diff 等工具生成的 .patch 文件可由该命令对源代码打补丁。一般形式为： patch -p0 &lt; xx.patch 。p0 代表是源代码目标的第几层（文件夹深度），0就代表是根目录。一般是把 .patch 文件复制到源代码包的根目录，然后用上面的形式进行打补丁。更多的用 man patch 自己看吧。</p>
+<h2 id="ftp">ftp</h2>
+<p>用 ftp 上传东西的时候，如果发的不是文本文件，在上传之前要使用 binary 命令，转化为二进制传输模式，否则上传后的文件可能无法正常使用。</p>
+<h2 id="解压_rpm_包">解压 rpm 包</h2>
+<p>rpm 包可以使用 rpm -i 直接安装，也可以使用 rpm2cpio xxx.rpm | cpio -div 进行解压。</p>
+<h2 id="修改用户权限">修改用户权限</h2>
+<ul>
+<li><p>useradd<br>添加一个新用户，一般新建立一个用户就会相应的建立这个用户同名的用户组。如果要新建立用户组的话，可以用 groupadd 。</p>
+</li>
+<li><p>usermod<br>修改指定用户的信息。可以修改这个用户的用户目录（home目录）、shell 环境（bash 还是 sh）、所属于的用户组等。其中修改说属的用户组就可以赋予和删除用户相应的用户组的权限。使用 </p>
+</li>
+</ul>
+<pre>
+usermod -a -G group1 user1
+</pre>
+
+<p>就可以将 user1 添加到 group1 组中。具体的用法可以看 man。其中</p>
+<pre>
+// 可以看到有哪些组, 组里有哪些用户
+cat /ect/groups
+
+// 可以看到用户的一些信息
+cat /ect/passwd
+</pre>
+
+<ul>
+<li><p>chgrp<br>chgrp -R file 可以改变这个文件的所属于组。</p>
+</li>
+<li><p>权限说明<br>一般我们最常用的也就是 777 755 644 这三种 Linux主机文件目录权限原理：</p>
+</li>
+</ul>
+<pre config="brush:bash;toolbar:false;">
+444 r--r--r--
+600 rw-------
+644 rw-r--r--
+666 rw-rw-rw-
+700 rwx------
+744 rwxr--r--
+755 rwxr-xr-x
+777 rwxrwxrwx
+</pre>
+
+<p>三位数字代表9位的权限，分成3部分，第一部分3位表示所有者的权限，第二部分3位表示同组用户权限，第三部分3位表示其他用户权限，r代表读取权限等于4，w代表写入权限等于2，x代表执行权限等于1</p>
+<p>比如777，第一位7等于4+2+1，所以就是rwx，所有者有读取、写入、执行的权限，第二位7也是4+2+1，rwx，同组用户具有读取、写入、执行权限，第三位7，代表其他用户有读取、写入、执行的权限。<br>比如744，第一位7等于4+2+1，rwx，所有者具有读取、写入、执行权限，第二位4等于4+0+0，r—，同组用户只有读取权限、第三位4，也是r—，其他用户只有读取权限。</p>
+<h2 id="修改用户密码">修改用户密码</h2>
+<p>passwd user 可以修改指定用户的登陆密码，当然如果修改别的用户要有 root 权限。</p>
+<h2 id="监视某个端口">监视某个端口</h2>
+<pre>
+# 这里是监视网络流量
+watch -n 1 "/sbin/ifconfig eth0 | grep bytes"
+</pre>
+
+<h2 id="查看磁盘空间">查看磁盘空间</h2>
+<p>虽然有 fdisk 可用，但是 df -h 效果更好。</p>
+<h2 id="wget">wget</h2>
+<p>这个东西下 http 的挺好用的。一般用法比较简单，直接 wget url 就行了。</p>
+<h2 id="压缩">压缩</h2>
+<p>可以用 tar，也可以用 zip：</p>
+<pre>
+// gz 格式的
+tar -xzvf xx.tar.gz      // 解压
+tar -zvf xx.tar          // 解压
+tar -czvf xx.tar.gz xx   // 压缩
+
+// bz2 格式的
+bzip2 xx.tar.bz2  // 解压 
+
+// 递归（文件夹）中的打包为 xx.zip，其中 -0 表示不压缩，仅仅是存储
+// 不加 -0 则表示用默认压缩
+zip -r -0 xx.zip xx 
+
+// 将 xx 这个文件加入到 xx.zip 中，其中能保持 xx 的文件树结构
+zip -g xx.zip xx
+</pre>
+
+<h2 id="dpkg">dpkg</h2>
+<ul>
+<li>安装 deb 包： dpkg -i package-file.deb</li>
+<li>卸载 deb 包： dpkg -r package-name</li>
+<li>包名可以通过 dpkg —info package-file.deb 查看</li>
+</ul>
+<h2 id="df">df</h2>
+<p>查看磁盘分区大小，可以加 -h 显示单位。</p>
+<h2 id="xargs">xargs</h2>
+<p>可以显示指定让上一个命令的输出作为下一个命令的输入参数。例如： </p>
+<pre>
+# 先搜索以 buildin 结尾的文件，然后再删掉。
+find . -iname *.buildin | xargs rm 
+</pre>]]></content>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.light3moon.com/2015/01/13/Repo%20%E5%91%BD%E4%BB%A4%E5%A4%87%E5%BF%98/</loc>
+    <lastmod>2015-01-16T14:38:17.000Z</lastmod>
+    <data>
+        <display>
+        <title>Repo 命令备忘</title>
+        <pubTime>2015-01-13T12:37:16.000Z</pubTime>
+        
+        <tag>linux </tag>
+         
+         <content><![CDATA[<p>repo 其实本身就是一个 git 仓库，只不过这个仓库记录了别的 git 仓库的地址，版本号信息而已。这个 git 仓库在项目的根目录的 .repo/mainfests 下面。其实就是一个 xml 文件，然后里面记录了各个项目的版本号而已，repo 自身是一个脚本。</p>
+<h2 id="download_repo">download repo</h2>
+<p> 下载 repo 的地址: <a href="http://android.git.kernel.org/repo" target="_blank" rel="external">http://android.git.kernel.org/repo</a> ，可以用 wget <a href="http://android.git.kernel.org/repo" target="_blank" rel="external">http://android.git.kernel.org/repo</a> 或者 curl <a href="http://android.git.kernel.org/repo&gt;~/bin/repo" target="_blank" rel="external">http://android.git.kernel.org/repo&gt;~/bin/repo</a>  来下载 repo , Repo脚本授权：chmod a+x ~/bin/repo</p>
+<h2 id="repo_ini">repo ini</h2>
+<p>repo init -u URL ,  在当前目录安装 repository ，会在当前目录创建一个目录 “.repo”  -u 参数指定一个URL，从这个URL 中取得repository 的 manifest 文件。  </p>
+<pre>
+repo init -u git://android.git.kernel.org/platform/manifest.git  
+</pre>
+
+<p>可以用 -m 参数来选择 repository 中的某一个特定的 manifest 文件，如果不具体指定，那么表示为默认的 namifest 文件(default.xml)    repoinit -u git://android.git.kernel.org/platform/manifest.git -m dalvik-plus.xml 可以用 -b 参数来指定某个manifest 分支。</p>
+<pre>
+repo init -u git://android.git.kernel.org/platform/manifest.git -b release-1.0
+</pre>
+
+<p>可以用命令: repo help init 来获取 repo init 的其他用法。</p>
+<h2 id="查看_repo_可用的版本信息">查看 repo 可用的版本信息</h2>
+<p>先 repo init 把 repo 仓库安装下来，然后 cd ./repo/manifests 下，然后 git branch -a 就可以看到了。</p>
+<p>repo branch 也可以看到当前 repo 用的分支。</p>
+<h2 id="repo_sync_[project-list]">repo sync [project-list]</h2>
+<p>下载最新本地工作文件，更新成功，这本地文件和repository 中的代码是一样的。可以指定需要更新的project ，如果不指定任何参数，会同步整个所有的项目。如果是第一次运行 repo sync ，则这个命令相当于 git clone ，会把 repository 中的所有内容都拷贝到本地。如果不是第一次运行 repo sync ，则相当于 git remote update ;  git rebaseorigin/branch .  repo sync 会更新 .repo 下面的文件。如果在merge 的过程中出现冲突，这需要手动运行  git  rebase —continue</p>
+<h2 id="repo_update[_project-list_]">repo update[ project-list ]</h2>
+<p>上传修改的代码，如果你本地的代码有所修改，那么在运行 repo sync 的时候，会提示你上传修改的代码，所有修改的代码分支会上传到 Gerrit (基于web 的代码review 系统), Gerrit 受到上传的代码，会转换为一个个变更，从而可以让人们来review 修改的代码。</p>
+<h2 id="repo_diff_[_project-list_]">repo diff [ project-list ]</h2>
+<p>显示提交的代码和当前工作目录代码之间的差异。</p>
+<h2 id="repo_download_target_revision">repo download  target revision</h2>
+<p>下载特定的修改版本到本地，例如:  repo downloadpltform/frameworks/base 1241 下载修改版本为 1241 的代码</p>
+<h2 id="repo_start_newbranchname">repo start newbranchname</h2>
+<p>创建新的branch分支。 “.” 代表当前工作的branch 分支。</p>
+<h2 id="repo_prune_[project_list]">repo prune [project list]</h2>
+<p>删除已经merge 的 project</p>
+<h2 id="repo_forall_[_project-lists]_-c_command">repo forall [ project-lists] -c command</h2>
+<p>对每一个 project 运行 command 命令。例如你要用 repo 创建一个新的分支（其实就是让每个项目创建一个分支）： </p>
+<pre>
+# repo 本地创建一个 xx 分支
+repo forall -c git branch xx
+# repo 创建远程分支（把本地分支 push 到服务器上去）
+# origin 是默认的远程路径名字
+repo forall -c git push origin xx:xx
+</pre>
+
+<h2 id="repo_status">repo status</h2>
+<p>显示 project 的状态</p>
+<h2 id="签名错误">签名错误</h2>
+<p>有些时候 repo 的时候会出现</p>
+<pre>
+gpg: 于 2013年10月02日 星期三 00时44分27秒 CST 创建的签名，使用 RSA，钥匙号 692B382C
+gpg: 无法检查签名：找不到公钥
+</pre>
+
+<p>这样的错误。这是因为前后 key 不一样导致的，把 home 目录下的 .repoconfig 删掉，让 repo 自动导入一次 key 就可以了。</p>
+<h2 id="创建新的远程分支">创建新的远程分支</h2>
+<p>首先要创建对应的 git 的各个仓库的分支，可以参加前面 repo forall 命令的使用。然后去 .repo/mainfests 这个仓库下创建自己的 repo 分支。然后可以自己创建分支所用的 xml 文件，提交到刚刚新创建的 repo 分支就可以了。然后就可以用下面的命令 down 新分支代码了：</p>
+<pre>
+repo init -u git://android.git.kernel.org/platform/manifest.git -b my-branch -m my-branch.xml
+repo sync
+</pre>
+
+<h2 id="创建远程仓库">创建远程仓库</h2>
+<ol>
+<li><p>先本地库的创建，在一个本地一个目录把要创建仓库的目录创建好：</p>
+<pre>
+# 在本地仓库目录，创建裸仓库
+git init
+# 把本地仓库先提交到一个分支，一般开始是 master
+git add
+git commit
+</pre>
+</li>
+<li><p>提交远程服务器<br>命令： git remote add <name> <url><br>如:<br><pre><br>git remote add origin gitrepo:android/android4.1/platform/external/abc.git<br></pre><br>origin 是远程仓库的别名（路径），然后后面的 url 一定要是远程服务器的 url 。弄好后可以用 git remote -v 或是 git config -l 查看。如果一开始远程别名弄错了，可以用 git remote rename old new 来重命名。如果 url 错了，可以用 git remote set-url origin xx 来重新指定远程服务器 url 。确保正确后，用 git push origin master:master 把本地仓库提交远程服务器。</url></name></p>
+</li>
+<li><p>在 repo 中添加新的仓库<br>进入 .repo/manifests 这个 repo 仓库，编辑 default.xml (视自己项目使用的 xml 不用，编辑不同的 xml 文件)。照着原有的模版添加刚刚新创建的仓库就好。例如： <code>&lt;project path=&quot;external/abc&quot; name=&quot;platform/external/abc&quot; /&gt;</code>。然后把修改提交到自己项目的 repo 仓库分支就 OK 了，例如: git push origin default:default。</p>
+</li>
+</ol>
+]]></content>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.light3moon.com/2015/01/13/Rsa%20%E9%AA%8C%E8%AF%81%E7%AE%80%E4%BB%8B/</loc>
+    <lastmod>2015-01-16T14:38:17.000Z</lastmod>
+    <data>
+        <display>
+        <title>Rsa 验证简介</title>
+        <pubTime>2015-01-13T12:33:16.000Z</pubTime>
+        
+        <tag>linux </tag>
+         
+         <content><![CDATA[<p> 如果不是用密码来进行验证的话，那么就可以使用 rsa 数据签名来进行验证。签名分为公钥和私钥2个。公钥是可以公开出来的，密钥是自己个人持有的。一般来使用 RSA 验证的话，是自己生成一对公钥/私钥。然后把公钥放置到服务器上，自己持有公钥和私钥，然后就可以通过公钥来验证了。下面上使用简介：</p>
+<p>假设客户端的用户 charlee 要以 guest 用户登录到服务器上。首先在客户端执行下面的命令:</p>
+<pre>
+// ssh-keygen: 
+// -t 指定公钥类型，默认的是 rsa 的
+// -c 是生成的公钥注释，如果不指定的话就是自己机子的终端显示的那个东西
+// 其它的一些选项可以自己去查帮助文档
+</pre>
+
+<pre>
+[charlee@client:~]$ ssh-keygen -t rsa -c "your_email@youremail.com"
+Generating public/private rsa1 key pair.
+Enter file in which to save the key (/home/charlee/.ssh/id_rsa): 回车 （这个是让你指定输出文件，直接敲回车就是括号里那个默认的路径、文件）
+Enterpassphrase (empty for no passphrase):  回车 （这个是让你输入你公钥的密码，直接敲回车就不设定密码）
+Enter same passphrase again:   回车
+Your identification has been sabed in /home/charlee/.ssh/id_rsa
+Your public key has been saved in /home/charlee/.ssh/id_rsa.pub
+</pre>
+
+<p>生成的文件保存在主目录的 .ssh 目录下，id_rsa 为客户端密钥，id_rsa.pub 为客户端公钥。之后，通过 U 盘等方式将公钥 id_rsa.pub 复制到服务器上，并执行下列命令。</p>
+<p>[guest@server:~]$ cat id_rsa.pub &gt;&gt; .ssh/authorized_keys</p>
+<p>其实还可以执行 ssh-copy-id mingming@192.168.0.8 把公钥弄到服务器上。其中 id_rsa.pub 是客户端的用户 charlee 的公钥。这样在客户端即可通过以下的命令连接服务器。到此基本可以配对两台机的公钥了。</p>
+<p>[charlee@client:~]$ ssh -l guest server</p>
+<p>若不想每次登录服务器时都输入密码，可以先执行下列命令：</p>
+<pre>
+// 如果提示 ssh not find agent 之类的，可以输入 eval `ssh-agent` 启动 ssh agent
+[charlee@client:~]$ ssh-add
+Enter passphrase for /home/charlee/.ssh/id_rsa: 输入密码
+Identity added: /home/charlee/.ssh/id_rsa (/home/charlee/.ssh/id_rsa)
+</pre>
+
+<p>以后登录服务器就不需要输入密码了。</p>
+<p>如果出现： Permissions 0464 for ‘.ssh/id_rsa’ are too open. 之类的错误，把私钥文件（id_rsa）权限改为 600 就可以了。</p>
+]]></content>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.light3moon.com/2015/01/10/Test/</loc>
+    <lastmod>2015-01-16T14:38:17.000Z</lastmod>
+    <data>
+        <display>
+        <title>Test</title>
+        <pubTime>2015-01-10T03:07:14.000Z</pubTime>
+        
+        <tag>test </tag>
+         
+         <content><![CDATA[<p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">trobuleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<h2 id="Quick_Start">Quick Start</h2>
+<h3 id="Create_a_new_post">Create a new post</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+
+<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run_server">Run server</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
+
+<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate_static_files">Generate static files</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
+
+<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
+
+<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+]]></content>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.light3moon.com/2015/01/11/VI%20%E5%91%BD%E4%BB%A4%E5%A4%87%E5%BF%98/</loc>
+    <lastmod>2015-01-16T14:38:17.000Z</lastmod>
+    <data>
+        <display>
+        <title>VI 命令备忘</title>
+        <pubTime>2015-01-10T16:12:16.000Z</pubTime>
+        
+        <tag>linux </tag>
+         
+         <content><![CDATA[<p>我的一些常用的 vi 使用命令备忘。</p>
+<h2 id="新建">新建</h2>
+<ul>
+<li>在 shell 直接 vi file 就能创建以 file 命名的文件。</li>
+<li>:e file，在里面内存打开（创建）file 文件。（其中 ： 表示是命令模式）</li>
+</ul>
+<h2 id="保存">保存</h2>
+<ul>
+<li>:s，保存当前文件。</li>
+<li>:q!，退出，不保存。</li>
+<li>:q，退出当前窗口。:qa，退出所有窗口。 </li>
+<li>:c，关闭当前窗口。</li>
+</ul>
+<h2 id="复制、粘贴">复制、粘贴</h2>
+<ul>
+<li>c， 复制。</li>
+<li>p， 粘贴。</li>
+</ul>
+<h2 id="移动">移动</h2>
+<ul>
+<li>i， 上。</li>
+<li>k， 下。</li>
+<li>j， 左。</li>
+<li>l， 右。</li>
+<li>gg， 回到文件最第一行。</li>
+<li>GG， 回到文件最后一行。</li>
+<li>nG， 跳转到第n行。</li>
+<li>ctrl+i(k,j,l)， 在窗口之间移动。</li>
+</ul>
+<h2 id="跳转">跳转</h2>
+<ul>
+<li>ctrl+o， 能回到跳转前的位置。</li>
+<li>ctrl+i， 就是o的反操作。</li>
+</ul>
+<h2 id="撤销">撤销</h2>
+<ul>
+<li>u， 撤销。</li>
+<li>ctrl+r， 恢复（就是反撤销）。</li>
+</ul>
+<h2 id="搜索">搜索</h2>
+<ul>
+<li>/ xx， 向后搜索 xx。支持正则表达式。</li>
+<li>？ xx， 向前搜索 xx。</li>
+<li>n， 下一个。</li>
+<li>N， 上一个。</li>
+</ul>
+<h2 id="替换">替换</h2>
+<p>:s，用法为 “:[range]s/target/replace/g” 。其中 range 可以是全文（%），target 是你要替换的字符串，replace 是你要换成的东西（/是分隔符），后面的 g 参数，表示替换一行中所有出现的字符串。例如：你要全文替换 hello 为 hello_world</p>
+<pre>
+:%s/hello/hello_world/g
+</pre> 
+
+<p>典型的用法就是在 linux 下打开某些 window 下编辑的代码，会在每行结尾有一个 ^M 的符号，可以使用替换命令替换掉： %s/^M//g （注意这里输入的 ^M 要按住 ctrl + v 和 ctrl + M 输入）。</p>
+<h2 id="大小写转化">大小写转化</h2>
+<p>gu(gU)，u是变小写，U是变大写，后面可以接范围命令，例如 guw 就是把当前一个单词变成小写。</p>
+<h2 id="v">v</h2>
+<p>视图模式，可以使用任何移动命令进行选择，选择后可以使用复制、粘贴、对齐等操作。</p>
+<h2 id="标记">标记</h2>
+<ul>
+<li><p>:ma A-Z(a-z)，在当前位置做标记。可以设置 A 到 Z 个标记。</p>
+</li>
+<li><p>:marks，显示当前做的标记。</p>
+</li>
+<li><p>` A-Z，跳转到某个标记处。</p>
+</li>
+</ul>
+<h2 id="q">q</h2>
+<p>录制命令。qx：其中 x 是录制宏的编号，应该可以从 a ~ z 吧。按 qx 后就进入了录制模式，vi 会有 rercdring 的提示，录制完成后，再次按 q 推出。之后用 @x 来播放，x 就是宏的编号。@x 前面可以加范围的命令，例如 10@x ，表示10行进行这个命令。</p>
+<h2 id="代码展开">代码展开</h2>
+<p>代码展开命令。有些代码默认是折叠的，使用 zo 命令可以全部展开。</p>
+<ul>
+<li>zo 展开当前</li>
+<li>zO 展开所有</li>
+<li>zr 展开所有</li>
+</ul>
+<h2 id="==">==</h2>
+<p>连续按2次 “=” 号键，就会自动对该行代码进行缩进对齐。并且前面可以加行数前缀。</p>
+<h2 id="分屏编辑">分屏编辑</h2>
+<ul>
+<li>split： 上下分屏</li>
+<li>vsplit： 左右分屏</li>
+</ul>
+<h2 id=":nohl">:nohl</h2>
+<p>这是vi里的一个命令来的，就是去掉一些搜索结果时候的高亮显示。有时候高亮太多时，用这个比较好。</p>
+<h2 id="16进制编辑">16进制编辑</h2>
+<p>%!xxd 或者 %!xxd -r</p>
+<h2 id="外部命令">外部命令</h2>
+<p>在命令模式下，前面加 ！ 号，然后后面就可以执行外部 shell 命令。例如 :！pwd 就是显示当前路径。</p>
+<h2 id="插件使用">插件使用</h2>
+<p>插件、插件配置以及 vi 配置在附件里。</p>
+<ul>
+<li><p>可以看附件里的 vi 配置设置的快捷键参数，例如 F2、F3 这些。</p>
+</li>
+<li><p>wm（这个是 vi 配置里的快捷键），开启文件管理插件，类似 IDE 的那种。</p>
+</li>
+<li><p>superTab</p>
+<ul>
+<li>tab 键进行标签切换。</li>
+<li>:b 1，切换到1号标签，标签号在 tab 上有显示。</li>
+<li>在标签上按 d 键可以关闭这个标签。</li>
+</ul>
+</li>
+<li><p>如果窗口大小乱了，可以使用窗口管理命令：</p>
+<ul>
+<li>ctrl + w + “+”， 放大该窗口。（注意是先按 ctrl，再按 w，再按 +号）</li>
+<li>ctrl + w + “-“， 缩小该窗口。</li>
+</ul>
+</li>
+</ul>
+<h2 id="附件">附件</h2>
+<p><a href="http://pan.baidu.com/s/1c0F6QTq" target="_blank" rel="external">vi 配置以及插件配置文件</a></p>
+]]></content>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.light3moon.com/1986/12/20/%E6%96%87%E7%AB%A0%E7%B4%A2%E5%BC%95/</loc>
+    <lastmod>2015-01-16T14:38:17.000Z</lastmod>
+    <data>
+        <display>
+        <title>文章索引</title>
+        <pubTime>1986-12-19T16:00:16.000Z</pubTime>
+        
+         <content><![CDATA[<h2 id="Linux">Linux</h2>
+<p><a href="http://light3moon.com/2015/01/10/Linux 命令备忘/" target="_blank" rel="external">Linux 命令备忘</a><br><a href="http://light3moon.com/2015/01/11/VI 命令备忘/" target="_blank" rel="external">VI 命令备忘</a><br><a href="http://light3moon.com/2015/01/11/GDB 命令备忘/" target="_blank" rel="external">GDB 命令备忘</a><br><a href="http://light3moon.com/2015/01/13/Git 使用备忘" target="_blank" rel="external">Git 使用备忘</a><br><a href="http://light3moon.com/2015/01/13/Git 使用备忘" target="_blank" rel="external">Rsa 验证简介</a><br><a href="http://light3moon.com/2015/01/13/Repo 命令备忘" target="_blank" rel="external">Repo 命令备忘</a><br><a href="http://light3moon.com/2015/01/13/Gitweb" target="_blank" rel="external">Gitweb</a><br><a href="http://light3moon.com/2015/01/13/Linux shell 环境脚本分析" target="_blank" rel="external">Linux shell 环境脚本分析</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-22/40043951996" title="Linux Shell 进阶环境脚本分析" target="_blank" rel="external">Linux Shell 进阶环境脚本分析</a><br><a href="http://mingming-killer.diandian.com/post/2014-06-17/40062017517" title="BBK 工作编译脚本分析" target="_blank" rel="external">BBK 工作编译脚本分析</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-22/40043054888" title="使用 pkg-config" target="_blank" rel="external">使用 pkg-config</a><br><a href="http://mingming-killer.diandian.com/post/2013-08-26/40052382762" title="ubuntu 使用问题总结" target="_blank" rel="external">ubuntu 使用问题总结</a><br><a href="http://mingming-killer.diandian.com/post/2014-01-02/40060636504" title="ubuntu minicom 使用问题总结" target="_blank" rel="external">ubuntu minicom 使用问题总结</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-22/40042514280" title="ubuntu 10.10 安装 jdk" target="_blank" rel="external">ubuntu 10.10 安装 jdk</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-22/40043865417" title="ubuntu libtool 错误" target="_blank" rel="external">ubuntu libtool 错误</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-22/40043484831" title="ubuntu 开启 ftp 服务" target="_blank" rel="external">ubuntu 开启 ftp 服务</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042564359" title="交叉编译静态库常见问题" target="_blank" rel="external">交叉编译静态库常见问题</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042110738" title="如何生成 Patch 补丁" target="_blank" rel="external">如何生成 Patch 补丁</a><br><a href="http://mingming-killer.diandian.com/post/2013-11-21/40060176284" title="ubuntu virtual box 问题小结" target="_blank" rel="external">ubuntu virtual box 问题小结</a><br><a href="http://mingming-killer.diandian.com/post/2014-08-24/40062768487" title="ctags tag 文件错误问题" target="_blank" rel="external">ctags tag 文件错误问题</a><br><a href="http://mingming-killer.diandian.com/post/2014-09-22/40063041542" title="[转] gimp中如何查看拾色器拾取的颜色的alpha值" target="_blank" rel="external">[转] gimp中如何查看拾色器拾取的颜色的alpha值</a><br><a href="http://mingming-killer.diandian.com/post/2014-10-22/40063223014" title="ubuntu 14.04 安装 winusb" target="_blank" rel="external">ubuntu 14.04 安装 winusb</a> </p>
+<h2 id="Basics_Knowledge">Basics Knowledge</h2>
+<p><a href="http://mingming-killer.diandian.com/post/2014-08-27/40062798062" title="[转] unlocked_ioctl 和堵塞（waitqueue）读写函数的实现" target="_blank" rel="external">[转] unlocked_ioctl 和堵塞（waitqueue）读写函数的实现</a><br><a href="http://mingming-killer.diandian.com/post/2014-09-17/40062988353" title="`reinterpret_cast`、`static_cast` 和 dynamic_cast 的区别" target="_blank" rel="external">reinterpret_cast、static_cast 和 dynamic_cast 的区别</a><br><a href="http://mingming-killer.diandian.com/post/2014-06-19/40062039462" title="内存对齐" target="_blank" rel="external">内存对齐</a><br><a href="http://mingming-killer.diandian.com/post/2014-09-17/40062988142" title="Endianness" target="_blank" rel="external">Endianness</a><br><a href="http://mingming-killer.diandian.com/post/2014-12-20/40065653992" title="[转] float 类型在内存中的表示" target="_blank" rel="external">[转] float 类型在内存中的表示</a> </p>
+<h2 id="MiniGUI">MiniGUI</h2>
+<p><a href="http://mingming-killer.diandian.com/post/2012-02-05/40039203768" title="MiniGUI 自定义控件教程1" target="_blank" rel="external">MiniGUI 自定义控件教程1</a><br><a href="http://mingming-killer.diandian.com/post/2012-02-05/40039960287" title="MiniGUI 自定义控件教程2" target="_blank" rel="external">MiniGUI 自定义控件教程2</a><br><a href="http://mingming-killer.diandian.com/post/2012-02-05/40039689836" title="MiniGUI 自定义控件教程3" target="_blank" rel="external">MiniGUI 自定义控件教程3</a><br><a href="http://mingming-killer.diandian.com/post/2012-02-05/40039394475" title="MiniGUI 自定义控件教程4" target="_blank" rel="external">MiniGUI 自定义控件教程4</a><br><a href="http://mingming-killer.diandian.com/post/2012-02-05/40039209884" title="MiniGUI 自定义控件教程5" target="_blank" rel="external">MiniGUI 自定义控件教程5</a><br><a href="http://mingming-killer.diandian.com/post/2012-02-05/40039209844" title="MiniGUI 自定义控件教程6" target="_blank" rel="external">MiniGUI 自定义控件教程6</a><br><a href="http://mingming-killer.diandian.com/post/2012-02-05/40038475199" title="MiniGUI 自定义控件教程7" target="_blank" rel="external">MiniGUI 自定义控件教程7</a> </p>
+<p><a href="http://mingming-killer.diandian.com/post/2012-11-23/40043726027" title="MiniGUI 消息机制源码分析" target="_blank" rel="external">MiniGUI 消息机制源码分析</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042541518" title="MiniGUI 源码分析笔记" target="_blank" rel="external">MiniGUI 源码分析笔记</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042205741" title="MiniGUI DC 分析" target="_blank" rel="external">MiniGUI DC 分析</a> </p>
+<h2 id="Android_Development">Android Development</h2>
+<p><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042118355" title="Java 备忘" target="_blank" rel="external">Java 备忘</a><br><a href="http://mingming-killer.diandian.com/post/2014-12-27/40065680516" title="Java 反射的参数问题" target="_blank" rel="external">Java 反射的参数问题</a><br><a href="http://mingming-killer.diandian.com/post/2013-10-30/40056056697" title="Android 命令备忘" target="_blank" rel="external">Android 命令备忘</a><br><a href="http://mingming-killer.diandian.com/post/2012-02-19/40038133438" title="Android 开发环境搭建全程演示 (jdk+eclipse+android sdk)" target="_blank" rel="external">Android 开发环境搭建全程演示 (jdk+eclipse+android sdk)</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40043137292" title="Android 模拟器使用心得" target="_blank" rel="external">Android 模拟器使用心得</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042612750" title="Android 应用程序开发小问题总结" target="_blank" rel="external">Android 应用程序开发小问题总结</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-22/40042474656" title="Android sdk 本地文档加载慢的解决办法" target="_blank" rel="external">Android sdk 本地文档加载慢的解决办法</a><br><a href="http://mingming-killer.diandian.com/post/2012-04-09/40039374207" title="Android 程序签名问题" target="_blank" rel="external">Android 程序签名问题</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40043044175" title="Linux 下 adb usb 连接 usb 设备问题总结" target="_blank" rel="external">Linux 下 adb usb 连接 usb 设备问题总结</a><br><a href="http://mingming-killer.diandian.com/post/2013-08-26/40052345030" title="64位 ubuntu adb No such file or directory 解决办法" target="_blank" rel="external">64位 ubuntu adb No such file or directory 解决办法</a><br><a href="http://mingming-killer.diandian.com/post/2014-04-24/40061579231" title="Android sdk content loader 0% 的解决方法" target="_blank" rel="external">Android sdk content loader 0% 的解决方法</a><br><a href="http://mingming-killer.diandian.com/post/2013-08-26/40053692186" title="[转] linux 下 ndk-build 出现 Invalid attribute name: package 错误" target="_blank" rel="external">[转] linux 下 ndk-build 出现 Invalid attribute name: package 错误</a><br><a href="http://mingming-killer.diandian.com/post/2011-07-24/40038165328" title="Android中 Error generating final archive: Debug Certificate expired on xx 的错误" target="_blank" rel="external">Android中 Error generating final archive: Debug Certificate expired on xx 的错误</a><br><a href="http://mingming-killer.diandian.com/post/2012-03-02/40038459637" title="反编译 Android apk" target="_blank" rel="external">反编译 Android apk</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042527201" title="Android Gesture 使用简介" target="_blank" rel="external">Android Gesture 使用简介</a><br><a href="http://mingming-killer.diandian.com/post/2012-08-21/40039695400" title="Android View 系统的一些理解" target="_blank" rel="external">Android View 系统的一些理解</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042020328" title="Android 布局笔记" target="_blank" rel="external">Android 布局笔记</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40043824662" title="Android Create Bitmap Out Of Memory" target="_blank" rel="external">Android Create Bitmap Out Of Memory</a><br><a href="http://mingming-killer.diandian.com/post/2012-08-21/40039904672" title="Android OpenGLES 学习笔记" target="_blank" rel="external">Android OpenGLES 学习笔记</a><br><a href="http://mingming-killer.diandian.com/post/2012-08-31/40038128935" title="Android 4.0 访问WebService 出现 android.os.NetworkOnMainThreadException异常" target="_blank" rel="external">Android 4.0 访问WebService 出现 android.os.NetworkOnMainThreadException异常</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042795428" title="Android 自定义 Preference" target="_blank" rel="external">Android 自定义 Preference</a><br><a href="http://mingming-killer.diandian.com/post/2014-05-04/40061663797" title="Android 资源文件夹命名规则" target="_blank" rel="external">Android 资源文件夹命名规则</a><br><a href="http://mingming-killer.diandian.com/post/2014-05-15/40061752791" title="Android 设置广播标志启动还没启动程序" target="_blank" rel="external">Android 设置广播标志启动还没启动程序</a><br><a href="http://mingming-killer.diandian.com/post/2014-05-26/40061843062" title="[转] Android 让应用手动管理应用的数据目录" target="_blank" rel="external">[转] Android 让应用手动管理应用的数据目录</a><br><a href="http://mingming-killer.diandian.com/post/2014-05-26/40061842470" title="Android 优秀开源网络框架" target="_blank" rel="external">Android 优秀开源网络框架</a><br><a href="http://mingming-killer.diandian.com/post/2014-06-17/40062037390" title="apk 捕获全局异常" target="_blank" rel="external">apk 捕获全局异常</a><br><a href="http://mingming-killer.diandian.com/post/2014-07-22/40062251272" title="dmtracedump 的用法" target="_blank" rel="external">dmtracedump 的用法</a><br><a href="http://mingming-killer.diandian.com/post/2014-07-28/40062314377" title="Android 打印函数调用堆栈调试" target="_blank" rel="external">Android 打印函数调用堆栈调试</a><br><a href="http://mingming-killer.diandian.com/post/2014-12-20/40065644503" title="hierarchyviewer 无法使用问题" target="_blank" rel="external">hierarchyviewer 无法使用问题</a> </p>
+<p><a href="http://mingming-killer.diandian.com/post/2014-08-13/40062497661" title="Android 坑爹大全 —— SeekBar" target="_blank" rel="external">Android 坑爹大全 —— SeekBar</a><br><a href="http://mingming-killer.diandian.com/post/2014-09-19/40063020120" title="Android 坑爹大全 —— Paint mask filter 无效" target="_blank" rel="external">Android 坑爹大全 —— Paint mask filter 无效</a> </p>
+<h2 id="Android_Framework">Android Framework</h2>
+<p><a href="http://mingming-killer.diandian.com/post/2012-02-19/40038593763" title="如何取得Android源代码" target="_blank" rel="external">如何取得Android源代码</a><br><a href="http://mingming-killer.diandian.com/post/2013-12-19/40060490947" title="获取 Android 源码问题总结" target="_blank" rel="external">获取 Android 源码问题总结</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042629605" title="开启 Android SDK 所有的 API 的方法" target="_blank" rel="external">开启 Android SDK 所有的 API 的方法</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40043597499" title="Android x86 在 X window system 上的调研" target="_blank" rel="external">Android x86 在 X window system 上的调研</a><br><a href="http://mingming-killer.diandian.com/post/2012-08-21/40039144800" title="Android Root Recovery 学习笔记" target="_blank" rel="external">Android Root Recovery 学习笔记</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042663361" title="Android MiniGUI Recovery 笔记" target="_blank" rel="external">Android MiniGUI Recovery 笔记</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40042370948" title="编译 Android 源码问题总结" target="_blank" rel="external">编译 Android 源码问题总结</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-23/40043260736" title="Android 按键映射分析" target="_blank" rel="external">Android 按键映射分析</a><br><a href="http://mingming-killer.diandian.com/post/2013-09-02/40052117745" title="在源码中修改 Android 系统配置" target="_blank" rel="external">在源码中修改 Android 系统配置</a><br><a href="http://mingming-killer.diandian.com/post/2013-11-14/40060119035" title="[转] Android locales 本地化" target="_blank" rel="external">[转] Android locales 本地化</a><br><a href="http://mingming-killer.diandian.com/post/2013-11-15/40060103255" title="[转] Android系统移植与调试之-------&gt;build.prop文件详细赏析" target="_blank" rel="external">[转] Android系统移植与调试之———-&gt;build.prop文件详细赏析</a><br><a href="http://mingming-killer.diandian.com/post/2014-04-28/40061628264" title="Android 4.2 SystemUI 最近任务列表分析" target="_blank" rel="external">Android 4.2 SystemUI 最近任务列表分析</a><br><a href="http://mingming-killer.diandian.com/post/2014-05-04/40061671114" title="编译 framework 自动增加自定义资源" target="_blank" rel="external">编译 framework 自动增加自定义资源</a><br><a href="http://mingming-killer.diandian.com/post/2014-05-15/40061757929" title="forceStopPackage 的副作用" target="_blank" rel="external">forceStopPackage 的副作用</a><br><a href="http://mingming-killer.diandian.com/post/2014-05-17/40061795955" title="vold share 操作清理正在使用磁盘的进程分析" target="_blank" rel="external">vold share 操作清理正在使用磁盘的进程分析</a><br><a href="http://mingming-killer.diandian.com/post/2014-05-20/40061810899" title="Android 开机启动画面分析" target="_blank" rel="external">Android 开机启动画面分析</a><br><a href="http://mingming-killer.diandian.com/post/2014-05-31/40061867491" title="Android Surface flinger 颜色格式分析" target="_blank" rel="external">Android Surface flinger 颜色格式分析</a><br><a href="http://mingming-killer.diandian.com/post/2014-09-09/40062912287" title="Android Provision 的影响和作用" target="_blank" rel="external">Android Provision 的影响和作用</a><br><a href="http://mingming-killer.diandian.com/post/2014-06-17/40062011119" title="Android 智能指针备忘" target="_blank" rel="external">Android 智能指针备忘</a> </p>
+<p><a href="http://mingming-killer.diandian.com/post/2014-08-22/40062739695" title="Android Binder 分析——原理" target="_blank" rel="external">Android Binder 分析——原理</a><br><a href="http://mingming-killer.diandian.com/post/2014-09-12/40062959178" title="Android Binder 分析——通信模型" target="_blank" rel="external">Android Binder 分析——通信模型</a><br><a href="http://mingming-killer.diandian.com/post/2014-09-23/40063048909" title="Android Binder 分析——数据传递者（Parcel）" target="_blank" rel="external">Android Binder 分析——数据传递者（Parcel）</a><br><a href="http://mingming-killer.diandian.com/post/2014-10-31/40063291795" title="Android Binder 分析——匿名共享内存（Ashmem）" target="_blank" rel="external">Android Binder 分析——匿名共享内存（Ashmem）</a><br><a href="http://mingming-killer.diandian.com/post/2014-10-11/40063168555" title="Android Binder 分析——内存管理" target="_blank" rel="external">Android Binder 分析——内存管理</a><br><a href="http://mingming-killer.diandian.com/post/2014-08-27/40062814789" title="Android Binder 分析——系统服务 Binder 对象的传递" target="_blank" rel="external">Android Binder 分析——系统服务 Binder 对象的传递</a><br><a href="http://mingming-killer.diandian.com/post/2014-11-08/40063333232" title="Android Binder 分析——普通服务 Binder 对象的传递" target="_blank" rel="external">Android Binder 分析——普通服务 Binder 对象的传递</a><br><a href="http://mingming-killer.diandian.com/post/2014-08-19/40062702434" title="Android Binder 分析——多线程支持" target="_blank" rel="external">Android Binder 分析——多线程支持</a><br><a href="http://mingming-killer.diandian.com/post/2014-08-04/40062388014" title="Android Binder 分析——懒人的工具（AIDL）" target="_blank" rel="external">Android Binder 分析——懒人的工具（AIDL）</a><br><a href="http://mingming-killer.diandian.com/post/2014-11-19/40064430905" title="Android Binder 分析——死亡通知（DeathRecipient）" target="_blank" rel="external">Android Binder 分析——死亡通知（DeathRecipient）</a> </p>
+<p><a href="http://mingming-killer.diandian.com/post/2014-12-22/40065669072" title="Android 一些有意思的命令小工具 —— dumpsys" target="_blank" rel="external">Android 一些有意思的命令小工具 —— dumpsys</a><br><a href="http://mingming-killer.diandian.com/post/2014-12-20/40065655791" title="Android 一些有意思的命令小工具 —— service" target="_blank" rel="external">Android 一些有意思的命令小工具 —— service</a> </p>
+<p><a href="http://mingming-killer.diandian.com/post/2014-08-08/40062437624" title="工作小笔记——扩展字库乱码排查" target="_blank" rel="external">工作小笔记——扩展字库乱码排查</a><br><a href="http://mingming-killer.diandian.com/post/2014-10-08/40063121053" title="工作小笔记——Android 多用户切换无法启动应用的问题" target="_blank" rel="external">工作小笔记——Android 多用户切换无法启动应用的问题</a><br><a href="http://mingming-killer.diandian.com/post/2014-10-09/40063130162" title="工作小笔记——Android 多用户下的要注意的问题" target="_blank" rel="external">工作小笔记——Android 多用户下的要注意的问题</a><br><a href="http://mingming-killer.diandian.com/post/2014-10-23/40063248496" title="工作小笔记——Android 动态切换系统字体" target="_blank" rel="external">工作小笔记——Android 动态切换系统字体</a><br><a href="http://mingming-killer.diandian.com/post/2014-10-28/40063279653" title="工作小笔记——利用反射需要注意的问题" target="_blank" rel="external">工作小笔记——利用反射需要注意的问题</a><br><a href="http://mingming-killer.diandian.com/post/2014-12-22/40065676359" title="工作小笔记——Android 自带的应用统计服务（UsageStatsService）" target="_blank" rel="external">工作小笔记——Android 自带的应用统计服务（UsageStatsService）</a><br><a href="http://mingming-killer.diandian.com/post/2014-11-24/40064455886" title="工作小笔记——拦截应用内置广告.检测篇" target="_blank" rel="external">工作小笔记——拦截应用内置广告.检测篇</a><br><a href="http://mingming-killer.diandian.com/post/2014-12-27/40065701903" title="工作小笔记——拦截应用内置广告.拦截篇" target="_blank" rel="external">工作小笔记——拦截应用内置广告.拦截篇</a> </p>
+<h2 id="Android_Device">Android Device</h2>
+<p><a href="http://mingming-killer.diandian.com/post/2014-01-08/40060697037" title="Google android source code build 问题总结" target="_blank" rel="external">Google android source code build 问题总结</a><br><a href="http://mingming-killer.diandian.com/post/2013-12-16/40060463270" title="[转] Nexus7 2rd unlock fastboot" target="_blank" rel="external">[转] Nexus7 2rd unlock fastboot</a><br><a href="http://mingming-killer.diandian.com/post/2014-12-01/40065502652" title="删除遗忘的 vpn 存储凭据" target="_blank" rel="external">删除遗忘的 vpn 存储凭据</a> </p>
+<h2 id="Window">Window</h2>
+<p><a href="http://mingming-killer.diandian.com/post/2013-07-27/40051133099" title="cygwin 使用备忘" target="_blank" rel="external">cygwin 使用备忘</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-22/40042324975" title="window 在 cygwin 中使用 repo ssh" target="_blank" rel="external">window 在 cygwin 中使用 repo ssh</a><br><a href="http://mingming-killer.diandian.com/post/2014-05-01/40061664796" title="cygwin screen Directory /tmp/uscreens/S-UserName must have mode 700" target="_blank" rel="external">cygwin screen Directory /tmp/uscreens/S-UserName must have mode 700</a><br><a href="http://mingming-killer.diandian.com/post/2014-05-02/40061657220" title="cygwin screen Caption line issue" target="_blank" rel="external">cygwin screen Caption line issue</a> </p>
+<p><a href="http://mingming-killer.diandian.com/post/2014-05-02/40061677452" title="EFI 安装系统" target="_blank" rel="external">EFI 安装系统</a><br><a href="http://mingming-killer.diandian.com/post/2014-06-17/40062038137" title="提取 OEM window key" target="_blank" rel="external">提取 OEM window key</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-22/40043529497" title="window 下的 linux 开发工具" target="_blank" rel="external">window 下的 linux 开发工具</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-22/40043063359" title="window 开启自带 ftp" target="_blank" rel="external">window 开启自带 ftp</a> </p>
+<p><a href="http://mingming-killer.diandian.com/post/2014-02-03/40060915144" title="win8.1 自带程序入口" target="_blank" rel="external">win8.1 自带程序入口</a><br><a href="http://mingming-killer.diandian.com/post/2014-08-22/40062749280" title="win8.1 关闭蓝牙的省电功能" target="_blank" rel="external">win8.1 关闭蓝牙的省电功能</a><br><a href="http://mingming-killer.diandian.com/post/2014-09-18/40062981165" title="win8.1 手动连接蓝牙设备" target="_blank" rel="external">win8.1 手动连接蓝牙设备</a><br><a href="http://mingming-killer.diandian.com/post/2014-12-31/40065717557" title="win8.1 微软输入法备忘" target="_blank" rel="external">win8.1 微软输入法备忘</a> </p>
+<h2 id="OpenGL">OpenGL</h2>
+<p><a href="http://mingming-killer.diandian.com/post/2013-11-03/40056620141" target="_blank" rel="external">OES_draw_texture 详解</a><br><a href="http://mingming-killer.diandian.com/post/2014-06-13/40062006061" title="GL 中的纹理坐标" target="_blank" rel="external">GL 中的纹理坐标</a> </p>
+<h2 id="Python">Python</h2>
+<p><a href="http://mingming-killer.diandian.com/post/2014-01-07/40060700011" title="Python 使用总结" target="_blank" rel="external">Python 使用总结</a> </p>
+<h2 id="Other">Other</h2>
+<p><a href="http://mingming-killer.diandian.com/post/2012-11-22/40042628884" title="Eclipse 插件小结" target="_blank" rel="external">Eclipse 插件小结</a><br><a href="http://mingming-killer.diandian.com/post/2014-04-26/40061615417" title="[转] eclipse 代码补齐、注释小窗口崩溃解决方法" target="_blank" rel="external">[转] eclipse 代码补齐、注释小窗口崩溃解决方法</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-22/40043627359" title="[转] 那些 cache 和 buffer（一）" target="_blank" rel="external">[转] 那些 “cache” 和 “buffer”（一）</a><br><a href="http://mingming-killer.diandian.com/post/2012-11-22/40043851115" title="[转] 那些 cache 和 buffer（二）" target="_blank" rel="external">[转] 那些 “cache” 和 “buffer”（二）</a><br><a href="http://mingming-killer.diandian.com/post/2012-12-11/40046147033" title="[转] Dia 无法输入中文" target="_blank" rel="external">[转] Dia 无法输入中文</a><br><a href="http://mingming-killer.diandian.com/post/2014-06-17/40062018531" title="[转] 什么是 VSync" target="_blank" rel="external">[转] 什么是 VSync</a><br><a href="http://mingming-killer.diandian.com/post/2014-06-20/40062030713" title="[转] Java 的模版和 C++ 模版的区别" target="_blank" rel="external">[转] Java 的模版和 C++ 模版的区别</a><br><a href="http://mingming-killer.diandian.com/post/2014-08-08/40062434087" title="[转] unicode 编码表" target="_blank" rel="external">[转] unicode 编码表</a><br><a href="http://mingming-killer.diandian.com/post/2014-08-08/40062440589" title="[转] 字符编码笔记" target="_blank" rel="external">[转] 字符编码笔记</a><br><a href="http://mingming-killer.diandian.com/post/2014-11-25/40064450570" title="[转] 如何在 github 上删除一个仓库" target="_blank" rel="external">[转] 如何在 github 上删除一个仓库</a> </p>
+<p><a href="http://mingming-killer.diandian.com/post/2012-11-22/40042558341" title="Private" target="_blank" rel="external">Private</a> </p>
+]]></content>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.light3moon.com/2015/01/11/GDB%20%E5%91%BD%E4%BB%A4%E5%A4%87%E5%BF%98/</loc>
+    <lastmod>2015-01-16T14:38:17.000Z</lastmod>
+    <data>
+        <display>
+        <title>GDB 命令备忘</title>
+        <pubTime>2015-01-10T16:25:16.000Z</pubTime>
+        
+        <tag>linux </tag>
+         
+         <content><![CDATA[<p>一些常用的 gdb 使用命令备忘。help 可以查看命令，help xx 可以查看具体命令的所有参数。</p>
+<h2 id="编译带调试符号的程序">编译带调试符号的程序</h2>
+<p>要想用 gdb 调试，编译的时候要带上 debug 符号，就是用 gcc 编译的时候带上 -g 参数编译（bu要带 -o 开启优化模式，这个会把所有的调试符号优化掉）。</p>
+<h2 id="file">file</h2>
+<p>file app，装载要调试的应用程序。</p>
+<h2 id="list_（l）">list （l）</h2>
+<p>list fun，可查看对应函数 fun 的代码。可以接很多参数，例如行号等。函数名是可以使用 tab 键补全的。</p>
+<h2 id="breakpoint_(b)">breakpoint (b)</h2>
+<p>break fun，在函数 fun 出设置断点。也是可以接很多参数的，例如说行号等。</p>
+<ul>
+<li><p>b fun if condition，设置条件断点，只有当 condition 为 true 时才中断。</p>
+</li>
+<li><p>i breakpoint（b），显示当前设置的断点。</p>
+</li>
+<li><p>delete breakpoint 1，删除1号断点，编号可以使用 i b 查看，如果不加参数，则会删除所有断点。</p>
+</li>
+<li><p>disable breakpoint 1，禁止1号断点。</p>
+</li>
+<li><p>enable breakpoint 1，开启1号断点。</p>
+</li>
+</ul>
+<h2 id="watch">watch</h2>
+<p>watch condition (watch i&gt;99)，监视变量的变化达到条件时停止程序执行。注意：监视点的设定不依赖于断点的位置，但是与变量的作用域有关。也就是说，要设置监视点必须在程序运行时才可设置。</p>
+<p>还有一个作用是，硬件写断点。这种断点和普通的 break 有点不同，需要每次挂载 gdb 后，先利用普通的 break 让程序停下来，然后查看出你要查看变量的地址（用p）。然后再用 watch 命令设置。然后每次程序重新运行都要重新设置，因此每次变量地址的都不一样。</p>
+<h2 id="控制命令">控制命令</h2>
+<ul>
+<li><p>run (r): 运行程序。</p>
+</li>
+<li><p>next (n): 下一步，跳过函数。</p>
+</li>
+<li><p>setp (s): 下一步，进入函数。</p>
+</li>
+<li><p>continue (c): 继续执行。</p>
+</li>
+</ul>
+<h2 id="info_(i)">info (i)</h2>
+<p>显示某些内容。</p>
+<ul>
+<li><p>i breakpoints(b)，显示当前断点。</p>
+</li>
+<li><p>i variables，显示所有全局变量和静态变量。</p>
+</li>
+<li><p>i functions，显示所有函数名字。</p>
+</li>
+<li><p>i local，显示当前函数中的变量。</p>
+</li>
+<li><p>i file，显示调试文件的信息。</p>
+</li>
+<li><p>i prog，显示调试程序的执行状态</p>
+</li>
+</ul>
+<h2 id="print_(p)">print (p)</h2>
+<p>p var，显示变量 var 的值，或者 p exp，可以显示该表达式的值。这样可以查看几乎任何变量的值。只要你确定改变量是什么类型的指针，可以直接转化为该类型就行了，例如 p *(PDC)hdc 就可以查看这个结构的值了。还可以通过添加参数来设置输出格式：</p>
+<pre>
+/x 按十六进制格式显示变量
+/d 按十进制格式显示变量
+/u 按十六进制格式显示无符号整型
+/o 按八进制格式显示变量
+/t 按二进制格式显示变量
+/a 按十六进制格式显示变量
+/c 按字符格式显示变量
+/f 按浮点数格式显示变量
+</pre>
+
+<p>其实它还有一个功能就是执行函数。调试 MiniGUI 的时候，最典型的用法用法就是可以将你想查看的一些 memdc 中的图像信息输出到屏幕上进行检查。方法是调用 BitBlt ，注意这种情况一些宏定义的变量无法直接使用，而是要填入真正的数值，这些可以从代码里面去差。例如先把屏幕一块地方填充成红色，然后再把 memdc 中的内容输入到屏幕的这个地方：</p>
+<pre config="brush:bash;toolbar:false;">
+// SetBrushColor(hdc, color) 的宏定义是 SetDCAttr(hdc, DC_ATTR_BRUSH_COLOR, color)
+// DC_ATTR_BRUSH_COLOR 值就是2
+// HDC_SCREEN 的值就是0
+// 如果自己知道 rgb 对应的 pixel 值的话，也可以不用 RGB2Pixel
+p SetDCAttr(0, 2, RGB2Pixel(0, 255, 0, 0))
+
+p FillBox(0, 400, 0, 360, 480)
+
+p BitBlt(memdc, 0, 0, 0, 0, 0, 400, 0, 0)
+</pre>
+
+<h2 id="x">x</h2>
+<p>x /nfu <addr>，查看addr地址处的内存信息。n是显示多少字节，后面的显示的格式，和 p 命令是一样的。</addr></p>
+<h2 id="thread">thread</h2>
+<p>用法：thread xx。切换当前活动线程。用于调试多线程程序。xx 为线程号，用 info thread（th）查看，每个线程的第一个数字就是线程号。 </p>
+<h2 id="backtrace_(bt)">backtrace (bt)</h2>
+<p>backtrace [-n] [n] 显示程序中的当前位置和表示如何到达当前位置的栈跟踪。<br>-n：表示只打印栈底上n层的栈信息<br> n：表示只打印栈顶上n层的栈信息<br>不加参数，表示打印所有栈信息。</p>
+<h2 id="call">call</h2>
+<p>call func_name，调用和执行一个函数。例如 call print(“abcd\n”)。</p>
+<h2 id="查看_coredump_文件">查看 coredump 文件</h2>
+<p>首先要让程序在崩溃的时候产生 coredump 文件。输入 ulimit -c unlimited 命令（注意这个只对一个终端有效）。然后在程序崩溃的时候，就会产生 core.xx 的文件。使用 gdb app core.xx 命令查看（app 就是产生 core.xx 的程序）。然后就和普通的 gdb 用法一样了，用 bt 查看崩溃时的堆栈信息啊，但是就是不能执行而已。</p>
+<h2 id="disassemble">disassemble</h2>
+<p>对当前的执行到的代码反汇编。</p>
+]]></content>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://www.light3moon.com/2015/01/13/Gitweb/</loc>
+    <lastmod>2015-01-16T14:38:17.000Z</lastmod>
+    <data>
+        <display>
+        <title>Gitweb</title>
+        <pubTime>2015-01-13T12:48:16.000Z</pubTime>
+        
+        <tag>linux </tag>
+         
+         <content><![CDATA[<p>Git web 是一个可以在 web 上查看 git 仓库的程序。例如可以在 web 上查看所有的 git 分支， git 的 commit、diff 等。</p>
+<p>参考资料： <a href="http://www.cnblogs.com/wanghongmei/archive/2011/06/22/2087391.html" target="_blank" rel="external">ubuntu 上安装 gitweb</a></p>
+]]></content>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+</urlset>
