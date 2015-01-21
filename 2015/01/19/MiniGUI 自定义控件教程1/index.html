@@ -1,0 +1,440 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>MiniGUI 自定义控件教程1 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="前言：
+MiniGUI 采用的机制是与win32十分类似的消息机制，基本上与win32的sdk一致。win32上经典的Framework MFC 采用的是C++，面向对象的方法，自定控件可以直接使用继承的方式，十分方便。MiniGUI 使用的是c语音，重所周知这是一个面向过程的语言。但是其实它也可以">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/19/MiniGUI 自定义控件教程1/" title="MiniGUI 自定义控件教程1" itemprop="url">MiniGUI 自定义控件教程1</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-19T12:25:16.000Z" itemprop="datePublished">2015 1月 19</time>
+    更新日期:<time datetime="2015-01-21T16:27:06.000Z" itemprop="dateModified">2015 1月 22</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言："><span class="toc-number">1.</span> <span class="toc-text">前言：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定控件的方法"><span class="toc-number">2.</span> <span class="toc-text">自定控件的方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#对已建立的控件进（实例）行子类化"><span class="toc-number">2.1.</span> <span class="toc-text">对已建立的控件进（实例）行子类化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#对控件类进行子类化"><span class="toc-number">2.2.</span> <span class="toc-text">对控件类进行子类化</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="前言：">前言：</h2>
+<p>MiniGUI 采用的机制是与win32十分类似的消息机制，基本上与win32的sdk一致。win32上经典的Framework MFC 采用的是C++，面向对象的方法，自定控件可以直接使用继承的方式，十分方便。MiniGUI 使用的是c语音，重所周知这是一个面向过程的语言。但是其实它也可以使用类似c++的面向对象的思想（详细的可以看一本叫做 《Object-Oriented Programming with ANSI-C》的书，具体的就不在这里研究了）。MiniGUI 本身自带的控件就是用c语言来模仿一些面向对象思想来实现的。</p>
+<p> 飞漫的编程指南上也提到了自定控件的方法。但是与其它的章节比起来篇幅太小了 -_-||。网上这方面的资料更是少得可怜，在csdn和pudn上我可以随便搜到MFC、VB、Dephi等自定义控件的例子，但是MiniGUI基本上就没看到。想当初自己研究，很费劲，走了不少弯路。现在总结了一些心得，希望开发定义控件的弟兄们少走些弯路。</p>
+<h2 id="自定控件的方法">自定控件的方法</h2>
+<p>MiniGUI 原有的控件用一个叫做 WNDCLASS 的来表示。从名字就可以看出了，飞漫把这玩意当类来对待了。不过c++（面向对象的语言相对来说本人对c++比较熟悉，就拿这个举例子了）里的自定义控件可都是子类化某个原有的控件类，然后写好类之后，实例化得到控件对象就可以使用了。</p>
+<p>飞漫的编程指南里说到了3种方法：</p>
+<ol>
+<li>对已经建立的控件实例进行子类化，子类化的结果只会影响这一个控件实例。</li>
+<li>是对某个控件类进行子类化，将影响其后创建的所有该控件类的控件实例。 </li>
+<li>是在某个控件类的基础上新注册一个子类化的控件类，不会影响原有控件类。在 Windows 中，这种技术又称为超类化。</li>
+</ol>
+<p>恕本人水平及理解能力有限，我目前只理解和使用了第1和第3种方法，第2种我愣是没明白怎么回事。要是哪位兄弟理解了的，望留言或发email告诉我。 那现在我就说说我理解了的这2种方法吧。</p>
+<h3 id="对已建立的控件进（实例）行子类化">对已建立的控件进（实例）行子类化</h3>
+<p>MiniGUI 的控件就是一类特殊的子窗口，所以它们也有自己的过程处理函数 typedef int (* WNDPROC) (HWND, int, WPARAM, LPARAM) 。这种方式的实现其实就是替换掉已经创建了的控件原来的过程出来函数。这个函数其实是每个控件结构体变量里一个函数指针所指向的。通过函数指针指向不同的处理函数就能实现控件的不同功能已经不同的属性。再配合上每个控件的实例数据（后面再说这个东东），是不是有点像面向对象的感觉了呢 ^_^。</p>
+<p>这种方法只会对你替换了过程处理函数的控件实例才生效。个人感觉比较适用的情况是：一个工程里，有好几个界面用到了同一个控件或者一个界面用到了好几个控件；但是这些控件都是和本工程关系比较紧密的，其他工程基本上用不到的。例如：一个项目里需要画N个直方图，这些直方图只是数据不一样而已，绘图方法基本一致；但是别的工程基本上用不到这个东西。其实这个用一个函数来实现也可以，让其传入绘图dc和相应的区域坐标就可以了。不过我感觉用函数这种方法没有封装成控件来得方便。</p>
+<ol>
+<li>函数使用的绘图相关的变量是和父窗口相关的，用起来不怎么方便。</li>
+<li>提供给工程里别的模块使用话，在MiniGUI这种gui编程中，封装成控件，使用消息机制更符合MiniGUI的编程方式。</li>
+</ol>
+<p>哎~~总之大家自己可以感受封装成控件的好处的，我表达能力有限，好像没怎么说清楚。不过这样弄有点点代价。就是MiniGUI的控件都有自己的数据结构变量，会稍微占有一些额外的资源，不过都能跑GUI的设备了，这些应该问题不大啦。</p>
+<h3 id="对控件类进行子类化">对控件类进行子类化</h3>
+<p>这种方法与上一种相比，应该算是更接近C++的自定义控件的方法。上一种是针对原有控件实例的，而这种是针对控件类了。是改动整了类，正如飞漫编程指南上写的，这种方法能影响到每一个创建的控件实例。 这种方法要是向MiniGUI 注册自己的类，然后自己设计控件数据（不是指GUI系统的调用的控件窗口数据（这些例如客户区、私有DC、托管窗口之类的），而是指保存控件某些行为的数据（例如ctrl_button里的BUTTONDATA这一些的数据））和过程处理函数。</p>
+<p>这种方法我个人认为比较适用用于像扩展按钮（Button）、编辑框（Edit）、进度条（ProgressBar）之类的通用性比较强的控件。例如你觉得MiniGUI原来的Button不怎么好看，就可以自己弄一个，然后你写的所有工程都可以用你写的好看的Button来装饰了。</p>
+<p>这里先介绍些理论的东西，之后再结合实际来讲解具体的方法。</p>
+<p>参考资料：飞漫MiniGUI编程指南2.0.4</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/minigui/">minigui</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/19/MiniGUI 自定义控件教程1/" data-title="MiniGUI 自定义控件教程1 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/19/MiniGUI 自定义控件教程2/" title="MiniGUI 自定义控件教程2">
+  <strong>上一篇:</strong><br/>
+  <span>
+  MiniGUI 自定义控件教程2</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/19/[转] float 类型在内存中的表示/"  title="(转) float 类型在内存中的表示">
+ <strong>下一篇:</strong><br/> 
+ <span>(转) float 类型在内存中的表示
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread"></div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言："><span class="toc-number">1.</span> <span class="toc-text">前言：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定控件的方法"><span class="toc-number">2.</span> <span class="toc-text">自定控件的方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#对已建立的控件进（实例）行子类化"><span class="toc-number">2.1.</span> <span class="toc-text">对已建立的控件进（实例）行子类化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#对控件类进行子类化"><span class="toc-number">2.2.</span> <span class="toc-text">对控件类进行子类化</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>5</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>23</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>9</sup></a></li>
+		
+			<li><a href="/tags/test/" title="test">test<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li> <i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="5" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2015 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

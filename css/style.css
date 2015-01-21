@@ -110,10 +110,13 @@ a img {
   content: "\f1d6";
 }
 .fa-github:before {
-  content: "\f09b";
+  content: "\f113";
 }
 .fa-analytics:before {
-  content: "\f1fe";
+  content: "\f200";
+}
+.fa-markdown-help:before {
+  content: "\f059";
 }
 @font-face {
   font-family: "FontAwesome";
@@ -1340,7 +1343,7 @@ footer.article-footer {
   }
 }
 .article-nav strong {
-  font-size: 0.6em;
+  font-size: 0.8em;
 }
 .article-nav a {
   display: block;
