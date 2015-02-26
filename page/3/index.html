@@ -81,158 +81,160 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/提取 OEM window key/" title="提取 OEM window key" itemprop="url">
+    <a href="/2015/01/31/[转] Dia 无法输入中文/" title="(转) Dia 无法输入中文" itemprop="url">
   
-    <h1 itemprop="name">提取 OEM window key</h1>
+    <h1 itemprop="name">(转) Dia 无法输入中文</h1>
     
      
-           <p itemprop="description" >如果买带 window 的笔记本，自带的 window 都是 OEM 授权的正版来的，有 OEM key 的。但是这个 key OEM 厂商并没有主动显式的提供给用户。这样如果自己重新装系统就没办法正常激活正版 window 了。也许 OEM 就想着用户不要自己装系统。不过这个 </p>
+           <p itemprop="description" >需要画流程图装了dia for windows，结果画图时不能输入中文，只能输入英文，很郁闷…，Google之，发现解决方案：
+菜单里选择输入法-&amp;gt;简单，就可以了，不能用默认的系统(Windows IME)。
+注意：在ubuntu下要用系统(IBUS)，若选简单的话，甚至连</p>
         
     
-    <time datetime="2015-01-31T07:55:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T11:34:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/EFI 安装系统/" title="EFI 安装系统" itemprop="url">
+    <a href="/2015/01/31/[转] 那些 cache 和 buffer —— 下/" title="(转) 那些 cache 和 buffer —— 下" itemprop="url">
   
-    <h1 itemprop="name">EFI 安装系统</h1>
+    <h1 itemprop="name">(转) 那些 cache 和 buffer —— 下</h1>
     
      
-           <p itemprop="description" >啥叫 EFI 自己度娘、google 去，这里不解释。下面直接进入主题：
-EFI 安装 Win8（8.1）
-制作启动安装U盘
-在EFI下安装系统，是不能像以前那样分区滴，必须重新分区，需要GPT格式。找个大点的 U盘（至少4G以上），格成 fat32 格式的。用 Universa</p>
+           <p itemprop="description" >前面一篇文章 谈了一些Linux系统层面的cache和buffer。这里主要谈谈应用层面的那些cache。相比系统层面的cache集中在IO上，应用层面的cache就显得五花八门了。就从WEB说起吧。
+web服务器缓存
+web缓存对于服务器和客户端都是不可或缺的。对于web服务器</p>
         
     
-    <time datetime="2015-01-31T03:55:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T09:40:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/cygwin screen Caption line issue/" title="cygwin screen Caption line issue" itemprop="url">
+    <a href="/2015/01/31/[转] 那些 cache 和 buffer —— 上/" title="(转) 那些 cache 和 buffer —— 上" itemprop="url">
   
-    <h1 itemprop="name">cygwin screen Caption line issue</h1>
+    <h1 itemprop="name">(转) 那些 cache 和 buffer —— 上</h1>
     
      
-           <p itemprop="description" >win8.1 64bit cygwin screen 4.1.0 在 screenrc 中设置：caption always “%{= dd}%-w%{+bu}%n %t%{-}%+w” （就是 screen session 的标题一直显示） 会造成当显示内容超过一屏会在最后一行</p>
+           <p itemprop="description" >江湖人称：cache is king。
+还有个与之类似的是buffer。这里就谈谈buffer和cache。那么他们到底是用来干什么的呢？其实他们就是在两个相对独立的系统之间的一个中间层，用来避免这两个系统之间不必要的交互和不不必要的或者重复的同步。同步，你懂的，不同数量级系统之</p>
         
     
-    <time datetime="2015-01-31T03:50:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T09:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/cygwin screen Directory tmp uscreens S-UserName must have mode 700/" title="cygwin screen Directory tmp uscreens S-UserName must have mode 700" itemprop="url">
+    <a href="/2015/01/31/Eclipse 插件小结/" title="Eclipse 插件小结" itemprop="url">
   
-    <h1 itemprop="name">cygwin screen Directory tmp uscreens S-UserName must have mode 700</h1>
+    <h1 itemprop="name">Eclipse 插件小结</h1>
     
      
-           <p itemprop="description" >win8.1 cygwin 目录权限问题很多。使用 cygwin 自带安装的 screen 会报上面的错误。S-UserName 就是你 cygwin 的用户名。有2种解决办法：
-修改文件夹所有者
-一开始我根据它的提示直接去改这个 S-UserName 这个文件夹的权限为 700</p>
+           <p itemprop="description" >安装
+
+在线安装：在 Help —&amp;gt; Install new sofeware —&amp;gt; 输入相应的 url 然后按照提示做就行了。
+离线安装（其实照样需要从相应的站点下载数据，只不过下载得少点而已）：从网上下载插件的 zip 包。然后在 Help —&amp;gt; Insta</p>
         
     
-    <time datetime="2015-01-31T03:49:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T09:25:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/window 在 cygwin 中使用 repo ssh/" title="window 在 cygwin 中使用 repo ssh" itemprop="url">
+    <a href="/2015/01/31/[转] eclipse 代码补齐、注释小窗口崩溃解决方法/" title="(转) eclipse 代码补齐、注释小窗口崩溃解决方法" itemprop="url">
   
-    <h1 itemprop="name">window 在 cygwin 中使用 repo ssh</h1>
+    <h1 itemprop="name">(转) eclipse 代码补齐、注释小窗口崩溃解决方法</h1>
     
      
-           <p itemprop="description" >其实在 cygwin 中弄 ssh 是为使用在 window 中使用 repo 。如果单纯为了在 window 上 ssh 登陆 linux 服务器的话，直接用 putty 就行了，简单方便，无需安装、配置。
-安装 cygwin
-从cygwin web 下载一个很小的 setup</p>
+           <p itemprop="description" >最近换了新的 ubuntu，eclipse 一出现代码补齐或是注释的小窗口就崩溃了。查看 crash log 文件（在你的 home 目录下）说是 java 虚拟机挂了。网上找了一下，在 eclispe.ini （在 eclipse 文件夹下）中加入一条配置就好了：
+
+-Dorg</p>
         
     
-    <time datetime="2015-01-31T03:42:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T09:34:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/cygwin 使用备忘/" title="cygwin 使用备忘" itemprop="url">
+    <a href="/2015/01/31/Python 使用总结/" title="Python 使用总结" itemprop="url">
   
-    <h1 itemprop="name">cygwin 使用备忘</h1>
+    <h1 itemprop="name">Python 使用总结</h1>
     
      
-           <p itemprop="description" >乱码
-有些时候中文或是别的字符集会乱码。可以右键单击标题栏 ——&amp;gt; Options ——&amp;gt; Text 修改字符集还有编码，但是注意一下，有些如果改了对应的字符集和编码，记得上面的 Font 要选择相应支持的字体才行。例如说，如果改的是GBK的，字体要选择宋体之类的才行</p>
+           <p itemprop="description" >android 有个自动化的测试工具 monkeyrunner ，是使用 python 编写一段指令，然后自动跑，测试程序。所以就要稍微会点 python 语法啦。
+不要乱用空格（indent）
+平常的其他代码，空格随便用（在不影响美观情况下），但是在 python 中，每行的缩</p>
         
     
-    <time datetime="2015-01-31T03:31:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T09:23:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/删除遗忘的 vpn 存储凭据/" title="删除遗忘的 vpn 存储凭据" itemprop="url">
+    <a href="/2015/01/31/GL 中的纹理坐标/" title="GL 中的纹理坐标" itemprop="url">
   
-    <h1 itemprop="name">删除遗忘的 vpn 存储凭据</h1>
+    <h1 itemprop="name">GL 中的纹理坐标</h1>
     
      
-           <p itemprop="description" >自从入手了 nexus7，公司就不时有人来玩下新系统的新功能。上次好像谁给我设了什么加密的破密码，后面他好像解除掉了，但是不知道为什么每次我进系统设置的 vpn 界面，就弹个什么鸟界面，让我输入什么存储的凭据，我刚开始以为是我设置锁屏的 PIN 码，但是不对。连续输错了3次后，系</p>
+           <p itemprop="description" >GL 中的纹理坐标是左上（0，0）、右上（1，0）、右下（1，1）、左下（0，1），来几张图：
+
+
+还有纹理坐标可以为负的，会有很有趣的现象（反过来贴），范围是 0 ～ 1，超过 1 现象会非常奇怪（负数范围也要在 -1 ～ 0）。这里记一下，免得每次都忘记坐标系统。</p>
         
     
-    <time datetime="2015-01-31T03:21:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T09:07:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/[转] Nexus7 2rd unlock fastboot/" title="(转) Nexus7 2rd unlock fastboot" itemprop="url">
+    <a href="/2015/01/31/OES_draw_texture 详解/" title="OES_draw_texture 详解" itemprop="url">
   
-    <h1 itemprop="name">(转) Nexus7 2rd unlock fastboot</h1>
+    <h1 itemprop="name">OES_draw_texture 详解</h1>
     
      
-           <p itemprop="description" >电脑上装 android sdk（主要是保证有 platform-tools 下的 adb 和 fastboot）。
-装 usb 驱动，window 要，linux 下不需要，地址： google usb driver。
-在 N7 上开启 adb，这个默认的系统把开发者选项隐藏起</p>
+           <p itemprop="description" >昨天在网上找了头天，找到关于这个函数的一部分信息，好像网上对这个函数的信息不是很多，可以在这里看到对该函数的详细解释：OES_draw_texture
+这个函数有什么用呢？它的作用是把纹理的指定片断，当然这个片断是个矩形，直接贴到你指定的视图坐标上的一个矩形上面。加快了2D图形的</p>
         
     
-    <time datetime="2015-01-31T03:00:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T08:58:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/Google android source code build 问题总结/" title="Google android source code build 问题总结" itemprop="url">
+    <a href="/2015/01/31/win8.1 蓝牙使用备忘/" title="win8.1 蓝牙使用备忘" itemprop="url">
   
-    <h1 itemprop="name">Google android source code build 问题总结</h1>
+    <h1 itemprop="name">win8.1 蓝牙使用备忘</h1>
     
      
-           <p itemprop="description" >编译 external/chromium_org 出错
-编译 external/chromium_org 的时候如果报类似下面的错误：
-
-Traceback (most recent call last):
-  File &quot;../../base/android/jni_gener</p>
+           <p itemprop="description" >关闭蓝牙省电功能
+整了一个蓝牙鼠标，最好把 window 的蓝牙省电功能关掉，不然蓝牙鼠标会时不时的抽风一下的。
+在 “设备管理”——&amp;gt;“蓝牙” 注意这里要选择你机子上的蓝牙芯片，例如下面这个高通的4.0的蓝牙芯片（如果选其他的不会出电源管理选项的），然后选属性，就能看到电</p>
         
     
-    <time datetime="2015-01-31T02:58:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T08:40:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/工作小笔记——拦截应用内置广告.拦截篇/" title="工作小笔记——拦截应用内置广告.拦截篇" itemprop="url">
+    <a href="/2015/01/31/win8.1 微软输入法备忘/" title="win8.1 微软输入法备忘" itemprop="url">
   
-    <h1 itemprop="name">工作小笔记——拦截应用内置广告.拦截篇</h1>
+    <h1 itemprop="name">win8.1 微软输入法备忘</h1>
     
      
-           <p itemprop="description" >上一篇说到怎么检测一个应用是否带有广告。那么现在就来说说怎么拦截广告。在开始之前首先感谢看雪论坛的牛人的分享，后面的方法基本是借鉴别人的想法的。
-拦截思路
-修改 hosts
-以前在 PC 通过修改 hosts 来访问 google 的哥们对这个东西应该不陌生吧。同样在 andro</p>
+           <p itemprop="description" >半角、全角切换
+win8.1 的微软输入法 UI 灰常简洁，你在输入框都看不到半角、全角的切换按钮和状态显示。有些时候不小心按倒快捷键切换到全角，都不知道。这个你输入的英文字母会比全角的时候间隔要大，然后在网站上输验证码和密码各种不对。蛋疼得很，这个时候只要切换回半角就行了。快捷</p>
         
     
-    <time datetime="2015-01-31T02:46:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T08:48:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 

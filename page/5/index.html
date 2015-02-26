@@ -81,147 +81,162 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android Binder 分析——懒人的工具[AIDL]/" title="Android Binder 分析——懒人的工具（AIDL）" itemprop="url">
+    <a href="/2015/01/31/[转] Nexus7 2rd unlock fastboot/" title="(转) Nexus7 2rd unlock fastboot" itemprop="url">
   
-    <h1 itemprop="name">Android Binder 分析——懒人的工具（AIDL）</h1>
+    <h1 itemprop="name">(转) Nexus7 2rd unlock fastboot</h1>
     
      
-           <p itemprop="description" >前面说了 binder 的原理，和 parcel，当时也说了实现 IBinder 接口（Bp 端、Bn 端）代码都非常的机械，人工写的话，不仅浪费时间，而且很有可能会出错（复制、粘贴后忘记改某个地方）。所以 android 弄了代码自动生成的东西。然后还美名其曰 XX 语言—— </p>
+           <p itemprop="description" >电脑上装 android sdk（主要是保证有 platform-tools 下的 adb 和 fastboot）。
+装 usb 驱动，window 要，linux 下不需要，地址： google usb driver。
+在 N7 上开启 adb，这个默认的系统把开发者选项隐藏起</p>
         
     
-    <time datetime="2015-01-28T13:53:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    <time datetime="2015-01-31T03:00:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android Binder 分析——多线程支持/" title="Android Binder 分析——多线程支持" itemprop="url">
+    <a href="/2015/01/31/Google android source code build 问题总结/" title="Google android source code build 问题总结" itemprop="url">
   
-    <h1 itemprop="name">Android Binder 分析——多线程支持</h1>
+    <h1 itemprop="name">Google android source code build 问题总结</h1>
     
      
-           <p itemprop="description" >前面普通服务篇那里说到 ActivityManager（AM） 里锁的问题，其实不光 AM，WindowManager（WM）、PackageMananger（PM）中基本上很多对外的业务函数里面都是加锁的，所以这些 SS 里面有会有带 Locked 结尾的函数（这些函数都是在锁</p>
+           <p itemprop="description" >编译 external/chromium_org 出错
+编译 external/chromium_org 的时候如果报类似下面的错误：
+
+Traceback (most recent call last):
+  File &quot;../../base/android/jni_gener</p>
         
     
-    <time datetime="2015-01-28T13:42:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    <time datetime="2015-01-31T02:58:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android Binder 分析——普通服务 Binder 对象的传递/" title="Android Binder 分析——普通服务 Binder 对象的传递" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——拦截应用内置广告.拦截篇/" title="工作小笔记——拦截应用内置广告.拦截篇" itemprop="url">
   
-    <h1 itemprop="name">Android Binder 分析——普通服务 Binder 对象的传递</h1>
+    <h1 itemprop="name">工作小笔记——拦截应用内置广告.拦截篇</h1>
     
      
-           <p itemprop="description" >上一篇把 SS 传递 binder 对象说了， SS 传递是要依靠 SM 的。但是普通应用的服务是没权向 SM 注册的，就是说普通应用获取普通服务的接口不能像 SS 那样，通过 SM 的接口去取。这篇就来讲讲普通应用中 binder 对象的传递。
-那这篇主要就是分析这些，照例先把</p>
+           <p itemprop="description" >上一篇说到怎么检测一个应用是否带有广告。那么现在就来说说怎么拦截广告。在开始之前首先感谢看雪论坛的牛人的分享，后面的方法基本是借鉴别人的想法的。
+拦截思路
+修改 hosts
+以前在 PC 通过修改 hosts 来访问 google 的哥们对这个东西应该不陌生吧。同样在 andro</p>
         
     
-    <time datetime="2015-01-28T13:33:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    <time datetime="2015-01-31T02:46:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android Binder 分析——系统服务 Binder 对象的传递/" title="Android Binder 分析——系统服务 Binder 对象的传递" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——拦截应用内置广告.检测篇/" title="工作小笔记——拦截应用内置广告.检测篇" itemprop="url">
   
-    <h1 itemprop="name">Android Binder 分析——系统服务 Binder 对象的传递</h1>
+    <h1 itemprop="name">工作小笔记——拦截应用内置广告.检测篇</h1>
     
      
-           <p itemprop="description" >前面 binder 说了那多，但是有一个关键的一点前面忽略掉了，就是 binder 对象是传递给另外一个进程使用的，然后还引伸出一个问题，Proc A 是怎么通过 binder 接口找到 Proc B 进行 IPC 调用的。
-那这篇主要就是分析这些，照例先把源代码位置啰嗦一下（4</p>
+           <p itemprop="description" >最近步步高的平板被熊孩子的家长爆料了，说里面有有黄色内容。后面发现是一些免费的第三放学习应用内置广告，在后台弹窗口广告，结果有些无节操的广告就蹦出来了，例如下面那个：
+
+然后这边就让想办法屏蔽这些第三方应用内的广告。发现市场上有不少工具类的软件可以检测，并且拦截第三应用内的广告。</p>
         
     
-    <time datetime="2015-01-28T13:23:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    <time datetime="2015-01-31T02:44:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android Binder 分析——内存管理/" title="Android Binder 分析——内存管理" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——Android 自带的应用统计服务[UsageStatsService]/" title="工作小笔记——Android 自带的应用统计服务（UsageStatsService）" itemprop="url">
   
-    <h1 itemprop="name">Android Binder 分析——内存管理</h1>
+    <h1 itemprop="name">工作小笔记——Android 自带的应用统计服务（UsageStatsService）</h1>
     
      
-           <p itemprop="description" >android 为了高效的 IPC 通信做了很多工作，内存管理就属于其中之一。传统的 IPC 传递数据，至少需要2次拷贝，一次为进程1到内核，一次为内核到进程2，但是得益 android binder 的内存管理，数据拷贝只有1次，就从这里速度比传统的要快1倍。这里慢慢分析。还是</p>
+           <p itemprop="description" >继续占个坑～～services/java/com/android/server/am/UsageStatsService.java</p>
         
     
-    <time datetime="2015-01-28T13:14:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    <time datetime="2015-01-31T02:33:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android Binder 分析——匿名共享内存[Ashmem]/" title="Android Binder 分析——匿名共享内存（Ashmem）" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——利用反射需要注意的问题/" title="工作小笔记——利用反射需要注意的问题" itemprop="url">
   
-    <h1 itemprop="name">Android Binder 分析——匿名共享内存（Ashmem）</h1>
+    <h1 itemprop="name">工作小笔记——利用反射需要注意的问题</h1>
     
      
-           <p itemprop="description" >前面分析了 binder 中用来打包、传递数据的 Parcel，一般用来传递 IPC 中的小型参数和返回值。binder 目前每个进程 mmap 接收数据的内存是 1M，所以就算你不考虑效率问题用 Parcel 来传，也无法传过去。只要超过 1M 就会报错（binder 无法分配</p>
+           <p itemprop="description" >java 中的反射可以实现很多方便的功能。例如在配置文中写一些布局文件，运行的时候载入配置文件，然后利用反射创建配置文件中的对象（android 的 LayoutInflater 就是利用反射的）。
+运用得好的话，会很方便，但是需要注意一点。混淆过后，就导致通过名字创建对象的反射</p>
         
     
-    <time datetime="2015-01-28T13:00:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    <time datetime="2015-01-31T02:31:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android Binder 分析——数据传递者[Parcel]/" title="Android Binder 分析——数据传递者（Parcel）" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——Android 动态切换系统字体/" title="工作小笔记——Android 动态切换系统字体" itemprop="url">
   
-    <h1 itemprop="name">Android Binder 分析——数据传递者（Parcel）</h1>
+    <h1 itemprop="name">工作小笔记——Android 动态切换系统字体</h1>
     
      
-           <p itemprop="description" >前面 binder 原理和通信模型中在接口实现部分（Bp 和 Bn）中应该看到很多地方都有使用 parcel。这个 android 专门设计用来跨进程传递数据的，实现在 native，java 层有接口（基本上是 jni 马甲）。照例先说下源代码位置（4.4 的）：
-123456</p>
+           <p itemprop="description" >最近在调研一个东西，就是动态切换 android 的系统字体。我的手机是三棒的 Galaxy SIII，系统设置中自带的了这个功能：
+
+既然别人都弄出来了，应该是可行的。于是开始琢磨（这里事先申明下，以下是基于 4.1.2 的源码的）。
+初步了解
+经过几番百度， Typeface</p>
         
     
-    <time datetime="2015-01-28T12:41:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    <time datetime="2015-01-31T02:19:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android Binder 分析——通信模型/" title="Android Binder 分析——通信模型" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——Android 多用户下的要注意的问题/" title="工作小笔记——Android 多用户下的要注意的问题" itemprop="url">
   
-    <h1 itemprop="name">Android Binder 分析——通信模型</h1>
+    <h1 itemprop="name">工作小笔记——Android 多用户下的要注意的问题</h1>
     
      
-           <p itemprop="description" >通信就要搞一些协议，binder 的比较简单，但是也有一个基本的模型，这里以最基本的一次 IPC 调用来说明一下。然后涉及的代码主要在（这里不列 java 层的代码了，java 层的代码前面原理篇分析过了，主要是挂马甲调用 native 的方法的）：
-12345678# nati</p>
+           <p itemprop="description" >之前有篇小笔记也遇到了类似的问题。就是如果你的系统要使用多用户功能，自己写的一些东西（或是以前写的）就要注意用户问题， android 增加了很多带 userID 的参数的接口，如果发起调用的用户和当前的用户不配对的话，要么崩溃，要么抛权限异常。
+不知道从什么时候开始 core/</p>
         
     
-    <time datetime="2015-01-28T12:29:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    <time datetime="2015-01-31T02:12:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android Binder 分析——原理/" title="Android Binder 分析——原理" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——Android 多用户切换无法启动应用的问题/" title="工作小笔记——Android 多用户切换无法启动应用的问题" itemprop="url">
   
-    <h1 itemprop="name">Android Binder 分析——原理</h1>
+    <h1 itemprop="name">工作小笔记——Android 多用户切换无法启动应用的问题</h1>
     
      
-           <p itemprop="description" >分析之前说一下原理。为要 android 要搞这么复杂的一个东西。那是因为 android 是个多进程的系统，进程间的数据交换、相互调用（某几个程序配合完成某些业务）就涉及跨进程通信。2个进程不能直接访问数据的原因：
-
-每个进程的地址空间的独立的，所以进程A中某个数据的地址在进程</p>
+           <p itemprop="description" >Android 好像是从 3.0 开始引入多用户相关的支持，到 4.4 的是已经比较成熟了，相关的功能都有了，例如独立的用户空间（4.4 之后，android 把 flash 模拟成几个分区 0、1 等，对应 用户0、用户1），不同用户安装不同应用隔离等等。
+多用户功能可以关闭的</p>
         
     
-    <time datetime="2015-01-28T12:17:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    <time datetime="2015-01-31T01:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android 智能指针备忘/" title="Android 智能指针备忘" itemprop="url">
+    <a href="/2015/01/30/工作小笔记——扩展字库乱码排查/" title="工作小笔记——扩展字库乱码排查" itemprop="url">
   
-    <h1 itemprop="name">Android 智能指针备忘</h1>
+    <h1 itemprop="name">工作小笔记——扩展字库乱码排查</h1>
     
      
-           <p itemprop="description" >在 framework 的 native 层一大票 sp, wp 之类的玩意。这个是 android 自己搞的一套智能指针技术，就是为了偷懒用的，利用引用计数和构造、析构函数实现内存自动释放的功能（其实我挺讨厌这套东西，刚看着头晕，自己手动 new、delete 对象有那么难么？</p>
+           <p itemprop="description" >起源
+前几天市场反馈说，我们的平板上用浏览器在百度搜索的时候某些页面会有乱码现象：
+
+我们的平板的字库文件是被我们自己扩展过的。因为我们的应用需要显示一些特殊的符号（不在 unicode 编码里面），所以我们系统中的 ttf 字体是被我们扩展了很多东西进去。找到相关人员问了下，当</p>
         
     
-    <time datetime="2015-01-28T12:12:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    <time datetime="2015-01-30T09:00:16.000Z" itemprop="datePublished">2015 1月 30</time>
   </a>
 </section>
 

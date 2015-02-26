@@ -81,6 +81,70 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
+    <a href="/2015/01/25/Android 自定义 Preference/" title="Android 自定义 Preference" itemprop="url">
+  
+    <h1 itemprop="name">Android 自定义 Preference</h1>
+    
+     
+           <p itemprop="description" >有些时候系统提供的 Preference 不满足我们的要求的时候，我们就需要自己定制了。现在产品要求 ChekBoxPreference 的 summary 的颜色要能动态改变，在关闭的时候是默认颜色，在开启的时候变成红色。现在我们就可以自己定制啦。
+简单的修改 xml
+先说说简</p>
+        
+    
+    <time datetime="2015-01-25T15:32:16.000Z" itemprop="datePublished">2015 1月 25</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/25/Android OpenGLES 学习笔记/" title="Android OpenGLES 学习笔记" itemprop="url">
+  
+    <h1 itemprop="name">Android OpenGLES 学习笔记</h1>
+    
+     
+           <p itemprop="description" >GL10
+纹理问题
+贴纹理的时候最好是要 2^n 字节对齐，这里说的是最后绑定到 GL 的那个图片（如果这个图片是由别的图片组合的，则组合的小图片没有这个要求）。还有纹理的大小不能超过 GL 最大纹理大小的限制。查询方法： （这里是 GL 标准的，应该还有些特定硬件的扩展的）
+1</p>
+        
+    
+    <time datetime="2015-01-25T15:28:16.000Z" itemprop="datePublished">2015 1月 25</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/25/Android Create Bitmap Out Of Memory/" title="Android Create Bitmap Out Of Memory" itemprop="url">
+  
+    <h1 itemprop="name">Android Create Bitmap Out Of Memory</h1>
+    
+     
+           <p itemprop="description" >问题
+Android 对图片的解码、创建是有内存限制的，在弄一些图片多的程序，不小心很容易出 Out of Memory（OOM）的错误。图片用的内存好像是 native 的内存，由于 4.0 普通 UI 也使用了 GPU 硬件加速，导致系统有不少 UI 的缓冲，所以在高分辨率 </p>
+        
+    
+    <time datetime="2015-01-25T15:25:16.000Z" itemprop="datePublished">2015 1月 25</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/25/Android 布局笔记/" title="Android 布局笔记" itemprop="url">
+  
+    <h1 itemprop="name">Android 布局笔记</h1>
+    
+     
+           <p itemprop="description" >说实在我个人觉得 Android 搞这套玩意比 MiniGUI 麻烦多了。以前没怎么系统的研究、学习，遇到了不少问题。现在记一下。
+onMeasure
+实现 onMeasure 方法基本需要完成下面三个方面的事情（最终结果是你自己写相应代码得出测量值并调用view的一个方法进行设</p>
+        
+    
+    <time datetime="2015-01-25T15:15:16.000Z" itemprop="datePublished">2015 1月 25</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
     <a href="/2015/01/25/Android Gesture 使用简介/" title="Android Gesture 使用简介" itemprop="url">
   
     <h1 itemprop="name">Android Gesture 使用简介</h1>
@@ -160,26 +224,6 @@ android要求所有的程序必须有签名，否则就不会安装该程序。�
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/25/64位 ubuntu adb No such file or directory 解决办法/" title="64位 ubuntu adb No such file or directory 解决办法" itemprop="url">
-  
-    <h1 itemprop="name">64位 ubuntu adb No such file or directory 解决办法</h1>
-    
-     
-           <p itemprop="description" >13.04
-很简单，安装一个 ia32-libs 就好了（sudo apt-get install ia32-libs）。一看就知道64位系统又悲剧了一次。 
-13.10
-13.10 把 ia32-libs 这个包禁止掉了，它会提用下面几个包来代替：
-
-lib32z1
-lib32</p>
-        
-    
-    <time datetime="2015-01-25T14:42:16.000Z" itemprop="datePublished">2015 1月 25</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
     <a href="/2015/01/25/Linux 下 adb usb 连接 usb 设备问题总结/" title="Linux 下 adb usb 连接 usb 设备问题总结" itemprop="url">
   
     <h1 itemprop="name">Linux 下 adb usb 连接 usb 设备问题总结</h1>
@@ -190,51 +234,6 @@ lib32</p>
         
     
     <time datetime="2015-01-25T14:39:16.000Z" itemprop="datePublished">2015 1月 25</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/25/Android 程序签名问题/" title="Android 程序签名问题" itemprop="url">
-  
-    <h1 itemprop="name">Android 程序签名问题</h1>
-    
-     
-           <p itemprop="description" >一、多个开发环境具有相同的 debug 签名
-在多台机器用 Eclipse 开发 Android 程序的时候，签名不一致导致要反反复复删除原程序才能安装、调试很不爽吧。其实让 Eclipse 用一样的 debug 签名就好了。方法是选中其中一个 Eclipse 自动生成的 deb</p>
-        
-    
-    <time datetime="2015-01-25T14:34:16.000Z" itemprop="datePublished">2015 1月 25</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/25/Android sdk 本地文档加载慢的解决办法/" title="Android sdk 本地文档加载慢的解决办法" itemprop="url">
-  
-    <h1 itemprop="name">Android sdk 本地文档加载慢的解决办法</h1>
-    
-     
-           <p itemprop="description" >Android sdk 最近的版本本地文档加载很慢。后来上网百度了下，发现是在联网状态下它会去 google 官网上去加载一个 JS 文件。由于身处天朝，所以这个过程会很慢。据说最新的 sdk 解决了这个问题，我是 20 的，然后 API Level 16 （4.1.2）的 sd</p>
-        
-    
-    <time datetime="2015-01-25T14:33:16.000Z" itemprop="datePublished">2015 1月 25</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/25/Android 应用程序开发小问题总结/" title="Android 应用程序开发小问题总结" itemprop="url">
-  
-    <h1 itemprop="name">Android 应用程序开发小问题总结</h1>
-    
-     
-           <p itemprop="description" >新手问题多多 -_-|| 
-权限问题
-使用某些 api 进行操作时需要申请特定的权限的（最典型的就是写sdcard）。这类 api 一般来 sdk 文档中会有说明的，看的时候看仔细点，并且养成 catch 异常，并且把异常输出到 log 的好习惯。这样如果是因为权限问题失败的话，</p>
-        
-    
-    <time datetime="2015-01-25T14:30:16.000Z" itemprop="datePublished">2015 1月 25</time>
   </a>
 </section>
 

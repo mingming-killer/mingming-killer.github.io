@@ -81,156 +81,147 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/02/06/Android SystemUI 分析——通知/" title="Android SystemUI 分析——通知" itemprop="url">
+    <a href="/2015/01/28/Android Binder 分析——原理/" title="Android Binder 分析——原理" itemprop="url">
   
-    <h1 itemprop="name">Android SystemUI 分析——通知</h1>
+    <h1 itemprop="name">Android Binder 分析——原理</h1>
     
      
-           <p itemprop="description" >Notification 作为 android 系统中的一种提醒类的 UI，其实不是很复杂。但是过了些时候又有点忘记了，又要去翻代码，所以还是稍微总结记录一下比较好。这里不会说得太深，就是一些 Notification 比较基本的东西（浅析一下吧），我们先照例把相关代码位置啰嗦一</p>
+           <p itemprop="description" >分析之前说一下原理。为要 android 要搞这么复杂的一个东西。那是因为 android 是个多进程的系统，进程间的数据交换、相互调用（某几个程序配合完成某些业务）就涉及跨进程通信。2个进程不能直接访问数据的原因：
+
+每个进程的地址空间的独立的，所以进程A中某个数据的地址在进程</p>
         
     
-    <time datetime="2015-02-06T02:17:16.000Z" itemprop="datePublished">2015 2月 6</time>
+    <time datetime="2015-01-28T12:17:16.000Z" itemprop="datePublished">2015 1月 28</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/02/06/Android SystemUI 分析——最近任务列表/" title="Android SystemUI 分析——最近任务列表" itemprop="url">
+    <a href="/2015/01/28/Android Binder 分析——通信模型/" title="Android Binder 分析——通信模型" itemprop="url">
   
-    <h1 itemprop="name">Android SystemUI 分析——最近任务列表</h1>
+    <h1 itemprop="name">Android Binder 分析——通信模型</h1>
     
      
-           <p itemprop="description" >Android 4.1 SystemUI 的最近任务列表和 4.2 的区别还是很大的。4.1 的是一个 BAR_PANEL，是一个 view 添加到 window manager 里面 show 出来的。4.2 变成了依附一个 Activity 了（其实都是 window）。功能</p>
+           <p itemprop="description" >通信就要搞一些协议，binder 的比较简单，但是也有一个基本的模型，这里以最基本的一次 IPC 调用来说明一下。然后涉及的代码主要在（这里不列 java 层的代码了，java 层的代码前面原理篇分析过了，主要是挂马甲调用 native 的方法的）：
+123456789# nat</p>
         
     
-    <time datetime="2015-02-06T02:15:16.000Z" itemprop="datePublished">2015 2月 6</time>
+    <time datetime="2015-01-28T12:29:16.000Z" itemprop="datePublished">2015 1月 28</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/[转] 如何在 github 上删除一个仓库/" title="(转) 如何在 github 上删除一个仓库" itemprop="url">
+    <a href="/2015/01/28/Android Binder 分析——数据传递者[Parcel]/" title="Android Binder 分析——数据传递者（Parcel）" itemprop="url">
   
-    <h1 itemprop="name">(转) 如何在 github 上删除一个仓库</h1>
+    <h1 itemprop="name">Android Binder 分析——数据传递者（Parcel）</h1>
     
      
-           <p itemprop="description" >删除功能很隐蔽，可能老外就不太想让你删除吧，毕竟这是一个开源的地方，但是偶尔创建了一些测试仓库在那里很碍眼。
-首先点击进入你要删除的 repository，如下图，点击 setting：
-
-将网页拉到下方，找到 Delete this repository 按钮，点击：
-
-在弹出</p>
+           <p itemprop="description" >前面 binder 原理和通信模型中在接口实现部分（Bp 和 Bn）中应该看到很多地方都有使用 parcel。这个 android 专门设计用来跨进程传递数据的，实现在 native，java 层有接口（基本上是 jni 马甲）。照例先说下源代码位置（4.4 的）：
+123456</p>
         
     
-    <time datetime="2015-01-31T11:56:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-28T12:41:16.000Z" itemprop="datePublished">2015 1月 28</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/[转] 字符编码笔记/" title="(转) 字符编码笔记" itemprop="url">
+    <a href="/2015/01/28/Android Binder 分析——匿名共享内存[Ashmem]/" title="Android Binder 分析——匿名共享内存（Ashmem）" itemprop="url">
   
-    <h1 itemprop="name">(转) 字符编码笔记</h1>
+    <h1 itemprop="name">Android Binder 分析——匿名共享内存（Ashmem）</h1>
     
      
-           <p itemprop="description" >1、字符编码、内码，顺带介绍汉字编码
-字符必须编码后才能被计算机处理。计算机使用的缺省编码方式就是计算机的内码。早期的计算机使用7位的ASCII编码，为了处理汉字，程序员设计了用于简体中文的GB2312和用于繁体中文的big5。 
-GB2312(1980年)一共收录了7445个字</p>
+           <p itemprop="description" >前面分析了 binder 中用来打包、传递数据的 Parcel，一般用来传递 IPC 中的小型参数和返回值。binder 目前每个进程 mmap 接收数据的内存是 1M，所以就算你不考虑效率问题用 Parcel 来传，也无法传过去。只要超过 1M 就会报错（binder 无法分配</p>
         
     
-    <time datetime="2015-01-31T11:43:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-28T13:00:16.000Z" itemprop="datePublished">2015 1月 28</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/[转] unicode 编码表/" title="(转) unicode 编码表" itemprop="url">
+    <a href="/2015/01/28/Android Binder 分析——内存管理/" title="Android Binder 分析——内存管理" itemprop="url">
   
-    <h1 itemprop="name">(转) unicode 编码表</h1>
+    <h1 itemprop="name">Android Binder 分析——内存管理</h1>
     
      
-           <p itemprop="description" >unicode 编码表
-Unicode 目前普遍采用的是 UCS-2，它用两个字节来编码一个字符, 比如汉字”经”的编码是 0x7ECF，注意字符编码一般用十六进制来表示,为了与十进制区分,十六进制以 0x 头，0x7ECF 转换成十进制就是 32463，UCS-2 用两个字节来</p>
+           <p itemprop="description" >android 为了高效的 IPC 通信做了很多工作，内存管理就属于其中之一。传统的 IPC 传递数据，至少需要2次拷贝，一次为进程1到内核，一次为内核到进程2，但是得益 android binder 的内存管理，数据拷贝只有1次，就从这里速度比传统的要快1倍。这里慢慢分析。还是</p>
         
     
-    <time datetime="2015-01-31T11:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-28T13:14:16.000Z" itemprop="datePublished">2015 1月 28</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/[转] Java 的模版和 C++ 模版的区别/" title="(转) Java 的模版和 C++ 模版的区别" itemprop="url">
+    <a href="/2015/01/28/Android Binder 分析——系统服务 Binder 对象的传递/" title="Android Binder 分析——系统服务 Binder 对象的传递" itemprop="url">
   
-    <h1 itemprop="name">(转) Java 的模版和 C++ 模版的区别</h1>
+    <h1 itemprop="name">Android Binder 分析——系统服务 Binder 对象的传递</h1>
     
      
-           <p itemprop="description" >java 中的模版其实应该叫泛型。 泛型本质上是提供类型的”类型参数”，它们也被称为参数化类型（parameterized type）或参量多态（parametric polymorphism）。其实泛型思想并不是 Java 最先引入的，C++ 中的模板就是一个运用泛型的例子。泛</p>
+           <p itemprop="description" >前面 binder 说了那多，但是有一个关键的一点前面忽略掉了，就是 binder 对象是传递给另外一个进程使用的，然后还引伸出一个问题，Proc A 是怎么通过 binder 接口找到 Proc B 进行 IPC 调用的。
+那这篇主要就是分析这些，照例先把源代码位置啰嗦一下（4</p>
         
     
-    <time datetime="2015-01-31T11:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-28T13:23:16.000Z" itemprop="datePublished">2015 1月 28</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/[转] 什么是 VSync/" title="(转) 什么是 VSync" itemprop="url">
+    <a href="/2015/01/28/Android Binder 分析——普通服务 Binder 对象的传递/" title="Android Binder 分析——普通服务 Binder 对象的传递" itemprop="url">
   
-    <h1 itemprop="name">(转) 什么是 VSync</h1>
+    <h1 itemprop="name">Android Binder 分析——普通服务 Binder 对象的传递</h1>
     
      
-           <p itemprop="description" >一个老外写的 VSync（垂直同步）原理的文章的翻译：
-VSync是垂直同期(Vertical Synchronization)的简称。基本的思路是将你的FPS和显示器的刷新率同期起来。其目的是避免一种称之为”撕裂”的现象。再下面我将详细介绍这些内容。
-每一台CRT显示器都有自己</p>
+           <p itemprop="description" >上一篇把 SS 传递 binder 对象说了， SS 传递是要依靠 SM 的。但是普通应用的服务是没权向 SM 注册的，就是说普通应用获取普通服务的接口不能像 SS 那样，通过 SM 的接口去取。这篇就来讲讲普通应用中 binder 对象的传递。
+那这篇主要就是分析这些，照例先把</p>
         
     
-    <time datetime="2015-01-31T11:36:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-28T13:33:16.000Z" itemprop="datePublished">2015 1月 28</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/[转] Dia 无法输入中文/" title="(转) Dia 无法输入中文" itemprop="url">
+    <a href="/2015/01/28/Android Binder 分析——多线程支持/" title="Android Binder 分析——多线程支持" itemprop="url">
   
-    <h1 itemprop="name">(转) Dia 无法输入中文</h1>
+    <h1 itemprop="name">Android Binder 分析——多线程支持</h1>
     
      
-           <p itemprop="description" >需要画流程图装了dia for windows，结果画图时不能输入中文，只能输入英文，很郁闷…，Google之，发现解决方案：
-菜单里选择输入法-&amp;gt;简单，就可以了，不能用默认的系统(Windows IME)。
-注意：在ubuntu下要用系统(IBUS)，若选简单的话，甚至连</p>
+           <p itemprop="description" >前面普通服务篇那里说到 ActivityManager（AM） 里锁的问题，其实不光 AM，WindowManager（WM）、PackageMananger（PM）中基本上很多对外的业务函数里面都是加锁的，所以这些 SS 里面有会有带 Locked 结尾的函数（这些函数都是在锁</p>
         
     
-    <time datetime="2015-01-31T11:34:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-28T13:42:16.000Z" itemprop="datePublished">2015 1月 28</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/[转] 那些 cache 和 buffer —— 下/" title="(转) 那些 cache 和 buffer —— 下" itemprop="url">
+    <a href="/2015/01/28/Android Binder 分析——懒人的工具[AIDL]/" title="Android Binder 分析——懒人的工具（AIDL）" itemprop="url">
   
-    <h1 itemprop="name">(转) 那些 cache 和 buffer —— 下</h1>
+    <h1 itemprop="name">Android Binder 分析——懒人的工具（AIDL）</h1>
     
      
-           <p itemprop="description" >前面一篇文章 谈了一些Linux系统层面的cache和buffer。这里主要谈谈应用层面的那些cache。相比系统层面的cache集中在IO上，应用层面的cache就显得五花八门了。就从WEB说起吧。
-web服务器缓存
-web缓存对于服务器和客户端都是不可或缺的。对于web服务器</p>
+           <p itemprop="description" >前面说了 binder 的原理，和 parcel，当时也说了实现 IBinder 接口（Bp 端、Bn 端）代码都非常的机械，人工写的话，不仅浪费时间，而且很有可能会出错（复制、粘贴后忘记改某个地方）。所以 android 弄了代码自动生成的东西。然后还美名其曰 XX 语言—— </p>
         
     
-    <time datetime="2015-01-31T09:40:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-28T13:53:16.000Z" itemprop="datePublished">2015 1月 28</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/[转] 那些 cache 和 buffer —— 上/" title="(转) 那些 cache 和 buffer —— 上" itemprop="url">
+    <a href="/2015/01/28/Android Binder 分析——死亡通知[DeathRecipient]/" title="Android Binder 分析——死亡通知（DeathRecipient）" itemprop="url">
   
-    <h1 itemprop="name">(转) 那些 cache 和 buffer —— 上</h1>
+    <h1 itemprop="name">Android Binder 分析——死亡通知（DeathRecipient）</h1>
     
      
-           <p itemprop="description" >江湖人称：cache is king。
-还有个与之类似的是buffer。这里就谈谈buffer和cache。那么他们到底是用来干什么的呢？其实他们就是在两个相对独立的系统之间的一个中间层，用来避免这两个系统之间不必要的交互和不不必要的或者重复的同步。同步，你懂的，不同数量级系统之</p>
+           <p itemprop="description" >binder 是跨进程间的通信，那就是说有本地和远程之说，通过前面几篇也知道 Bp 需要发请求到 Bn 端。但是写过网络通信程序的都知道，远程不一定“靠谱”，就是说可能某些时候远程服务器挂了。所以一般网络通信程序会弄一个心跳的机制，就是每隔一段时间向服务发一些东西，看服务是否还有</p>
         
     
-    <time datetime="2015-01-31T09:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-28T14:12:16.000Z" itemprop="datePublished">2015 1月 28</time>
   </a>
 </section>
 

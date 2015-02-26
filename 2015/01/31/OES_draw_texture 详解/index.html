@@ -106,16 +106,16 @@
 		<p>昨天在网上找了头天，找到关于这个函数的一部分信息，好像网上对这个函数的信息不是很多，可以在这里看到对该函数的详细解释：<a href="http://www.khronos.org/registry/gles/extensions/OES/OES_draw_texture.txt" title="OES_draw_texture" target="_blank" rel="external">OES_draw_texture</a></p>
 <p>这个函数有什么用呢？它的作用是把纹理的指定片断，当然这个片断是个矩形，直接贴到你指定的视图坐标上的一个矩形上面。加快了2D图形的渲染速度。该函数是在opengl es 1.1引入，opengl 1.4引入 。</p>
 <p>为什么需要这个函数呢，也前我们如果想要在屏幕上显示一幅图片，需要绑定一个纹理，然后指顶点坐标，以及对应的纹理坐标，指定好后，就可以把纹理显示出来 ，这样做的一个缺点是需要经过顶点变换，纹理坐标变换，然后执行片断处理，性能上不如该函数来的快，这个函数不需要执行顶点变换和纹理变换，直接进行片断处理。现在说一下如何操作吧，首先你需要绑定对应的纹理，然后调用下面函数指定需要用纹理的哪一部分。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">glTexParameterfv</span>(<span class="keyword">int</span> target,</div><div class="line">                             <span class="keyword">int</span> pname,</div><div class="line">                             <span class="keyword">float</span>[] params,</div><div class="line">                             <span class="keyword">int</span> offset)</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">glTexParameterfv</span>(<span class="keyword">int</span> target,</div><div class="line">                             <span class="keyword">int</span> pname,</div><div class="line">                             <span class="keyword">float</span>[] params,</div><div class="line">                             <span class="keyword">int</span> offset)</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>这个函数大家应该很熟悉，pname 为GL_TEXTURE_CROP_RECT_OES， params是纹理的左边界，下边界，宽，高，宽和高可以为负数，这样渲染出来的效果是图片时行了左右颠倒，或者上下颠倒。然后执行下面这个函数指定屏幕坐标：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> DrawTex{sifx}OES(T X, T Y, T Z, T W, T H);</div><div class="line"><span class="keyword">void</span> DrawTex{sifx}vOES(T* coords);</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> DrawTex{sifx}OES(T X, T Y, T Z, T W, T H);</div><div class="line"><span class="keyword">void</span> DrawTex{sifx}vOES(T* coords);</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>上面函数指定了屏幕上的一个矩形，最终效果是纹理被填充到这个矩形中，我们可以看到矩形的大小 和纹理大小没有关系，也就是说纹理可能会被放大或者缩小。Z值用于计算纹理距离屏幕的远近,从下面公式可以看出z处于0.1之间会被计算到最远最近平面中间的一点，否则会在最远或者最近平面上。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">     { n,                 <span class="keyword">if</span> z &lt;= <span class="number">0</span> }</div><div class="line">Zw = { f,                 <span class="keyword">if</span> z &gt;= <span class="number">1</span> }</div><div class="line">     { n + z * (f - n),   otherwise }</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">     { n,                 <span class="keyword">if</span> z &lt;= <span class="number">0</span> }</div><div class="line">Zw = { f,                 <span class="keyword">if</span> z &gt;= <span class="number">1</span> }</div><div class="line">     { n + z * (f - n),   otherwise }</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>指定矩形上的每一个点所对应的纹理坐标是如何算出来的呢？下面是计算纹理坐标的方法。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">s = (Ucr + (X - Xs)*(Wcr/Ws)) / Wt</div><div class="line">t = (Vcr + (Y - Ys)*(Hcr/Hs)) / Ht</div><div class="line">r = <span class="number">0</span></div><div class="line">q = <span class="number">1</span></div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">s = (Ucr + (X - Xs)*(Wcr/Ws)) / Wt</div><div class="line">t = (Vcr + (Y - Ys)*(Hcr/Hs)) / Ht</div><div class="line">r = <span class="number">0</span></div><div class="line">q = <span class="number">1</span></div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>式中，带有CR下标的是纹理截取时的参数，X,Y是某个点的屏幕坐标， 带有S下标的是屏幕截取时的参数。这个公式简单说就是把屏幕上的一点换算到纹理图片上，看它在纹理上的坐标是什么。</p>
   
@@ -156,9 +156,9 @@
 
 
 <div class="next">
-<a href="/2015/01/31/win8.1 微软输入法备忘/"  title="win8.1 微软输入法备忘">
+<a href="/2015/01/31/win8.1 蓝牙使用备忘/"  title="win8.1 蓝牙使用备忘">
  <strong>下一篇:</strong><br/> 
- <span>win8.1 微软输入法备忘
+ <span>win8.1 蓝牙使用备忘
 </span>
 </a>
 </div>

@@ -11,7 +11,7 @@
     <meta name="author" content="Mingming">
     
     <meta name="description" content="在 android 中可以通过 context.sendBroadcast(Intent intent) 发送广播，让监听了该广播的程序处理业务。其中 Intent 中有一个 flag：
-12345678/* * If set, this intent will always match any c">
+123456789/* * If set, this intent will always match any ">
     
     
     
@@ -104,7 +104,7 @@
 		</div>
 		
 		<p>在 android 中可以通过 context.sendBroadcast(Intent intent) 发送广播，让监听了该广播的程序处理业务。其中 Intent 中有一个 flag：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*</span></div><div class="line"> * If set, this intent will always match any components in packages that</div><div class="line"> * are currently stopped.  This is the default behavior when</div><div class="line"> * {@link #FLAG_EXCLUDE_STOPPED_PACKAGES} is not set.  If both of these</div><div class="line"> * flags are set, this one wins (it allows overriding of exclude for</div><div class="line"> * places where the framework may automatically set the exclude flag).</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_INCLUDE_STOPPED_PACKAGES = <span class="number">0x00000020</span>;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*</span></div><div class="line"><span class="comment"> * If set, this intent will always match any components in packages that</span></div><div class="line"><span class="comment"> * are currently stopped.  This is the default behavior when</span></div><div class="line"><span class="comment"> * {@link #FLAG_EXCLUDE_STOPPED_PACKAGES} is not set.  If both of these</span></div><div class="line"><span class="comment"> * flags are set, this one wins (it allows overriding of exclude for</span></div><div class="line"><span class="comment"> * places where the framework may automatically set the exclude flag).</span></div><div class="line"><span class="comment"> */</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FLAG_INCLUDE_STOPPED_PACKAGES = <span class="number">0x00000020</span>;</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>设置了这个 flag 之后，能够让还没启动的程序（如果这个程序在 AndroidManifest 里面静态注册了该广播的话）也能处理这个广播。当然相应的还有一个标志： FLAG_EXCLUDE_STOPPED_PACKAGES 就是相反的功能（好像默认就是这个）。</p>
   

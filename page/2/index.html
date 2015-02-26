@@ -81,164 +81,154 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/[转] eclipse 代码补齐、注释小窗口崩溃解决方法/" title="(转) eclipse 代码补齐、注释小窗口崩溃解决方法" itemprop="url">
+    <a href="/2015/02/06/Android SystemUI 分析——通知/" title="Android SystemUI 分析——通知" itemprop="url">
   
-    <h1 itemprop="name">(转) eclipse 代码补齐、注释小窗口崩溃解决方法</h1>
+    <h1 itemprop="name">Android SystemUI 分析——通知</h1>
     
      
-           <p itemprop="description" >最近换了新的 ubuntu，eclipse 一出现代码补齐或是注释的小窗口就崩溃了。查看 crash log 文件（在你的 home 目录下）说是 java 虚拟机挂了。网上找了一下，在 eclispe.ini （在 eclipse 文件夹下）中加入一条配置就好了：
-
--Dorg</p>
+           <p itemprop="description" >Notification 作为 android 系统中的一种提醒类的 UI，其实不是很复杂。但是过了些时候又有点忘记了，又要去翻代码，所以还是稍微总结记录一下比较好。这里不会说得太深，就是一些 Notification 比较基本的东西（浅析一下吧），我们先照例把相关代码位置啰嗦一</p>
         
     
-    <time datetime="2015-01-31T09:34:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-02-06T02:17:16.000Z" itemprop="datePublished">2015 2月 6</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/Eclipse 插件小结/" title="Eclipse 插件小结" itemprop="url">
+    <a href="/2015/02/06/Android SystemUI 分析——最近任务列表/" title="Android SystemUI 分析——最近任务列表" itemprop="url">
   
-    <h1 itemprop="name">Eclipse 插件小结</h1>
+    <h1 itemprop="name">Android SystemUI 分析——最近任务列表</h1>
     
      
-           <p itemprop="description" >安装
-
-在线安装：在 Help —&amp;gt; Install new sofeware —&amp;gt; 输入相应的 url 然后按照提示做就行了。
-离线安装（其实照样需要从相应的站点下载数据，只不过下载得少点而已）：从网上下载插件的 zip 包。然后在 Help —&amp;gt; Insta</p>
+           <p itemprop="description" >Android 4.1 SystemUI 的最近任务列表和 4.2 的区别还是很大的。4.1 的是一个 BAR_PANEL，是一个 view 添加到 window manager 里面 show 出来的。4.2 变成了依附一个 Activity 了（其实都是 window）。功能</p>
         
     
-    <time datetime="2015-01-31T09:25:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-02-06T02:15:16.000Z" itemprop="datePublished">2015 2月 6</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/Python 使用总结/" title="Python 使用总结" itemprop="url">
+    <a href="/2015/01/22/Android Broadcast 分析——发送、处理/" title="Android Broadcast 分析——发送、处理" itemprop="url">
   
-    <h1 itemprop="name">Python 使用总结</h1>
+    <h1 itemprop="name">Android Broadcast 分析——发送、处理</h1>
     
      
-           <p itemprop="description" >android 有个自动化的测试工具 monkeyrunner ，是使用 python 编写一段指令，然后自动跑，测试程序。所以就要稍微会点 python 语法啦。
-不要乱用空格（indent）
-平常的其他代码，空格随便用（在不影响美观情况下），但是在 python 中，每行的缩</p>
+           <p itemprop="description" >上一篇分析了广播的注册流程，这篇来分析下广播的发送、处理流程。这里为什么把发送和处理和来一起说咧，那是因为其实这是一个过程，发送接口里面差不多就是处理过程了。我们先照例把相关代码位置啰嗦一下（4.2.2）：
+123456789101112131415161718192021222</p>
         
     
-    <time datetime="2015-01-31T09:23:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-22T02:15:16.000Z" itemprop="datePublished">2015 1月 22</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/GL 中的纹理坐标/" title="GL 中的纹理坐标" itemprop="url">
+    <a href="/2015/01/22/Android Broadcast 分析——超时或异常/" title="Android Broadcast 分析——超时或异常" itemprop="url">
   
-    <h1 itemprop="name">GL 中的纹理坐标</h1>
+    <h1 itemprop="name">Android Broadcast 分析——超时或异常</h1>
     
      
-           <p itemprop="description" >GL 中的纹理坐标是左上（0，0）、右上（1，0）、右下（1，1）、左下（0，1），来几张图：
-
-
-还有纹理坐标可以为负的，会有很有趣的现象（反过来贴），范围是 0 ～ 1，超过 1 现象会非常奇怪（负数范围也要在 -1 ～ 0）。这里记一下，免得每次都忘记坐标系统。</p>
+           <p itemprop="description" >上一篇（处理篇）最后留了一个问题：串行广播需要一个接着一个执行，如果其中某一个接收器处理的时候挂掉了，或者耗时很长还没处理完，是不是后面的接收器就无法处理了呢。我们在这里看一下 android 是不是已经想到这些了。我们先照例把相关代码位置啰嗦一下（4.2.2）：
+12345# </p>
         
     
-    <time datetime="2015-01-31T09:07:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-22T02:17:16.000Z" itemprop="datePublished">2015 1月 22</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/OES_draw_texture 详解/" title="OES_draw_texture 详解" itemprop="url">
+    <a href="/2015/01/22/Android Broadcast 分析——注册/" title="Android Broadcast 分析——注册" itemprop="url">
   
-    <h1 itemprop="name">OES_draw_texture 详解</h1>
+    <h1 itemprop="name">Android Broadcast 分析——注册</h1>
     
      
-           <p itemprop="description" >昨天在网上找了头天，找到关于这个函数的一部分信息，好像网上对这个函数的信息不是很多，可以在这里看到对该函数的详细解释：OES_draw_texture
-这个函数有什么用呢？它的作用是把纹理的指定片断，当然这个片断是个矩形，直接贴到你指定的视图坐标上的一个矩形上面。加快了2D图形的</p>
+           <p itemprop="description" >背景
+我们的平板增加了一个关机闹钟的功能。就是设备在关机的情况也能唤醒然后响闹钟。实现方法是：在 kernel 中增加一个 RTC 时钟（关机情况下，板载的 RTC 时钟还在运行的，所以你关机一段时间发现电池会变少），然后提前一段时间开机（我们设定的是1分钟，得给点时间给开机，我</p>
         
     
-    <time datetime="2015-01-31T08:58:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-22T02:07:16.000Z" itemprop="datePublished">2015 1月 22</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/win8.1 微软输入法备忘/" title="win8.1 微软输入法备忘" itemprop="url">
+    <a href="/2015/01/31/[转] 如何在 github 上删除一个仓库/" title="(转) 如何在 github 上删除一个仓库" itemprop="url">
   
-    <h1 itemprop="name">win8.1 微软输入法备忘</h1>
+    <h1 itemprop="name">(转) 如何在 github 上删除一个仓库</h1>
     
      
-           <p itemprop="description" >半角、全角切换
-win8.1 的微软输入法 UI 灰常简洁，你在输入框都看不到半角、全角的切换按钮和状态显示。有些时候不小心按倒快捷键切换到全角，都不知道。这个你输入的英文字母会比全角的时候间隔要大，然后在网站上输验证码和密码各种不对。蛋疼得很，这个时候只要切换回半角就行了。快捷</p>
+           <p itemprop="description" >删除功能很隐蔽，可能老外就不太想让你删除吧，毕竟这是一个开源的地方，但是偶尔创建了一些测试仓库在那里很碍眼。
+首先点击进入你要删除的 repository，如下图，点击 setting：
+
+将网页拉到下方，找到 Delete this repository 按钮，点击：
+
+在弹出</p>
         
     
-    <time datetime="2015-01-31T08:48:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T11:56:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/win8.1 蓝牙使用备忘/" title="win8.1 蓝牙使用备忘" itemprop="url">
+    <a href="/2015/01/31/[转] 字符编码笔记/" title="(转) 字符编码笔记" itemprop="url">
   
-    <h1 itemprop="name">win8.1 蓝牙使用备忘</h1>
+    <h1 itemprop="name">(转) 字符编码笔记</h1>
     
      
-           <p itemprop="description" >关闭蓝牙省电功能
-整了一个蓝牙鼠标，最好把 window 的蓝牙省电功能关掉，不然蓝牙鼠标会时不时的抽风一下的。
-在 “设备管理”——&amp;gt;“蓝牙” 注意这里要选择你机子上的蓝牙芯片，例如下面这个高通的4.0的蓝牙芯片（如果选其他的不会出电源管理选项的），然后选属性，就能看到电</p>
+           <p itemprop="description" >1、字符编码、内码，顺带介绍汉字编码
+字符必须编码后才能被计算机处理。计算机使用的缺省编码方式就是计算机的内码。早期的计算机使用7位的ASCII编码，为了处理汉字，程序员设计了用于简体中文的GB2312和用于繁体中文的big5。 
+GB2312(1980年)一共收录了7445个字</p>
         
     
-    <time datetime="2015-01-31T08:40:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T11:43:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/window 开启自带 ftp/" title="window 开启自带 ftp" itemprop="url">
+    <a href="/2015/01/31/[转] Java 的模版和 C++ 模版的区别/" title="(转) Java 的模版和 C++ 模版的区别" itemprop="url">
   
-    <h1 itemprop="name">window 开启自带 ftp</h1>
+    <h1 itemprop="name">(转) Java 的模版和 C++ 模版的区别</h1>
     
      
-           <p itemprop="description" >win7
-添加 ftp 用户
-在windows里添加一个用户。这个其实是你ftp的用户。当然你可以使用匿名访问，但是这样不怎么安全，要知道ftp外网其实也是可以连进来的。去把密码设一下，标准用户就可以了，不用管理员权限的。
-设置 ftp 目录
-在你机子上的任何一个硬盘分区创建一个</p>
+           <p itemprop="description" >java 中的模版其实应该叫泛型。 泛型本质上是提供类型的”类型参数”，它们也被称为参数化类型（parameterized type）或参量多态（parametric polymorphism）。其实泛型思想并不是 Java 最先引入的，C++ 中的模板就是一个运用泛型的例子。泛</p>
         
     
-    <time datetime="2015-01-31T08:15:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T11:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/win8.1 自带程序入口/" title="win8.1 自带程序入口" itemprop="url">
+    <a href="/2015/01/31/[转] unicode 编码表/" title="(转) unicode 编码表" itemprop="url">
   
-    <h1 itemprop="name">win8.1 自带程序入口</h1>
+    <h1 itemprop="name">(转) unicode 编码表</h1>
     
      
-           <p itemprop="description" >微软的 win8.1 系统设计师真是脑门被门板夹了，把那个啥移动设备的 UI 搬到传统桌面上来，搞得很多以前一些系统自带的工具都找不到在哪进去了（以前在开始菜单那的）。不过其实这些东西都还在的，可以从运行那里直接敲命令进去（win键+x+r进入运行），这里记一下，备忘。
-clea</p>
+           <p itemprop="description" >unicode 编码表
+Unicode 目前普遍采用的是 UCS-2，它用两个字节来编码一个字符, 比如汉字”经”的编码是 0x7ECF，注意字符编码一般用十六进制来表示,为了与十进制区分,十六进制以 0x 头，0x7ECF 转换成十进制就是 32463，UCS-2 用两个字节来</p>
         
     
-    <time datetime="2015-01-31T08:00:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T11:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/window 下的 linux 开发工具/" title="window 下的 linux 开发工具" itemprop="url">
+    <a href="/2015/01/31/[转] 什么是 VSync/" title="(转) 什么是 VSync" itemprop="url">
   
-    <h1 itemprop="name">window 下的 linux 开发工具</h1>
+    <h1 itemprop="name">(转) 什么是 VSync</h1>
     
      
-           <p itemprop="description" >有些时候要在 window 环境下工作的，这个时候就需要一些必要的工具来 window 上实现一些 linux 上的功能。
-cygwin（linux 环境模拟工具）
-window 下的神器，不解释： cygwin 官网
-GitBash（git）
-说真的把 cygwin 中的东西装</p>
+           <p itemprop="description" >一个老外写的 VSync（垂直同步）原理的文章的翻译：
+VSync是垂直同期(Vertical Synchronization)的简称。基本的思路是将你的FPS和显示器的刷新率同期起来。其目的是避免一种称之为”撕裂”的现象。再下面我将详细介绍这些内容。
+每一台CRT显示器都有自己</p>
         
     
-    <time datetime="2015-01-31T08:00:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-31T11:36:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 

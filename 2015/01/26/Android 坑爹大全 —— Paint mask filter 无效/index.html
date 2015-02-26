@@ -105,7 +105,7 @@
 		<p>android 的 Paint 提供2种边缘效果：一种是 BlurMaskFilter，一种是 EmbossMaskFilter。BlurMaskFilter 是模糊效果，EmbossMaskFilter 是浮雕效果。这里注意下，Paint 提供的只是边缘效果而已（egde），不是整体的效果，例如这个模糊效果不是类似 window vista 那种的整体的背景毛玻璃效果，边缘效果是这样的：</p>
 <p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/suck-problem-paint-mask-filter/1.jpeg" alt=""> </p>
 <p>然后用法很简单：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 创建一个 BlurMaskFilter（设置下参数）设置给 Paint</span></div><div class="line">paint.setMaskFilter(<span class="keyword">new</span> BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL));</div><div class="line"><span class="comment">// 然后 draw 的时候使用这个 Paint 去画就行了</span></div><div class="line">canvas.drawBitmap(bmp, <span class="keyword">null</span>, rect, paint);</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 创建一个 BlurMaskFilter（设置下参数）设置给 Paint</span></div><div class="line">paint.setMaskFilter(<span class="keyword">new</span> BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL));</div><div class="line"><span class="comment">// 然后 draw 的时候使用这个 Paint 去画就行了</span></div><div class="line">canvas.drawBitmap(bmp, <span class="keyword">null</span>, rect, paint);</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>BlurMaskFilter 有几个参数： radius 是模糊半径（值越大，模糊范围就越大），mode 是模式，有几个选择：</p>
 <ul>

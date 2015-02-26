@@ -81,6 +81,51 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
+    <a href="/2015/01/25/Android 程序签名问题/" title="Android 程序签名问题" itemprop="url">
+  
+    <h1 itemprop="name">Android 程序签名问题</h1>
+    
+     
+           <p itemprop="description" >一、多个开发环境具有相同的 debug 签名
+在多台机器用 Eclipse 开发 Android 程序的时候，签名不一致导致要反反复复删除原程序才能安装、调试很不爽吧。其实让 Eclipse 用一样的 debug 签名就好了。方法是选中其中一个 Eclipse 自动生成的 deb</p>
+        
+    
+    <time datetime="2015-01-25T14:34:16.000Z" itemprop="datePublished">2015 1月 25</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/25/Android sdk 本地文档加载慢的解决办法/" title="Android sdk 本地文档加载慢的解决办法" itemprop="url">
+  
+    <h1 itemprop="name">Android sdk 本地文档加载慢的解决办法</h1>
+    
+     
+           <p itemprop="description" >Android sdk 最近的版本本地文档加载很慢。后来上网百度了下，发现是在联网状态下它会去 google 官网上去加载一个 JS 文件。由于身处天朝，所以这个过程会很慢。据说最新的 sdk 解决了这个问题，我是 20 的，然后 API Level 16 （4.1.2）的 sd</p>
+        
+    
+    <time datetime="2015-01-25T14:33:16.000Z" itemprop="datePublished">2015 1月 25</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/25/Android 应用程序开发小问题总结/" title="Android 应用程序开发小问题总结" itemprop="url">
+  
+    <h1 itemprop="name">Android 应用程序开发小问题总结</h1>
+    
+     
+           <p itemprop="description" >新手问题多多 -_-|| 
+权限问题
+使用某些 api 进行操作时需要申请特定的权限的（最典型的就是写sdcard）。这类 api 一般来 sdk 文档中会有说明的，看的时候看仔细点，并且养成 catch 异常，并且把异常输出到 log 的好习惯。这样如果是因为权限问题失败的话，</p>
+        
+    
+    <time datetime="2015-01-25T14:30:16.000Z" itemprop="datePublished">2015 1月 25</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
     <a href="/2015/01/25/Android 模拟器使用心得/" title="Android 模拟器使用心得" itemprop="url">
   
     <h1 itemprop="name">Android 模拟器使用心得</h1>
@@ -174,51 +219,6 @@ mount
         
     
     <time datetime="2015-01-25T10:48:16.000Z" itemprop="datePublished">2015 1月 25</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/22/Android Broadcast 分析——超时或异常/" title="Android Broadcast 分析——超时或异常" itemprop="url">
-  
-    <h1 itemprop="name">Android Broadcast 分析——超时或异常</h1>
-    
-     
-           <p itemprop="description" >上一篇（处理篇）最后留了一个问题：串行广播需要一个接着一个执行，如果其中某一个接收器处理的时候挂掉了，或者耗时很长还没处理完，是不是后面的接收器就无法处理了呢。我们在这里看一下 android 是不是已经想到这些了。我们先照例把相关代码位置啰嗦一下（4.2.2）：
-1234# A</p>
-        
-    
-    <time datetime="2015-01-22T02:17:16.000Z" itemprop="datePublished">2015 1月 22</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/22/Android Broadcast 分析——发送、处理/" title="Android Broadcast 分析——发送、处理" itemprop="url">
-  
-    <h1 itemprop="name">Android Broadcast 分析——发送、处理</h1>
-    
-     
-           <p itemprop="description" >上一篇分析了广播的注册流程，这篇来分析下广播的发送、处理流程。这里为什么把发送和处理和来一起说咧，那是因为其实这是一个过程，发送接口里面差不多就是处理过程了。我们先照例把相关代码位置啰嗦一下（4.2.2）：
-12345678910111213141516171819202122#</p>
-        
-    
-    <time datetime="2015-01-22T02:15:16.000Z" itemprop="datePublished">2015 1月 22</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/22/Android Broadcast 分析——注册/" title="Android Broadcast 分析——注册" itemprop="url">
-  
-    <h1 itemprop="name">Android Broadcast 分析——注册</h1>
-    
-     
-           <p itemprop="description" >背景
-我们的平板增加了一个关机闹钟的功能。就是设备在关机的情况也能唤醒然后响闹钟。实现方法是：在 kernel 中增加一个 RTC 时钟（关机情况下，板载的 RTC 时钟还在运行的，所以你关机一段时间发现电池会变少），然后提前一段时间开机（我们设定的是1分钟，得给点时间给开机，我</p>
-        
-    
-    <time datetime="2015-01-22T02:07:16.000Z" itemprop="datePublished">2015 1月 22</time>
   </a>
 </section>
 

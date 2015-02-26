@@ -81,6 +81,76 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
+    <a href="/2015/01/30/Android 一些有意思的命令小工具 —— service/" title="Android 一些有意思的命令小工具 —— service" itemprop="url">
+  
+    <h1 itemprop="name">Android 一些有意思的命令小工具 —— service</h1>
+    
+     
+           <p itemprop="description" >android 自带了很多 cmds 的小工具，都挺用有的，也有些比较有意思。这里介绍的是 service 这个工具。说之前先把相关源码位置说下（4.4 的）：
+123# service 命令模块frameworks/native/cmds/service
+
+作用
+这个工具的作用</p>
+        
+    
+    <time datetime="2015-01-30T08:32:16.000Z" itemprop="datePublished">2015 1月 30</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/30/Android 一些有意思的命令小工具 —— dumpsys/" title="Android 一些有意思的命令小工具 —— dumpsys" itemprop="url">
+  
+    <h1 itemprop="name">Android 一些有意思的命令小工具 —— dumpsys</h1>
+    
+     
+           <p itemprop="description" >android 自带了很多 cmds 的小工具，都挺用有的，也有些比较有意思。这里介绍的是 dumpsys 这个工具。说之前先把相关源码位置说下（4.4 的）：
+123# service 命令模块frameworks/native/cmds/dumpsys
+
+作用
+这个工具的作用</p>
+        
+    
+    <time datetime="2015-01-30T08:30:16.000Z" itemprop="datePublished">2015 1月 30</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/25/64位 ubuntu adb No such file or directory 解决办法/" title="64位 ubuntu adb No such file or directory 解决办法" itemprop="url">
+  
+    <h1 itemprop="name">64位 ubuntu adb No such file or directory 解决办法</h1>
+    
+     
+           <p itemprop="description" >13.04
+很简单，安装一个 ia32-libs 就好了（sudo apt-get install ia32-libs）。一看就知道64位系统又悲剧了一次。 
+13.10
+13.10 把 ia32-libs 这个包禁止掉了，它会提用下面几个包来代替：
+
+lib32z1
+lib32</p>
+        
+    
+    <time datetime="2015-01-25T14:42:16.000Z" itemprop="datePublished">2015 1月 25</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/28/Android 智能指针备忘/" title="Android 智能指针备忘" itemprop="url">
+  
+    <h1 itemprop="name">Android 智能指针备忘</h1>
+    
+     
+           <p itemprop="description" >在 framework 的 native 层一大票 sp, wp 之类的玩意。这个是 android 自己搞的一套智能指针技术，就是为了偷懒用的，利用引用计数和构造、析构函数实现内存自动释放的功能（其实我挺讨厌这套东西，刚看着头晕，自己手动 new、delete 对象有那么难么？</p>
+        
+    
+    <time datetime="2015-01-28T12:12:16.000Z" itemprop="datePublished">2015 1月 28</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
     <a href="/2015/01/28/Android Provision 的影响和作用/" title="Android Provision 的影响和作用" itemprop="url">
   
     <h1 itemprop="name">Android Provision 的影响和作用</h1>
@@ -145,7 +215,7 @@ framebuffer logo
     
      
            <p itemprop="description" >ActivityManager 有个一个函数 forceStopPackage: 
-12345678910111213141516171819202122232425/** * Have the system perform a force stop of everything </p>
+1234567891011121314151617181920212223242526/** * Have the system perform a force stop of everythin</p>
         
     
     <time datetime="2015-01-28T11:35:16.000Z" itemprop="datePublished">2015 1月 28</time>
@@ -164,66 +234,6 @@ build/tools/buildinfo.sh 脚本就是专门用于生成buil</p>
         
     
     <time datetime="2015-01-27T15:45:16.000Z" itemprop="datePublished">2015 1月 27</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/27/[转] Android locales 本地化/" title="(转) Android locales 本地化" itemprop="url">
-  
-    <h1 itemprop="name">(转) Android locales 本地化</h1>
-    
-     
-           <p itemprop="description" >1. ICU
-ICU4C(ICU for C，http://site.icu-project.org/)是ICU在C/C++平台下的版本, ICU(International Component for Unicode)是基于”IBM公共许可证”的，与开源组织合作研究的, 用于支</p>
-        
-    
-    <time datetime="2015-01-27T15:37:16.000Z" itemprop="datePublished">2015 1月 27</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/27/在源码中修改 Android 系统配置/" title="在源码中修改 Android 系统配置" itemprop="url">
-  
-    <h1 itemprop="name">在源码中修改 Android 系统配置</h1>
-    
-     
-           <p itemprop="description" >Android 的系统（System Settings）的配置文件在 framework/base/core/res/res/values/config.xml 里面。编译模块 framework/base/core/res 能得到 out/target/product/xx/s</p>
-        
-    
-    <time datetime="2015-01-27T15:36:16.000Z" itemprop="datePublished">2015 1月 27</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/27/Android 按键映射分析/" title="编译 Android 按键映射分析" itemprop="url">
-  
-    <h1 itemprop="name">编译 Android 按键映射分析</h1>
-    
-     
-           <p itemprop="description" >android 能够将不同的低层 scancode 转化成上层使用的统一的 keycode （以下分析为 android 2.2 froyo 的）。下面说的几个相关的源代码文件都在 framework/base/libs/ui 下。
-EventHub.cpp
-先看看下面这段代码：</p>
-        
-    
-    <time datetime="2015-01-27T15:32:16.000Z" itemprop="datePublished">2015 1月 27</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/27/编译 Android 源码问题总结/" title="编译 Android 源码问题总结" itemprop="url">
-  
-    <h1 itemprop="name">编译 Android 源码问题总结</h1>
-    
-     
-           <p itemprop="description" >如何在 Android.mk 中添加自定义库
-在编译 android 模块的时候，有时候想自己添加一些自己的东西，或者是说链接一些额外的库（例如说自己写的）。这个时候需要去修改 Android.mk 文件。这里以 android 中简单的 toolbox 模块为例说明。例如说要在</p>
-        
-    
-    <time datetime="2015-01-27T15:28:16.000Z" itemprop="datePublished">2015 1月 27</time>
   </a>
 </section>
 

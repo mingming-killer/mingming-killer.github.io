@@ -105,7 +105,7 @@
 		<p>在开发涉及 WebService 的 Android 程序是出现了个很烦恼的错误 android.os.NetworkOnMainThreadException，找了很久才找到解决方案，可能在 Android 3.0 以上的版本都有这个问题，貌似他们在3.0以上的版本网络上做了更加严格的限制，更多的查询API上的StrictMode 。这个是由于在主线程中访问 Web API 很有可能会阻塞 UI 线程，所以 Android 就禁止你在主线程里访问 Web API 了。</p>
 <h2 id="方法一：">方法一：</h2>
 <p>在访问前调用如下代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span>(){</div><div class="line">    StrictMode.setThreadPolicy(<span class="keyword">new</span> StrictMode.ThreadPolicy.Builder()</div><div class="line">        .detectDiskReads()</div><div class="line">        .detectDiskWrites()</div><div class="line">        .detectNetwork()   <span class="comment">// or .detectAll() for all detectable problems</span></div><div class="line">        .penaltyLog()</div><div class="line">        .build());</div><div class="line"></div><div class="line">    StrictMode.setVmPolicy(<span class="keyword">new</span> StrictMode.VmPolicy.Builder()</div><div class="line">        .detectLeakedSqlLiteObjects()</div><div class="line">        .detectLeakedClosableObjects()</div><div class="line">        .penaltyLog()</div><div class="line">        .penaltyDeath()</div><div class="line">        .build());</div><div class="line">}</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span>(){</div><div class="line">    StrictMode.setThreadPolicy(<span class="keyword">new</span> StrictMode.ThreadPolicy.Builder()</div><div class="line">        .detectDiskReads()</div><div class="line">        .detectDiskWrites()</div><div class="line">        .detectNetwork()   <span class="comment">// or .detectAll() for all detectable problems</span></div><div class="line">        .penaltyLog()</div><div class="line">        .build());</div><div class="line"></div><div class="line">    StrictMode.setVmPolicy(<span class="keyword">new</span> StrictMode.VmPolicy.Builder()</div><div class="line">        .detectLeakedSqlLiteObjects()</div><div class="line">        .detectLeakedClosableObjects()</div><div class="line">        .penaltyLog()</div><div class="line">        .penaltyDeath()</div><div class="line">        .build());</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
 
 <h2 id="方法二：">方法二：</h2>
 <p>不要在主线程里访问 Web API，开个线程来访问（例如 new Thread 或者 AsyncTask 之类的）。这种方法也是 Android 推荐的方法。</p>
@@ -138,18 +138,18 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2015/01/25/Android 自定义 Preference/" title="Android 自定义 Preference">
+ <a href="/2015/01/27/Android 按键映射分析/" title="编译 Android 按键映射分析">
   <strong>上一篇:</strong><br/>
   <span>
-  Android 自定义 Preference</span>
+  编译 Android 按键映射分析</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2015/01/25/Android OpenGLES 学习笔记/"  title="Android OpenGLES 学习笔记">
+<a href="/2015/01/27/编译 Android 源码问题总结/"  title="编译 Android 源码问题总结">
  <strong>下一篇:</strong><br/> 
- <span>Android OpenGLES 学习笔记
+ <span>编译 Android 源码问题总结
 </span>
 </a>
 </div>

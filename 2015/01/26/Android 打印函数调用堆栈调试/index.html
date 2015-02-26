@@ -12,10 +12,10 @@
     
     <meta name="description" content="java 层
 可以利用抛出异常来打印：
-123RuntimeException here = new RuntimeException(&quot;here&quot;);here.fillInStackTrace();Log.i(TAG, &quot;call statck is&quot;, here);
+1234RuntimeException here = new RuntimeException(&quot;here&quot;);here.fillInStackTrace();Log.i(TAG, &quot;call statck is&quot;, here);
 
 native 层
-可以利用">
+可以利">
     
     
     
@@ -109,17 +109,17 @@ native 层
 		
 		<h2 id="java_层">java 层</h2>
 <p>可以利用抛出异常来打印：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">RuntimeException here = <span class="keyword">new</span> RuntimeException(<span class="string">"here"</span>);</div><div class="line">here.fillInStackTrace();</div><div class="line">Log.i(TAG, <span class="string">"call statck is"</span>, here);</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">RuntimeException here = <span class="keyword">new</span> RuntimeException(<span class="string">"here"</span>);</div><div class="line">here.fillInStackTrace();</div><div class="line">Log.i(TAG, <span class="string">"call statck is"</span>, here);</div><div class="line"></div></pre></td></tr></table></figure>
 
 <h2 id="native_层">native 层</h2>
 <p>可以利用 android 的 CallStack 来打印：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">CallStack <span class="built_in">stack</span>;</div><div class="line"><span class="built_in">stack</span>.update();</div><div class="line"><span class="built_in">stack</span>.dump(<span class="string">"SurfaceFlinger"</span>); </div><div class="line"></div><div class="line"><span class="comment">// 4.4 的接口变了 dump 是用来把 log 保存到文件里面去的</span></div><div class="line"><span class="comment">// 单纯的打印用这个: statck.log("SurfaceFlinger")</span></div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">CallStack <span class="built_in">stack</span>;</div><div class="line"><span class="built_in">stack</span>.update();</div><div class="line"><span class="built_in">stack</span>.dump(<span class="string">"SurfaceFlinger"</span>); </div><div class="line"></div><div class="line"><span class="comment">// 4.4 的接口变了 dump 是用来把 log 保存到文件里面去的</span></div><div class="line"><span class="comment">// 单纯的打印用这个: statck.log("SurfaceFlinger")</span></div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>要调用这个类的方法先插入 CallStack 头文件，然后在 Android.mk 中链接 utils 库就可以： </p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;utils/CallStack.h&gt;</span></div><div class="line">LOCAL_SHARED_LIBRARIES := libutils</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;utils/CallStack.h&gt;</span></div><div class="line">LOCAL_SHARED_LIBRARIES := libutils</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>这个可以自己去看 CallStack.h 的头文件（frameworks/base/native/include/utils/CallStack.h），方法的定义:</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 第一个参数没去研究啥作用，用默认的1吧，</span></div><div class="line"><span class="comment">// 第二个参数好像是设置追踪的最大调用堆栈深度，默认是 31</span></div><div class="line"><span class="keyword">void</span> update(int32_t ignoreDepth=<span class="number">1</span>, int32_t maxDepth=MAX_DEPTH);</div><div class="line"></div><div class="line"><span class="comment">// 这个就是把调用堆栈信息输出到 android 的 log 里面，</span></div><div class="line"><span class="comment">// 那个参数是 log 前面的前缀</span></div><div class="line"><span class="comment">// Dump a stack trace to the log</span></div><div class="line"><span class="keyword">void</span> dump(<span class="keyword">const</span> <span class="keyword">char</span>* prefix = <span class="number">0</span>) <span class="keyword">const</span>;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 第一个参数没去研究啥作用，用默认的1吧，</span></div><div class="line"><span class="comment">// 第二个参数好像是设置追踪的最大调用堆栈深度，默认是 31</span></div><div class="line"><span class="keyword">void</span> update(int32_t ignoreDepth=<span class="number">1</span>, int32_t maxDepth=MAX_DEPTH);</div><div class="line"></div><div class="line"><span class="comment">// 这个就是把调用堆栈信息输出到 android 的 log 里面，</span></div><div class="line"><span class="comment">// 那个参数是 log 前面的前缀</span></div><div class="line"><span class="comment">// Dump a stack trace to the log</span></div><div class="line"><span class="keyword">void</span> dump(<span class="keyword">const</span> <span class="keyword">char</span>* prefix = <span class="number">0</span>) <span class="keyword">const</span>;</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>效果如下：(注意 logcat 的 TAG 是 CallStack -_-||)</p>
 <pre config="brush:bash;toolbar:false;">
