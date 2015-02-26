@@ -1,0 +1,531 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>反编译 Android apk | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="如果 java 程序编译的时候没有混淆代码的话，就可以比较容易的反编译。但是反编译不一定就能 100% 的得到原始的代码，不过已经可以拿来做参考了。
+apk —&amp;gt; xml
+从 google code (apktool下载) 下载 apktool 工具，按照 google code 上的说明：
+">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/25/反编译 Android apk/" title="反编译 Android apk" itemprop="url">反编译 Android apk</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-25T14:50:16.000Z" itemprop="datePublished">2015 1月 25</time>
+    更新日期:<time datetime="2015-01-25T14:50:16.000Z" itemprop="dateModified">2015 1月 25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#apk_—>_xml"><span class="toc-number">1.</span> <span class="toc-text">apk —> xml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#class_—>_jar"><span class="toc-number">2.</span> <span class="toc-text">class —> jar</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#jar_—>_java"><span class="toc-number">3.</span> <span class="toc-text">jar —> java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重新打包"><span class="toc-number">5.</span> <span class="toc-text">重新打包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#odex_转_dex"><span class="toc-number">6.</span> <span class="toc-text">odex 转 dex</span></a></li></ol>
+		</div>
+		
+		<p>如果 java 程序编译的时候没有混淆代码的话，就可以比较容易的反编译。但是反编译不一定就能 100% 的得到原始的代码，不过已经可以拿来做参考了。</p>
+<h2 id="apk_—&gt;_xml">apk —&gt; xml</h2>
+<p>从 google code (<a href="http://code.google.com/p/android-apktool/" title="apktool下载" target="_blank" rel="external">apktool下载</a>) 下载 apktool 工具，按照 google code 上的说明：</p>
+<ol>
+<li>Download apktool-install-linux-* file</li>
+<li>Download apktool-* file</li>
+<li>Unpack both to /usr/local/bin directory (you must have root permissions)</li>
+</ol>
+<p>设置好 PATH 路径，让系统能找到 apktool。然后 apktool d -f xx.apk /home/mingming/tmp/apk 解压出 apk 完成的 xml 和 资源文件。</p>
+<h2 id="class_—&gt;_jar">class —&gt; jar</h2>
+<p>从 google code (<a href="http://code.google.com/p/dex2jar/downloads/list" title="dex2jar 下载" target="_blank" rel="external">dex2jar 下载</a>) 下载 dex2jar 工具。然后把 apk 文件改后缀为 .zip ，然后解压出 zip。在里面找到 class.dex ，然后把 class.dex 复制到 dex2jar 目录下。然后执行 dex2jar.sh class.dex (可能之前需要把 dex2jar.sh 增加可执行属性)。成功的话会在本目录下生成 classes.dex.dex2jar.jar 。</p>
+<h2 id="jar_—&gt;_java">jar —&gt; java</h2>
+<p>从 这里 (<a href="http://jd.benow.ca/" title="jd-gui 下载" target="_blank" rel="external">jd-gui 下载</a>) 下载 jd-gui 工具。然后运行 jd-gui 打开上一步生成的 jar 包，然后就可以在 jd-gui 里看到 jar 里的源代码里。可以使用 jd-gui 的 file 菜单里的 save all source 命令，把源代码导出成一个 zip 包里。</p>
+<h2 id="总结">总结</h2>
+<p>结合第一步得到的 xml 文件 和 res 文件，以及第三步得到的 java 源代码，就差不多可以还原 apk 程序了。</p>
+<h2 id="重新打包">重新打包</h2>
+<p>参考： <a href="http://nitinzzz.blogspot.com/" target="_blank" rel="external">http://nitinzzz.blogspot.com/</a> (注：这个被墙了 !!=_=!!)</p>
+<ul>
+<li><p>首先，准备工具</p>
+<ul>
+<li>apktool apk_manager ， <a href="http://u.115.com/file/aq38jnat" title="点这里下载" target="_blank" rel="external">点这里下载</a></li>
+<li>zip 的 管理工具 ，这个 ubuntu 底下默认有了。</li>
+<li>jdk 的 jarsigner ， 我这里路径为 /home/nxliao/tool/android/jvm/java/jdk1.6.0_25/bin/jarsigner</li>
+<li>android sdk 的 debug.keystore ，在ubuntu下为 ~/.android/debug.keystore</li>
+</ul>
+</li>
+<li><p>准备实验对象<br>Fishing Joy ， <a href="http://u.115.com/file/bh5nw429" title="点这里下载" target="_blank" rel="external">点这里下载</a></p>
+</li>
+<li><p>改装</p>
+<ul>
+<li>用 zip 管理工具打开这个 apk，删除里面的 META-INF 目录</li>
+<li>用 apktool 解压处理过的 apk <pre>
+$ ./apktool d ~/tmp/jianjiuhongchenfengha_V1.0_mumayi_85342.apk ~/tmp/jianjiuhongchenfengha
+</pre></li>
+<li>用 vi 打开目标代码 <pre>
+$ vi ~/tmp/jianjiuhongchenfengha/smali/com/sg/android/fish/FishActivity.smali
+</pre></li>
+<li>转到第 330行（在 .method private init()V 内），将 const/16 v6, 0xc8 修改成 const/16 v6, 0x647d （也可以设置成其它数值），即可将初始金钱改成 0x647d =25752</li>
+<li>保存退出</li>
+<li>用 apktool 重新打包 apk <pre>
+$ ./apktool b ~/tmp/jianjiuhongchenfengha ~/tmp/jian.apk
+</pre></li>
+<li>这时候新的apk还不能直接安装，需要打上签名。用jdk的 jarsigner 打上签名 <pre>
+$ jarsigner -verbose -storepass android -keystore ~/.android/debug.keystore ~/tmp/jian.apk androiddebugkey
+</pre>
+
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="odex_转_dex">odex 转 dex</h2>
+<p>odex文件无法直接使用dex2jar进行直接反编译成jar，必须先转为dex，才能继续反编译。用到的工具 baksmali smali</p>
+<p>下载地址：<a href="http://code.google.com/p/smali/downloads/list" target="_blank" rel="external">http://code.google.com/p/smali/downloads/list</a> </p>
+<p>步骤：</p>
+<ul>
+<li>1，分解odex文件 java -jar baksmali-1.2.4.jar -x ../TEST.odex 这时候出现问题：</li>
+</ul>
+<pre>
+Error occured while loading boot class path files. Aborting. 
+org.jf.dexlib.Util.ExceptionWithContext: Cannot locate boot class path file core.odex 
+at org.jf.dexlib.Code.Analysis.ClassPath.loadBootClassPath(ClassPath.java:237) 
+at org.jf.dexlib.Code.Analysis.ClassPath.initClassPath(ClassPath.java:145) 
+at org.jf.dexlib.Code.Analysis.ClassPath.InitializeClassPathFromOdex(ClassPath.java:110) 
+at org.jf.baksmali.baksmali.disassembleDexFile(baksmali.java:96) 
+at org.jf.baksmali.main.main(main.java:278) 
+</pre>
+
+<p>这是由于缺少core.odex, ext.odex, framework.odex, android.policy.odex, services.odex, bouncycastle.odex, core-junit.odex, 这7个文件的问题，将framework下的这5个odex文件一并考到同级目录下，在运行命令即可。</p>
+<ul>
+<li>2，生成classes.dex</li>
+</ul>
+<p>java -Xmx512M -jar smali-1.2.4.jar out -o classes.dex</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Development/">Android Development</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/25/反编译 Android apk/" data-title="反编译 Android apk | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/25/Android Gesture 使用简介/" title="Android Gesture 使用简介">
+  <strong>上一篇:</strong><br/>
+  <span>
+  Android Gesture 使用简介</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/25/Android中 Error generating final archive Debug Certificate expired on xx 的错误/"  title="Android中 Error generating final archive Debug Certificate expired on xx 的错误">
+ <strong>下一篇:</strong><br/> 
+ <span>Android中 Error generating final archive Debug Certificate expired on xx 的错误
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread" data-thread-key="反编译 Android apk" data-title="反编译 Android apk" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2015/01/25/反编译 Android apk/">
+    </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#apk_—>_xml"><span class="toc-number">1.</span> <span class="toc-text">apk —> xml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#class_—>_jar"><span class="toc-number">2.</span> <span class="toc-text">class —> jar</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#jar_—>_java"><span class="toc-number">3.</span> <span class="toc-text">jar —> java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重新打包"><span class="toc-number">5.</span> <span class="toc-text">重新打包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#odex_转_dex"><span class="toc-number">6.</span> <span class="toc-text">odex 转 dex</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>22</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li> <i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="5" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2015 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

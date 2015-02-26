@@ -1,0 +1,467 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>(转) 什么是 VSync | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="一个老外写的 VSync（垂直同步）原理的文章的翻译：
+VSync是垂直同期(Vertical Synchronization)的简称。基本的思路是将你的FPS和显示器的刷新率同期起来。其目的是避免一种称之为”撕裂”的现象。再下面我将详细介绍这些内容。
+每一台CRT显示器都有自己的刷新率。其单位是H">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/31/[转] 什么是 VSync/" title="(转) 什么是 VSync" itemprop="url">(转) 什么是 VSync</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-31T11:36:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    更新日期:<time datetime="2015-01-31T11:36:16.000Z" itemprop="dateModified">2015 1月 31</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
+		
+		<p>一个老外写的 VSync（垂直同步）原理的文章的翻译：</p>
+<p>VSync是垂直同期(Vertical Synchronization)的简称。基本的思路是将你的FPS和显示器的刷新率同期起来。其目的是避免一种称之为”撕裂”的现象。再下面我将详细介绍这些内容。</p>
+<p>每一台CRT显示器都有自己的刷新率。其单位是HZ.其数值是显示器每秒钟更新画面的次数。不同的显示器支持再不同分辨率下的不同刷新率。它的范围可以从低到60高到100。注意它不是你游戏中所提到的那个FPS.如果你设置了一个特定的刷新率，显示器将一直按照这个速率刷新画面。甚至画面没有任何的改变。液晶显示器就不同了。LCD的每个像素在被告知改变的时候将一直是亮着的。他们不需要刷新。但是因为VGA(或是DVI)的工作原理，LCD不得不从显示卡那里按一定的速率得到新的新画面。这就是虽然LCD不必要更新，但是他还是有自己的刷新率。</p>
+<p>我想这里的每一人都明白FPS。它显示显示卡在每秒钟可以描画多少画面。这显然是越高越好。但是对于快速变化的游戏而言，你的FPS很难一直保持同样的数值，他会随着你所看到的显示卡所要描画的画面的复杂程度而变化。这样画面的撕裂就发生了。所谓”撕裂”就是一种画面分离的现象，就象你照一张照片，在旋转哪怕一度再照一张照片，然后把两张照片的从中间裁开，用一张照片的上半部与另一张的下半部对接起来。这样得到的画像虽然相似但是上半部和下半部确实明显的不同。这就被称之为视觉现实上的撕裂。它不会一直从中间分开，它可能靠近上面也可能下面，分离点可能在屏幕上下移动，也可能在两点间前后移动。（译者：原文的作者实在是啰嗦，其实就是画面移动较快的时候，画面看上去是两截。这种现象恐怕打游戏的都看到过）。为什么会发生这种现象呢？让我们举一个特定的例子。让我们假定你的显示器的刷新率是75Hz, 你真在玩你最喜欢的游戏，而且你现在有100的FPS.这就意味着你的显示器每秒更新75次画面，而你的显示卡每秒更新100次，比你的显示器快33%。这就意味着在你的显示器更新画面的时间里，显示卡描画了1+1/3的画面。这样在画面显示的时候，那个1/3的画面就会覆盖那个完整画面上部的1/3。在下次的图像刷新的时候，显示卡会描画剩下来得2/3和新的2/3的画面。这样，因为屏幕的更新只能跟上画面更新的2/3，这样图像的上部的1/3或是下部的1/3就会和剩下的画面合不上。如果画面的变化不大可能不太会注意到这一点，但是如果你快速的环顾四周那就会非常的明显。现在，一个很普遍的误解就产生了。一些人认为解决这个问题的方法就是简单设置一个FPS的限制让FPS不超过显示器的刷新率，这样显示卡就不会超过75FPS,这样就可以了。真的吗？错！</p>
+<p>在我解释为什么之前，让我来讲一下双倍缓冲。双倍缓冲一种用来减轻撕裂问题，虽然不是很完全。基本上来说你有一个显示缓冲和一个后备缓冲。当显示器要显示画面的时候，就会从显示缓冲里“推出”显示画面。显示卡则在后备缓冲里描画另外一个新画面，当描画完成后则将新画面考入显示缓冲里。但是这个过程需要时间，如果显示器的刷新在拷贝过程中进行的话，显示器上显示的仍然是个”撕裂”的画面。</p>
+<p>VSync 通过建立一个不让在显示器刷新前将后备缓冲中的画面拷贝到显示缓冲中的规定来解决这个问题。如果FPS高于刷新率的话，没有问题。后备缓冲的更新完成后，系统处于等待状态。当显示器刷新后，后备缓存考入显示缓存，显示卡则可以在后备缓存里描画新的画面，这样就很有效的将你的FPS限制在显示器的刷新率的范围内。这样看起来不错，但是让我们来看一个另外一个不同的例子。让我们假定你已经玩到了你最喜欢的游戏的最后一关，这个游戏有很好的图像.你显示器的刷新率还是在75。但是你的FPS现在只有50了，比刷新率要低33%.这就意味着每次显示器刷新图像，你的显示卡只能画出下一桢画面的2/3。让我们看看它是如何工作的。显示器刚刚更新，第一桢的画面已经拷贝到显示缓冲，第二桢的画面的2/3被写入后备缓冲，这时显示器重新刷新，它会第一次从显示缓冲里提取第一桢的画面。然后显示卡开始完成的第二桢剩下的部分。但是它必须等待，应为再下一次刷新之前它是不会上传的。显示器再次刷新，显示器不得不第二次从显示缓冲里提取第一桢的画面，然后第二桢的画面被写入显示缓冲。显示卡在后备缓冲中写入第三桢的2/3.等到显示器刷新，第一次从显示缓冲里提取第二桢的画面，显示卡开始完成的第三桢剩下的部分。然后又是第二次从显示缓冲里提取第二桢的画面，然后第三桢的画面被写入显示缓冲。如此类推。这样4次显示器刷新，我们只能的到2桢的画面。如果刷新率是75的话，我们只能得到35的FPS.很明显这个数值要低于显示卡可以带到的50FPS.这主要就是应为显示卡不得不在描画后备缓冲上浪费时间。而在此过程中，后备缓冲上的画面是不能被拷贝到显示缓冲。理论上讲，双缓冲的VSync,FPS将是一组不连续的整数，其等于刷新率/n,n是正整数。也就是说，如果你的刷新率是60hz,你能得到的FPS只能是 60，30，20，15，12，10 等等。你可以注意到60到30是一个相当大的差距。只要的显示卡的FPS在60到30之间，你说得到的真实FPS都将只能等于30！</p>
+<p>现在，你明白为什么有人不喜欢它了。让我们回到一开始的那个例子。你在玩你最喜欢的游戏，刷新率是75HZ,100FPS。你打开VSync.游戏就被限制在75FPS,没有问题，没有撕裂图像，看起来不错。你到了一个图像特别复杂的地方，在不用VSync的时候，你的FPS下降到了60左右。但是你打开了VSync，你的FPS实际就只有37.5。这样你的游戏突然从75FPS变成了37.5FPS,不管37.5仍然很流畅但是你一定会注意到刷新率突然减少了一半。当让如果以下变到25FPS的话，实际的现实率可能就只有17.5。本来还可以玩的游戏，就变成了幻灯片。这就是大家不喜欢它的原因。</p>
+<p>如果你的游戏的FPS可以一直稳定的大于显示器的刷新率，VSync是个不错的东西。但是如果FPS忽大忽小。VSync就是让人烦的东西。如果你的游戏FPS一直都小于刷新率的话，实际的FPS要远远小于显示卡可以显示的FPS.看上去就象是VSync降低了你的FPS,但是从技术角度讲，不是应为图像太复杂，而是因为VSync就是这样工作的。也不是说所有的希望都没有了。现在的triple-buffering技术可以用来解决这个问题。让我们再来看刷新率75。FPS50的例子。第一桢在显示缓冲，第二桢的2/3在后备缓冲。显示器刷新第一桢第一次被显示，在后备缓冲里描画第二桢的剩下的1/3，在第二后备缓冲里描画第三桢的1/3(因为我们有三级缓冲了)。显示器再次刷新第一桢第二次被显示，第二桢放入在显示缓冲，第三桢的的1/3放入后备缓冲，第二后备缓冲里描画第三桢剩下的2/3。接下来显示器再次刷新的时候，第二桢被显示，第三桢就可以放入显示缓冲，这样我们就可以在3次刷新中得到2桢的画面。也就是刷新率的2/3,也就是50FPS.triple-buffering理论上讲可以避免缓冲写入是带来的延迟现象，这样就不会浪费时间。但是triple-buffering并不是适用于所有的游戏。实际上它并不是普及(这个文章可能写的太早，现在triple-buffering已经很普及了)，而且它也会影响显示卡的性能，应为它需要更多的显示内存，需要更多时间在内存之间降数据拷贝来拷贝去。但是triple-buffering确实是一个很好的方法，既可以消除撕裂画面又可以不像普通VSync一样影响你的FPS.我希望这篇文章是有用的，可以帮出你理解VSync的工作原理。（特别是不再犹豫是否打开VSync）总之，如果没有triple-buffering的情况下，如何权衡Vsync的FPS限制和消除撕裂画面带来的视觉感受，那将完全取决于你个人的喜好。</p>
+<p>译者按：如果这篇文章的机理是正确的。triple-buffering也不是万能的，实际上就是把减少1/2变成了减少1/3而已，如果是FPS恰好卡到了一定的数值的时候没有问题，一旦没有，那就绝对要损失FPS.所以对于那种FPS刚刚超过24的游戏，不管有没有triple-buffering，都应该关.</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/basics/">basics</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Basics-Knowledge/">Basics Knowledge</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/31/[转] 什么是 VSync/" data-title="(转) 什么是 VSync | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/31/[转] Java 的模版和 C++ 模版的区别/" title="(转) Java 的模版和 C++ 模版的区别">
+  <strong>上一篇:</strong><br/>
+  <span>
+  (转) Java 的模版和 C++ 模版的区别</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/31/[转] Dia 无法输入中文/"  title="(转) Dia 无法输入中文">
+ <strong>下一篇:</strong><br/> 
+ <span>(转) Dia 无法输入中文
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread" data-thread-key="(转) 什么是 VSync" data-title="(转) 什么是 VSync" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2015/01/31/[转] 什么是 VSync/">
+    </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>22</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li> <i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="5" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2015 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

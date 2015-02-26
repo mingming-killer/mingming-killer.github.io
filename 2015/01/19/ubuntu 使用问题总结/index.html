@@ -94,7 +94,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-01-19T01:54:16.000Z" itemprop="datePublished">2015 1月 19</time>
-    更新日期:<time datetime="2015-01-21T16:27:06.000Z" itemprop="dateModified">2015 1月 22</time>
+    更新日期:<time datetime="2015-01-19T01:54:16.000Z" itemprop="dateModified">2015 1月 19</time>
     
   </p>
 </header>
@@ -103,7 +103,7 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#激活_root_账号"><span class="toc-number">1.</span> <span class="toc-text">激活 root 账号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#中文输入安装之后无法调出"><span class="toc-number">2.</span> <span class="toc-text">中文输入安装之后无法调出</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自动挂载_ntfs_分区"><span class="toc-number">3.</span> <span class="toc-text">自动挂载 ntfs 分区</span></a></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#激活_root_账号"><span class="toc-number">1.</span> <span class="toc-text">激活 root 账号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#中文输入安装之后无法调出"><span class="toc-number">2.</span> <span class="toc-text">中文输入安装之后无法调出</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自动挂载_ntfs_分区"><span class="toc-number">3.</span> <span class="toc-text">自动挂载 ntfs 分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vpn_无法连接"><span class="toc-number">4.</span> <span class="toc-text">vpn 无法连接</span></a></li></ol>
 		</div>
 		
 		<h2 id="激活_root_账号">激活 root 账号</h2>
@@ -127,6 +127,11 @@ ls -l /dev/disk/by-uuid
 <p>然后有些时候 window 的 ntfs 分区会挂载失败，然后出来下面的错误：</p>
 <p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/linux/ubuntu-memos/unable-mount.png" alt="" title="挂载错误"></p>
 <p>这个时候可以用 sudo ntfsfix -d xx（xx 就是图中报错的那个 device： /dev/sdc3，这个用上面那个2个命令也可以看得到的）。一般来说输出修复成功就可以挂载了。如果还是实在不行，网上有人话说是因为 win8 的快速启动导致 ntfs 分区没有被 window 完全卸载导致的。实在不行，尝试把 win8 的快速启动关掉吧。</p>
+<h2 id="vpn_无法连接">vpn 无法连接</h2>
+<p>ubuntu 一安装好就可以直接新建 PPTP 方式的 vpn 的（点右上角的网络连接的 vpn 配置那里）。除了记得设置 Advanced 那里按下面的设置：</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/linux/ubuntu-memos/vpn-config-adv.png" alt=""></p>
+<p>把 IP、用户名和密码设置好后，一般就能连上了。不过有些时候有点蛋疼，怎么也连不上，刚开始以为是什么 vpn PPTP 的什么软件没装，搞了半天还是没用。后面无意发现设置 General 那里有一个 <strong>允许所有用户连接</strong> 的选项（默认一般是勾上的），不知道什么时候没勾上，勾上后就可以连了。</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/linux/ubuntu-memos/vpn-all-users.png" alt=""></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -136,6 +141,11 @@ ls -l /dev/disk/by-uuid
   <span></span> <a href="/tags/linux/">linux</a>
   </div>
 
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Linux/">Linux</a>
+</div>
 
 
 
@@ -172,15 +182,19 @@ ls -l /dev/disk/by-uuid
 
 	
 <section class="comment">
-	<div class="ds-thread"></div>
+	<div class="ds-thread" data-thread-key="ubuntu 使用问题总结" data-title="ubuntu 使用问题总结" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2015/01/19/ubuntu 使用问题总结/">
+    </div>
 </section>
+
 
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#激活_root_账号"><span class="toc-number">1.</span> <span class="toc-text">激活 root 账号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#中文输入安装之后无法调出"><span class="toc-number">2.</span> <span class="toc-text">中文输入安装之后无法调出</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自动挂载_ntfs_分区"><span class="toc-number">3.</span> <span class="toc-text">自动挂载 ntfs 分区</span></a></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#激活_root_账号"><span class="toc-number">1.</span> <span class="toc-text">激活 root 账号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#中文输入安装之后无法调出"><span class="toc-number">2.</span> <span class="toc-text">中文输入安装之后无法调出</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自动挂载_ntfs_分区"><span class="toc-number">3.</span> <span class="toc-text">自动挂载 ntfs 分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vpn_无法连接"><span class="toc-number">4.</span> <span class="toc-text">vpn 无法连接</span></a></li></ol>
   </div>
 
 <div id="asidepart">
@@ -188,17 +202,50 @@ ls -l /dev/disk/by-uuid
 <aside class="clearfix">
 
   
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>22</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
 <div class="tagslist">
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/basics/" title="basics">basics<sup>5</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
 		
-			<li><a href="/tags/linux/" title="linux">linux<sup>23</sup></a></li>
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		
-			<li><a href="/tags/minigui/" title="minigui">minigui<sup>9</sup></a></li>
+			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
 		
-			<li><a href="/tags/test/" title="test">test<sup>1</sup></a></li>
+			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
 		
 		</ul>
 </div>

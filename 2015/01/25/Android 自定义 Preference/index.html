@@ -1,0 +1,476 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>Android 自定义 Preference | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="有些时候系统提供的 Preference 不满足我们的要求的时候，我们就需要自己定制了。现在产品要求 ChekBoxPreference 的 summary 的颜色要能动态改变，在关闭的时候是默认颜色，在开启的时候变成红色。现在我们就可以自己定制啦。
+简单的修改 xml
+先说说简单的情况。如果字体颜">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/25/Android 自定义 Preference/" title="Android 自定义 Preference" itemprop="url">Android 自定义 Preference</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-25T15:32:16.000Z" itemprop="datePublished">2015 1月 25</time>
+    更新日期:<time datetime="2015-01-25T15:32:16.000Z" itemprop="dateModified">2015 1月 25</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简单的修改_xml"><span class="toc-number">1.</span> <span class="toc-text">简单的修改 xml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#扩展代码"><span class="toc-number">2.</span> <span class="toc-text">扩展代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">3.</span> <span class="toc-text">参考</span></a></li></ol>
+		</div>
+		
+		<p>有些时候系统提供的 Preference 不满足我们的要求的时候，我们就需要自己定制了。现在产品要求 ChekBoxPreference 的 summary 的颜色要能动态改变，在关闭的时候是默认颜色，在开启的时候变成红色。现在我们就可以自己定制啦。</p>
+<h2 id="简单的修改_xml">简单的修改 xml</h2>
+<p>先说说简单的情况。如果字体颜色只是静态的话，可以不用改代码，改改 layout xml 就好了。系统自己的 xml 是 framework/base/core/res/res/layout/preference.xml 。把这个文件复制，然后在其基础上改改 text 的属性就好了，然后在使用 CheckBoxPreference 的时候指定自己定制的 xml（这里我叫 custom_preference.xml）。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></div><div class="line"><span class="comment">&lt;!-- Copyright (C) 2006 The Android Open Source Project</span></div><div class="line"></div><div class="line">     Licensed under the Apache License, Version 2.0 (the "License");</div><div class="line">     you may not use this file except in compliance with the License.</div><div class="line">     You may obtain a copy of the License at</div><div class="line">  </div><div class="line">          http://www.apache.org/licenses/LICENSE-2.0</div><div class="line">  </div><div class="line">     Unless required by applicable law or agreed to in writing, software</div><div class="line">     distributed under the License is distributed on an "AS IS" BASIS,</div><div class="line">     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</div><div class="line">     See the License for the specific language governing permissions and</div><div class="line">     limitations under the License.</div><div class="line">--&gt;</div><div class="line"></div><div class="line"><span class="comment">&lt;!-- Layout for a Preference in a PreferenceActivity. The</span></div><div class="line">     Preference is able to place a specific widget for its particular</div><div class="line">     type in the "widget_frame" layout. --&gt;</div><div class="line"><span class="tag">&lt;<span class="title">LinearLayout</span> <span class="attribute">xmlns:android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span> </span></div><div class="line">    <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></div><div class="line">    <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></div><div class="line">    <span class="attribute">android:minHeight</span>=<span class="value">"?android:attr/listPreferredItemHeight"</span></div><div class="line">    <span class="attribute">android:gravity</span>=<span class="value">"center_vertical"</span></div><div class="line">    <span class="attribute">android:paddingRight</span>=<span class="value">"?android:attr/scrollbarSize"</span>&gt;</div><div class="line">    </div><div class="line">    <span class="tag">&lt;<span class="title">RelativeLayout</span></span></div><div class="line">        <span class="attribute">android:layout_width</span>=<span class="value">"wrap_content"</span></div><div class="line">        <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></div><div class="line">        <span class="attribute">android:layout_marginLeft</span>=<span class="value">"15dip"</span></div><div class="line">        <span class="attribute">android:layout_marginRight</span>=<span class="value">"6dip"</span></div><div class="line">        <span class="attribute">android:layout_marginTop</span>=<span class="value">"6dip"</span></div><div class="line">        <span class="attribute">android:layout_marginBottom</span>=<span class="value">"6dip"</span></div><div class="line">        <span class="attribute">android:layout_weight</span>=<span class="value">"1"</span>&gt;</div><div class="line">    </div><div class="line">        <span class="tag">&lt;<span class="title">TextView</span> <span class="attribute">android:id</span>=<span class="value">"@+android:id/title"</span></span></div><div class="line">            <span class="attribute">android:layout_width</span>=<span class="value">"wrap_content"</span></div><div class="line">            <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></div><div class="line">            <span class="attribute">android:singleLine</span>=<span class="value">"true"</span></div><div class="line">            <span class="attribute">android:textAppearance</span>=<span class="value">"?android:attr/textAppearanceLarge"</span></div><div class="line">            <span class="attribute">android:ellipsize</span>=<span class="value">"marquee"</span></div><div class="line">            <span class="attribute">android:fadingEdge</span>=<span class="value">"horizontal"</span> /&gt;</div><div class="line">            </div><div class="line">        // 就是在这里改啦，加一个 textColor 属性</div><div class="line">        <span class="tag">&lt;<span class="title">TextView</span> <span class="attribute">android:id</span>=<span class="value">"@+android:id/summary"</span></span></div><div class="line">            <span class="attribute">android:layout_width</span>=<span class="value">"wrap_content"</span></div><div class="line">            <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></div><div class="line">            <span class="attribute">android:layout_below</span>=<span class="value">"@android:id/title"</span></div><div class="line">            <span class="attribute">android:layout_alignLeft</span>=<span class="value">"@android:id/title"</span></div><div class="line">            <span class="attribute">android:textAppearance</span>=<span class="value">"?android:attr/textAppearanceSmall"</span></div><div class="line">            <span class="attribute">android:textColor</span>=<span class="value">"#FFFF0000"</span> </div><div class="line">            <span class="attribute">android:maxLines</span>=<span class="value">"4"</span> /&gt;</div><div class="line"></div><div class="line">    <span class="tag">&lt;/<span class="title">RelativeLayout</span>&gt;</span></div><div class="line">    </div><div class="line">    <span class="comment">&lt;!-- Preference should place its actual preference widget here. --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">LinearLayout</span> <span class="attribute">android:id</span>=<span class="value">"@+android:id/widget_frame"</span></span></div><div class="line">        <span class="attribute">android:layout_width</span>=<span class="value">"wrap_content"</span></div><div class="line">        <span class="attribute">android:layout_height</span>=<span class="value">"match_parent"</span></div><div class="line">        <span class="attribute">android:gravity</span>=<span class="value">"center_vertical"</span></div><div class="line">        <span class="attribute">android:orientation</span>=<span class="value">"vertical"</span> /&gt;</div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="title">LinearLayout</span>&gt;</span></div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">// 改好后，在用 CheckBoxPreference 的时候，指定自己的 xml layout</div><div class="line"><span class="tag">&lt;<span class="title">CheckBoxPreference</span> <span class="attribute">android:key</span>=<span class="value">"lock_screen"</span> </span></div><div class="line">    	<span class="attribute">android:title</span>=<span class="value">"@string/settings_lock_screen_title"</span> </div><div class="line">    	<span class="attribute">android:defaultValue</span>=<span class="value">"false"</span> </div><div class="line">        <span class="attribute">android:layout</span>=<span class="value">"@layout/custom_preference"</span></div><div class="line">    	<span class="attribute">android:summaryOff</span>=<span class="value">"@string/settings_lock_screen_off_summary"</span> </div><div class="line">    	<span class="attribute">android:summaryOn</span>=<span class="value">"@string/settings_lock_screen_on_summary"</span> </div><div class="line">    	<span class="attribute">android:summary</span>=<span class="value">"@string/settings_lock_screen_off_summary"</span>&gt;</div><div class="line">    <span class="tag">&lt;/<span class="title">CustomCheckBoxPreference</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h2 id="扩展代码">扩展代码</h2>
+<p>如果需要复杂点的功能，就需要继承 CheckBoxPreference ，然后自己定制代码了。这里以动态的改字体颜色为例：继承 CheckBoxPreference 后，重载父类的 onBindView 函数（这个函数好像是在将数据显示到视图上的时候调用的）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomCheckBoxPreference</span> <span class="keyword">extends</span> <span class="title">CheckBoxPreference</span> </span>{</div><div class="line"></div><div class="line">	<span class="keyword">public</span> <span class="title">CustomCheckBoxPreference</span>(Context context, AttributeSet attrs,</div><div class="line">			<span class="keyword">int</span> defStyle) {</div><div class="line">		<span class="keyword">super</span>(context, attrs, defStyle);</div><div class="line">		<span class="comment">// TODO Auto-generated constructor stub</span></div><div class="line">	}</div><div class="line">	</div><div class="line">	<span class="annotation">@Override</span></div><div class="line">	<span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onBindView</span>(View view) {</div><div class="line">		<span class="keyword">super</span>.onBindView(view);</div><div class="line">		</div><div class="line">		<span class="keyword">boolean</span> isChecked = isChecked();</div><div class="line">		Resources res = view.getResources();</div><div class="line">		</div><div class="line">		TextView summaryView = (TextView)view.findViewById(com.android.internal.R.id.summary);</div><div class="line">		<span class="keyword">if</span> (summaryView != <span class="keyword">null</span>) {</div><div class="line">			<span class="keyword">if</span> (isChecked) {</div><div class="line">				summaryView.setTextColor(res.getColor(R.color.red));</div><div class="line">			} <span class="keyword">else</span> {</div><div class="line">				<span class="comment">//summaryView.setTextAppearance(getContext(), com.android.internal.R.attr.textAppearanceSmall);</span></div><div class="line">				summaryView.setTextColor(res.getColor(com.android.internal.R.color.secondary_text_light));</div><div class="line">			}</div><div class="line">		}</div><div class="line">	}</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>写好自己的类之后，在用的时候把原来的 CheckBoxPreference 换成自己的类就可以了：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">cn.fmsoft.launcher2.CustomCheckBoxPreference</span> <span class="attribute">android:key</span>=<span class="value">"lock_screen"</span> </span></div><div class="line">    	<span class="attribute">android:title</span>=<span class="value">"@string/settings_lock_screen_title"</span> </div><div class="line">    	<span class="attribute">android:defaultValue</span>=<span class="value">"false"</span> </div><div class="line">    	<span class="attribute">android:summaryOff</span>=<span class="value">"@string/settings_lock_screen_off_summary"</span> </div><div class="line">    	<span class="attribute">android:summaryOn</span>=<span class="value">"@string/settings_lock_screen_on_summary"</span> </div><div class="line">    	<span class="attribute">android:summary</span>=<span class="value">"@string/settings_lock_screen_off_summary"</span>&gt;</div><div class="line">    <span class="tag">&lt;/<span class="title">cn.fmsoft.launcher2.CustomCheckBoxPreference</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h2 id="参考">参考</h2>
+<p>参考出处：<a href="http://www.cnblogs.com/franksunny/archive/2011/10/21/2219890.html" title="Preference 使用小结" target="_blank" rel="external">Preference 使用小结</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Development/">Android Development</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/25/Android 自定义 Preference/" data-title="Android 自定义 Preference | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/25/Android 资源文件夹命名规则/" title="Android 资源文件夹命名规则">
+  <strong>上一篇:</strong><br/>
+  <span>
+  Android 资源文件夹命名规则</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/25/Android 4.0 访问 WebService 出现 android.os.NetworkOnMainThreadException 异常/"  title="Android 4.0 访问 WebService 出现 android.os.NetworkOnMainThreadException 异常">
+ <strong>下一篇:</strong><br/> 
+ <span>Android 4.0 访问 WebService 出现 android.os.NetworkOnMainThreadException 异常
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread" data-thread-key="Android 自定义 Preference" data-title="Android 自定义 Preference" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2015/01/25/Android 自定义 Preference/">
+    </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简单的修改_xml"><span class="toc-number">1.</span> <span class="toc-text">简单的修改 xml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#扩展代码"><span class="toc-number">2.</span> <span class="toc-text">扩展代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">3.</span> <span class="toc-text">参考</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>22</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li> <i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="5" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2015 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

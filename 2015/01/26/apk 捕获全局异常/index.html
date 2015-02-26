@@ -1,0 +1,507 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>apk 捕获全局异常 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="某些时候我们写的程序会意外崩溃。有些时候的崩溃是必然出现的，有些时候是随机的出现的。随机出现的崩溃问题，一般查找崩溃的原因需要花费很多时间，不过如果要是有崩溃的 log ，就能很快的定位到问题的所在了。相信大家有些对 SQA 打的一些随机一次、有规律重现的 bug 都很头痛吧。现在介绍一个办法能抓住">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/26/apk 捕获全局异常/" title="apk 捕获全局异常" itemprop="url">apk 捕获全局异常</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-26T15:11:16.000Z" itemprop="datePublished">2015 1月 26</time>
+    更新日期:<time datetime="2015-01-26T15:11:16.000Z" itemprop="dateModified">2015 1月 26</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#原理"><span class="toc-number">1.</span> <span class="toc-text">原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">2.</span> <span class="toc-text">实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用方法"><span class="toc-number">3.</span> <span class="toc-text">使用方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#限制"><span class="toc-number">4.</span> <span class="toc-text">限制</span></a></li></ol>
+		</div>
+		
+		<p>某些时候我们写的程序会意外崩溃。有些时候的崩溃是必然出现的，有些时候是随机的出现的。随机出现的崩溃问题，一般查找崩溃的原因需要花费很多时间，不过如果要是有崩溃的 log ，就能很快的定位到问题的所在了。相信大家有些对 SQA 打的一些随机一次、有规律重现的 bug 都很头痛吧。现在介绍一个办法能抓住崩溃的现场 log 日志，这样就能快速的定位崩溃的原因。</p>
+<h2 id="原理">原理</h2>
+<p>这个办法就是：捕获全局异常。java 程序的大多数崩溃都是异常引起的（注意这里说的是一般，这个方法其实是有限制的，具体的后面会说到）。如果发生了异常，你捕获了，那么系统会把让你的程序来处理异常，如果你没有捕获，那么系统最后会自己处理：那就是挂掉你的程序，然后打印一些崩溃信息。我们现在要做的处理这些没有被程序捕获（处理）的异常（这些异常会引起崩溃），这就是捕获全局异常的原理。但是要注意的一点是：<strong>这里捕获全局异常的作用，仅仅是抓取异常（崩溃）的现场日志，方便查找问题而已，不能防止程序崩溃</strong>。也就是说就算你捕获了全局异常，也无法阻止你出错的程序挂掉。</p>
+<h2 id="实现">实现</h2>
+<p>我们就来看看如何来实现这个功能吧。首先是新建一个异常处理类 CrashHandler 实现 UncaughtExceptionHandler，这个接口有一个 uncaughtException 方法。当发生了崩溃异常的时候，就会调用这个方法让你来处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrashHandler</span> <span class="keyword">implements</span> <span class="title">UncaughtExceptionHandler</span> </span>{</div><div class="line"></div><div class="line">... ...</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">uncaughtException</span>(Thread thread, Throwable ex) {</div><div class="line">        <span class="keyword">if</span> (!handleException(ex) && <span class="keyword">null</span> != mDefaultHandler) {</div><div class="line">            mDefaultHandler.uncaughtException(thread, ex);</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div><div class="line">.... ....</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">handleException</span>(Throwable ex) {</div><div class="line">        <span class="keyword">if</span> (ex == <span class="keyword">null</span>) {</div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="comment">// show the crash to the logcat.</span></div><div class="line">        ex.printStackTrace();</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (!needCatchCrash()) {</div><div class="line">            selfKill();</div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        }</div><div class="line"></div><div class="line">        collectCrashDeviceInfo();</div><div class="line">        saveCrashInfoToFile(ex);</div><div class="line"></div><div class="line">        <span class="comment">// if need upload we send the log file to server.</span></div><div class="line">        <span class="keyword">if</span> (needUpload()) {</div><div class="line">            sendCrashReportToServer(getLastCrashReportFile());</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (needReport()) {</div><div class="line">            autoRestart();</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            selfKill();</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    }</div><div class="line"></div><div class="line">... ...</div><div class="line"></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>可以看到 handleException 处理流程是：</p>
+<ol>
+<li>调用 ex.printStackTrace 打印当前的异常信息。</li>
+<li>收集运行崩溃程序的设备信息。</li>
+<li>将崩溃的时候堆栈信息（log）保存到文件。</li>
+<li>显示崩溃报告界面。</li>
+</ol>
+<p>这里有一个可以添加的功能：那就是如果以后有服务器支持，可以向服务器发送崩溃日志信息（类似于一些手机平台sdk，像友盟这种），这样在正式发布产品的时候如果出了错误，也能第一时间发现（当然最好是不出问题）。</p>
+<p>收集运行崩溃程序的设备信息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">collectCrashDeviceInfo</span>() {</div><div class="line">    <span class="keyword">try</span> {</div><div class="line">        PackageManager pm = mContext.getPackageManager();</div><div class="line">        PackageInfo pi = pm.getPackageInfo(mContext.getPackageName(),</div><div class="line">                PackageManager.GET_ACTIVITIES);</div><div class="line">        <span class="keyword">if</span> (pi != <span class="keyword">null</span>) {</div><div class="line">            mDeviceCrashInfo.put(VERSION_NAME,</div><div class="line">                    pi.versionName == <span class="keyword">null</span> ? <span class="string">"unknow"</span> : pi.versionName);</div><div class="line">            mDeviceCrashInfo.put(VERSION_CODE,</div><div class="line">                    String.valueOf(pi.versionCode));</div><div class="line">            <span class="comment">// collect the upload info.</span></div><div class="line">            mVersionName = (pi.versionName == <span class="keyword">null</span> ? <span class="string">"unknow"</span> : pi.versionName);</div><div class="line">            mVersionCode = pi.versionCode;</div><div class="line">        }</div><div class="line">    } <span class="keyword">catch</span> (NameNotFoundException e) {</div><div class="line">        <span class="keyword">if</span> (DEBUG) LogUtils.e(TAG, <span class="string">"Error while collect package info"</span>, e);</div><div class="line">    }</div><div class="line"></div><div class="line">    Field[] fields = Build.class.getDeclaredFields();</div><div class="line">    <span class="keyword">for</span> (Field field : fields) {</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            field.setAccessible(<span class="keyword">true</span>);</div><div class="line">            String key = field.getName();</div><div class="line">            Object value = field.get(<span class="keyword">null</span>);</div><div class="line">            <span class="comment">//if (DEBUG) LogUtils.d(TAG, key + " : " + value);</span></div><div class="line">            mDeviceCrashInfo.put(key,</div><div class="line">                    value != <span class="keyword">null</span> ? value.toString() : value);</div><div class="line">            <span class="comment">// collect the upload info.</span></div><div class="line">            <span class="keyword">if</span> (PRODUCT.equals(key)) {</div><div class="line">                mProduct = (value != <span class="keyword">null</span> ? value.toString() : <span class="string">"unknow"</span>);</div><div class="line">            }</div><div class="line">        } <span class="keyword">catch</span> (Exception e) {</div><div class="line">            <span class="keyword">if</span> (DEBUG) LogUtils.e(TAG, <span class="string">"Error while collect crash info"</span>, e);</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这里首先会收集崩溃程序的版本号（VersionCode），然后会收集崩溃程序运行的系统的一些信息（系统的一些编译信息），然后保存在一个 Properties 对象（mDeviceCrashInfo）中。</p>
+<p>接下来是保存崩溃时候的堆栈信息了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">saveCrashInfoToFile</span>(Throwable ex) {</div><div class="line">    Writer info = <span class="keyword">new</span> StringWriter();</div><div class="line">    PrintWriter printWriter = <span class="keyword">new</span> PrintWriter(info);</div><div class="line">    <span class="comment">// printStackTrace(PrintWriter s)</span></div><div class="line">    ex.printStackTrace(printWriter);</div><div class="line"></div><div class="line">    Throwable cause = ex.getCause();</div><div class="line">    <span class="keyword">while</span> (<span class="keyword">null</span> != cause) {</div><div class="line">        cause.printStackTrace(printWriter);</div><div class="line">        cause = cause.getCause();</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="comment">//String result = info.toString();</span></div><div class="line">    String result = formatStackTrace(info.toString());</div><div class="line">    printWriter.close();</div><div class="line">    mDeviceCrashInfo.put(STACK_TRACE, result);</div><div class="line"></div><div class="line">    <span class="keyword">try</span> {</div><div class="line"></div><div class="line">        String logPath = resolveLogPath();</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == logPath) {</div><div class="line">            LogUtils.e(TAG, <span class="string">"log path invalid, can't save crash log file !!"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        }</div><div class="line"></div><div class="line">        String fileName = resolveLogFileName();</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == fileName) {</div><div class="line">            LogUtils.e(TAG, <span class="string">"log file name invalid, can't save crash log file !!"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="comment">// check save directory whether existed.</span></div><div class="line">        String filePath = logPath + File.separator + fileName;</div><div class="line">        <span class="keyword">if</span> (!StoreUtils.checkFileDirExisted(filePath)) {</div><div class="line">            LogUtils.e(TAG, <span class="string">"save crash info: create crash file dir error !"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="comment">// check the cache size.</span></div><div class="line">        checkCacheSize();</div><div class="line"></div><div class="line">        <span class="comment">//FileOutputStream trace = mContext.openFileOutput(fileName,</span></div><div class="line">        <span class="comment">//      Context.MODE_PRIVATE);</span></div><div class="line">        FileOutputStream trace = <span class="keyword">new</span> FileOutputStream(filePath);</div><div class="line"></div><div class="line">        mDeviceCrashInfo.store(trace, <span class="string">""</span>);</div><div class="line">        trace.flush();</div><div class="line">        trace.close();</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (DEBUG) LogUtils.e(TAG, <span class="string">"save a crash file: "</span> + logPath + fileName);</div><div class="line"></div><div class="line">    } <span class="keyword">catch</span> (Exception e) {</div><div class="line">        <span class="keyword">if</span> (DEBUG) LogUtils.e(TAG, <span class="string">"an error occured while writing report file..."</span>, e);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>可以看得到，抓取崩溃的堆栈信息是通过将 java 系统抛出的异常 Throwable 打印到我们之前的那个变量 mDeviceCrashInfo 中，然后再把这个变量里面的信息（全都是 String）保存到指定文件来实现的。这里的保存路径（resolveLogPath），我是做了个接口，可以让程序自由设置的。然后这里还限制了一下崩溃文件的大小，如果保存的崩溃文件数量大小超过一定限制，就会去清理一下。具体的代码我这里就不贴了，大家可以自己去看看。 </p>
+<p>然后最后显示下崩溃报告界面：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">autoRestart</span>() {</div><div class="line">    Intent intent;</div><div class="line">    intent = <span class="keyword">new</span> Intent(mContext, CrashReportActivity.class);</div><div class="line">    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK</div><div class="line">            | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED</div><div class="line">            | Intent.FLAG_ACTIVITY_CLEAR_TOP</div><div class="line">            | Intent.FLAG_ACTIVITY_NO_ANIMATION);</div><div class="line">    PendingIntent contentIntent = PendingIntent.getActivity(mContext, <span class="number">0</span>,</div><div class="line">            intent, PendingIntent.FLAG_UPDATE_CURRENT);</div><div class="line"></div><div class="line">    AlarmManager mgr = (AlarmManager) mContext</div><div class="line">            .getSystemService(Context.ALARM_SERVICE);</div><div class="line"></div><div class="line">    <span class="comment">// record re-start count</span></div><div class="line">    recordReStartCount();</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (isReStartTooMany()) {</div><div class="line">        <span class="comment">// if re-start count is too many, we abandon it and cancel the old re-start intent.</span></div><div class="line">        mgr.cancel(contentIntent);</div><div class="line">        <span class="comment">// leave the clean count record in application init.</span></div><div class="line">        <span class="comment">//cleanReStartCount();</span></div><div class="line">        selfKill();</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="comment">// the re-start don't set too short, if is too short,</span></div><div class="line">    <span class="comment">// we have not enough time to cancel it.</span></div><div class="line">    <span class="comment">//mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100,</span></div><div class="line">    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + <span class="number">300</span>,</div><div class="line">            contentIntent);</div><div class="line">    <span class="keyword">if</span> (DEBUG) LogUtils.d(TAG, <span class="string">"we restart the app"</span>);</div><div class="line"></div><div class="line">    selfKill();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这里的崩溃报告界面（CrashReportActivity）是程序中的一个专门用来显示刚刚保存的崩溃信息的 activity 。这里显示这个 activity 的原理是，设一个短时间的闹钟，然后自己杀死已经发生崩溃了的进程，闹钟到时间后，启动显示崩溃信息的 activity 。这里注意，必须杀是原来已经崩溃了的进程，然后重新启动，才能正常启动程序中的 activity，因为原来的进程已经发生了崩溃异常了，程序已经不正常了，不杀死重启的话，是无法再启动 activity 的。这也是前面的说的为什么这个方法无法阻止程序挂掉的原因。</p>
+<p>这个 activity 会调用 CrashHandler 的 loadLastCrashReport 接口来读取最后一次保存的崩溃信息来显示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> String <span class="title">loadLastCrashReport</span>() {</div><div class="line">    StringWriter sw = <span class="keyword">new</span> StringWriter();</div><div class="line">    PrintWriter pw = <span class="keyword">new</span> PrintWriter(sw);</div><div class="line"></div><div class="line">    Properties properties = <span class="keyword">new</span> Properties();</div><div class="line">    String crFile = getLastCrashReportFile();</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> != crFile) {</div><div class="line">        File cr = <span class="keyword">new</span> File(crFile);</div><div class="line"></div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            FileInputStream is;</div><div class="line">            is = <span class="keyword">new</span> FileInputStream(cr);</div><div class="line">            properties.load(is);</div><div class="line">            <span class="comment">//properties.list(pw);</span></div><div class="line">            pw.println(crFile + <span class="string">" -----"</span>);</div><div class="line">            <span class="comment">//pw.println(properties.get(STACK_TRACE));</span></div><div class="line">            printProperties(properties, pw);</div><div class="line">            properties.clear();</div><div class="line">            pw.println();</div><div class="line">            pw.println();</div><div class="line">        } <span class="keyword">catch</span> (Exception e) {</div><div class="line">            e.printStackTrace();</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">return</span> sw.toString();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>activity 的代码我就不贴了，具体的大家也可以去看代码。</p>
+<p>最后弄一个设置处理未获取异常的接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span>(Context context) {</div><div class="line">    <span class="comment">// the path must be public for upload service can access it.</span></div><div class="line">    <span class="comment">//String defLogPath = context.getCacheDir().toString()</span></div><div class="line">    <span class="comment">//      + File.separator + ".crash" + File.separator;</span></div><div class="line">    String defLogPath = DEFAULT_CRASH_LOG_PATH</div><div class="line">            + context.getPackageName() + File.separator;</div><div class="line">    init(context, CRASH_HANDLE_FLAG_CATCH,</div><div class="line">            defLogPath, DEFAULT_CRASH_CACHE_SIZE);</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span>(Context context, <span class="keyword">int</span> flag, String logPath, <span class="keyword">long</span> crashCacheSize) {</div><div class="line">    mContext = context;</div><div class="line">    mPkgName = context.getPackageName();</div><div class="line"></div><div class="line">    mHandleFlag = flag;</div><div class="line">    mLogPath = logPath;</div><div class="line">    mCrashCacheSize = crashCacheSize;</div><div class="line"></div><div class="line">    <span class="comment">// we use app self cache path as re-start count file save path</span></div><div class="line">    mCountFilePath = context.getCacheDir().toString() + File.separator + <span class="string">"CrashLaunchCount.sav"</span>;</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerCrashHandler</span>() {</div><div class="line">    mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();</div><div class="line">    Thread.setDefaultUncaughtExceptionHandler(<span class="keyword">this</span>);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h2 id="使用方法">使用方法</h2>
+<p>自定义一个 Application ，然后在 onCreate 的时候设置一下捕获全局异常的处理就行了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomApplication</span> <span class="keyword">extends</span> <span class="title">Application</span> <span class="keyword">implements</span> <span class="title">ActivityLifecycleCallbacks</span> </span>{</div><div class="line">    </div><div class="line">... ...</div><div class="line"></div><div class="line">    <span class="annotation">@Override</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span>() {</div><div class="line">        <span class="keyword">super</span>.onCreate();</div><div class="line">        init();</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span>() {</div><div class="line">        <span class="comment">// 初始化全局异常处理</span></div><div class="line">        CrashHandler.getInstance().init(<span class="keyword">this</span>);</div><div class="line">        setCrashLogPath();</div><div class="line">        CrashHandler.getInstance().setCrashCacheSize(CRASH_CACHE_SIZE);</div><div class="line">        CrashHandler.getInstance().registerCrashHandler();</div><div class="line">        ... ...</div><div class="line">    }</div><div class="line"></div><div class="line">... ...</div><div class="line"></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这里调用 CrashHandler 提供的设置捕获全局异常的接口（init），然后设置了一下保存崩溃文件的路径和崩溃文件的大小限制。如果在某些情况下不想要这个功能，你可以弄个开关，注释掉这3句话就行了，使用起来还是很简单的。因为要写文件，最后别忘记在 manifest 中加上写文件权限和把 application 设置为自己自定义的就行了：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">    <span class="tag">&lt;<span class="title">application</span></span></div><div class="line">        <span class="attribute">android:name</span>=<span class="value">".lib.CustomApplication"</span></div><div class="line">        <span class="attribute">android:allowBackup</span>=<span class="value">"true"</span></div><div class="line">        <span class="attribute">android:icon</span>=<span class="value">"@drawable/ic_launcher"</span></div><div class="line">        <span class="attribute">android:label</span>=<span class="value">"@string/app_name"</span></div><div class="line">        <span class="attribute">android:theme</span>=<span class="value">"@style/AppTheme"</span></div><div class="line">        &gt;</div><div class="line">... ...</div><div class="line">    <span class="tag">&lt;/<span class="title">application</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h2 id="限制">限制</h2>
+<p>这个方法也不是万能，也存在一些限制：</p>
+<ol>
+<li>它只能捕获崩溃挂掉的情况。也就是说，如果不是挂掉的问题，而是一些逻辑 bug 或是界面刷新不对的，这个方法是没用的。</li>
+<li>它只能捕获有异常发生的情况。如果是 JNI 里面导致一些内存访问越界而导致程序崩溃，这个方法也是没用的。</li>
+<li>它不能用来拯救程序的，原因之前说过了，这个方法的功能简单来话说：仅仅是抓 log 。 </li>
+</ol>
+<p>最后上个效果图（demo里面一个故意的空指针访问）：</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/crash-catch/1.jpeg" alt=""></p>
+<p>附上参考代码（后续改进了下，project 直接编不过的，需要稍微改一下）： <a href="http://pan.baidu.com/s/1ZOwm" title="ApplicationDemo.tar.gz" target="_blank" rel="external">ApplicationDemo.tar.gz</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Development/">Android Development</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/26/apk 捕获全局异常/" data-title="apk 捕获全局异常 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/26/dmtracedump 的用法/" title="dmtracedump 的用法">
+  <strong>上一篇:</strong><br/>
+  <span>
+  dmtracedump 的用法</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/26/Android 优秀开源网络框架/"  title="Android 优秀开源网络框架">
+ <strong>下一篇:</strong><br/> 
+ <span>Android 优秀开源网络框架
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread" data-thread-key="apk 捕获全局异常" data-title="apk 捕获全局异常" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2015/01/26/apk 捕获全局异常/">
+    </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#原理"><span class="toc-number">1.</span> <span class="toc-text">原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">2.</span> <span class="toc-text">实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用方法"><span class="toc-number">3.</span> <span class="toc-text">使用方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#限制"><span class="toc-number">4.</span> <span class="toc-text">限制</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>22</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li> <i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="5" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2015 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

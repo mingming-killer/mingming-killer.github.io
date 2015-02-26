@@ -81,174 +81,162 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/21/MiniGUI 源码分析笔记/" title="MiniGUI 源码分析笔记" itemprop="url">
+    <a href="/2015/02/06/Android SystemUI 分析——通知/" title="Android SystemUI 分析——通知" itemprop="url">
   
-    <h1 itemprop="name">MiniGUI 源码分析笔记</h1>
+    <h1 itemprop="name">Android SystemUI 分析——通知</h1>
     
      
-           <p itemprop="description" >随手记记，免得忘记。
-线程版启动的线程
-线程版的 MiniGUI 在 InitGUI 后，会启动额外3个线程：
-
-__mg_desktop（pthread_t）：桌面线程，线程函数 DesktopMain。这个线程用于运行桌面处理函数，处理各种桌面消息，以及分发各种消息给所需要的</p>
+           <p itemprop="description" >Notification 作为 android 系统中的一种提醒类的 UI，其实不是很复杂。但是过了些时候又有点忘记了，又要去翻代码，所以还是稍微总结记录一下比较好。这里不会说得太深，就是一些 Notification 比较基本的东西（浅析一下吧），我们先照例把相关代码位置啰嗦一</p>
         
     
-    <time datetime="2015-01-21T13:12:16.000Z" itemprop="datePublished">2015 1月 21</time>
+    <time datetime="2015-02-06T02:17:16.000Z" itemprop="datePublished">2015 2月 6</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/21/MiniGUI 消息机制源码分析/" title="MiniGUI 消息机制源码分析" itemprop="url">
+    <a href="/2015/02/06/Android SystemUI 分析——最近任务列表/" title="Android SystemUI 分析——最近任务列表" itemprop="url">
   
-    <h1 itemprop="name">MiniGUI 消息机制源码分析</h1>
+    <h1 itemprop="name">Android SystemUI 分析——最近任务列表</h1>
     
      
-           <p itemprop="description" >现在不少的GUI都是基于消息机制的。所谓的消息机制我个人的理解是：当用户与GUI交互时发生了一些事件（如按下键盘、点击鼠标等），这个时候就要告诉GUI发生了某个事件（发送消息），GUI在监听是不是有事件发生（获取消息），当GUI得知有事件发生时就要做出某些动作来响应用户的这些事件</p>
+           <p itemprop="description" >Android 4.1 SystemUI 的最近任务列表和 4.2 的区别还是很大的。4.1 的是一个 BAR_PANEL，是一个 view 添加到 window manager 里面 show 出来的。4.2 变成了依附一个 Activity 了（其实都是 window）。功能</p>
         
     
-    <time datetime="2015-01-21T13:07:16.000Z" itemprop="datePublished">2015 1月 21</time>
+    <time datetime="2015-02-06T02:15:16.000Z" itemprop="datePublished">2015 2月 6</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/21/MiniGUI 自定义控件教程7/" title="MiniGUI 自定义控件教程7" itemprop="url">
+    <a href="/2015/01/31/[转] 如何在 github 上删除一个仓库/" title="(转) 如何在 github 上删除一个仓库" itemprop="url">
   
-    <h1 itemprop="name">MiniGUI 自定义控件教程7</h1>
+    <h1 itemprop="name">(转) 如何在 github 上删除一个仓库</h1>
     
      
-           <p itemprop="description" >接着上次的教程继续。这次给大家介绍的是界面美观的进度条控件。它功能上和MiniGUI原有的进度条控件（CTRL_PROGRESSBAR）是一样的（其实进度条也就是那些功能，哪还能整出别点什么花样哦）。
-一、功能确定
+           <p itemprop="description" >删除功能很隐蔽，可能老外就不太想让你删除吧，毕竟这是一个开源的地方，但是偶尔创建了一些测试仓库在那里很碍眼。
+首先点击进入你要删除的 repository，如下图，点击 setting：
 
-要具有MiniGUI原有进度条控件的所有功能，像设置范围，设置</p>
+将网页拉到下方，找到 Delete this repository 按钮，点击：
+
+在弹出</p>
         
     
-    <time datetime="2015-01-21T09:48:16.000Z" itemprop="datePublished">2015 1月 21</time>
+    <time datetime="2015-01-31T11:56:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/21/MiniGUI 自定义控件教程6/" title="MiniGUI 自定义控件教程6" itemprop="url">
+    <a href="/2015/01/31/[转] 字符编码笔记/" title="(转) 字符编码笔记" itemprop="url">
   
-    <h1 itemprop="name">MiniGUI 自定义控件教程6</h1>
+    <h1 itemprop="name">(转) 字符编码笔记</h1>
     
      
-           <p itemprop="description" >接着上次的教程继续。之前就已经介绍完MiniGUI 2.0以前本人掌握的自定义控件的方法了（3.0的好像不太一样了呢，目前本人还没研究过）。恩，让我们来回顾下先：
-
-对已经创建了的控件实例进行子类化。
-对某个控件的子类进行子类化；这个又可以分为针对某个已有的控件（继承父类，类似之</p>
+           <p itemprop="description" >1、字符编码、内码，顺带介绍汉字编码
+字符必须编码后才能被计算机处理。计算机使用的缺省编码方式就是计算机的内码。早期的计算机使用7位的ASCII编码，为了处理汉字，程序员设计了用于简体中文的GB2312和用于繁体中文的big5。 
+GB2312(1980年)一共收录了7445个字</p>
         
     
-    <time datetime="2015-01-21T08:07:16.000Z" itemprop="datePublished">2015 1月 21</time>
+    <time datetime="2015-01-31T11:43:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/21/MiniGUI 自定义控件教程5/" title="MiniGUI 自定义控件教程5" itemprop="url">
+    <a href="/2015/01/31/[转] unicode 编码表/" title="(转) unicode 编码表" itemprop="url">
   
-    <h1 itemprop="name">MiniGUI 自定义控件教程5</h1>
+    <h1 itemprop="name">(转) unicode 编码表</h1>
     
      
-           <p itemprop="description" >接着上次的教程继续。上次以ButtonEx控件的开发为例介绍了如果自己完全重新开始写控件，这次我以一个扩展单行编辑框控件为例介绍如何在原有控件的基础上扩展自定义功能（继承原有控件功能）。
-一、功能确定
-MiniGUI原来的单行编辑框控件 CTRL_SLEdit 除了具有编辑框的基</p>
+           <p itemprop="description" >unicode 编码表
+Unicode 目前普遍采用的是 UCS-2，它用两个字节来编码一个字符, 比如汉字”经”的编码是 0x7ECF，注意字符编码一般用十六进制来表示,为了与十进制区分,十六进制以 0x 头，0x7ECF 转换成十进制就是 32463，UCS-2 用两个字节来</p>
         
     
-    <time datetime="2015-01-21T06:40:16.000Z" itemprop="datePublished">2015 1月 21</time>
+    <time datetime="2015-01-31T11:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/20/MiniGUI 自定义控件教程4/" title="MiniGUI 自定义控件教程4" itemprop="url">
+    <a href="/2015/01/31/[转] Java 的模版和 C++ 模版的区别/" title="(转) Java 的模版和 C++ 模版的区别" itemprop="url">
   
-    <h1 itemprop="name">MiniGUI 自定义控件教程4</h1>
+    <h1 itemprop="name">(转) Java 的模版和 C++ 模版的区别</h1>
     
      
-           <p itemprop="description" >接着上次的教程继续。上次介绍了ButtonEx控件的设计，这次介绍ButtonEx的具体实现。这里我不打算说C语言的语法和简单的MiniGUI API调用，我就只说一些需要注意的问题。因为我认为这些才是大家真正需要了解的。
-注册类
-不管你是自己完全重新开始写控件类，还是继承现有的</p>
+           <p itemprop="description" >java 中的模版其实应该叫泛型。 泛型本质上是提供类型的”类型参数”，它们也被称为参数化类型（parameterized type）或参量多态（parametric polymorphism）。其实泛型思想并不是 Java 最先引入的，C++ 中的模板就是一个运用泛型的例子。泛</p>
         
     
-    <time datetime="2015-01-20T09:35:16.000Z" itemprop="datePublished">2015 1月 20</time>
+    <time datetime="2015-01-31T11:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/19/MiniGUI 自定义控件教程3/" title="MiniGUI 自定义控件教程3" itemprop="url">
+    <a href="/2015/01/31/[转] 什么是 VSync/" title="(转) 什么是 VSync" itemprop="url">
   
-    <h1 itemprop="name">MiniGUI 自定义控件教程3</h1>
+    <h1 itemprop="name">(转) 什么是 VSync</h1>
     
      
-           <p itemprop="description" >接着上次的教程继续。之前介绍了子类化已有的控件实例的方法，现在介绍子类化类和完全自己重新开始写控件类的方法。这个2种区别就是：子类化类，其实就是OOP里的继承，继承一个已有的控件类，在其基础上作扩展。完全自己重新开始写控件类是我自己的叫法，可以理解为MFC（我个人对MFC相对来说</p>
+           <p itemprop="description" >一个老外写的 VSync（垂直同步）原理的文章的翻译：
+VSync是垂直同期(Vertical Synchronization)的简称。基本的思路是将你的FPS和显示器的刷新率同期起来。其目的是避免一种称之为”撕裂”的现象。再下面我将详细介绍这些内容。
+每一台CRT显示器都有自己</p>
         
     
-    <time datetime="2015-01-19T12:52:16.000Z" itemprop="datePublished">2015 1月 19</time>
+    <time datetime="2015-01-31T11:36:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/19/MiniGUI 自定义控件教程2/" title="MiniGUI 自定义控件教程2" itemprop="url">
+    <a href="/2015/01/31/[转] Dia 无法输入中文/" title="(转) Dia 无法输入中文" itemprop="url">
   
-    <h1 itemprop="name">MiniGUI 自定义控件教程2</h1>
+    <h1 itemprop="name">(转) Dia 无法输入中文</h1>
     
      
-           <p itemprop="description" >控件功能确认
-咋接着上次的教程继续。这次我们依托一个例子来说明如何使用MiniGUI中的第一种方法（也就是子类化已经创建的控件实例）。假设我们的例子是：某个学校的某个年级的某些班在某个时间搞了某次考试。考试过后经老师研究决定把考试成绩按班为单位分成3个分数段：差、中等、好。现在咱</p>
+           <p itemprop="description" >需要画流程图装了dia for windows，结果画图时不能输入中文，只能输入英文，很郁闷…，Google之，发现解决方案：
+菜单里选择输入法-&amp;gt;简单，就可以了，不能用默认的系统(Windows IME)。
+注意：在ubuntu下要用系统(IBUS)，若选简单的话，甚至连</p>
         
     
-    <time datetime="2015-01-19T12:34:16.000Z" itemprop="datePublished">2015 1月 19</time>
+    <time datetime="2015-01-31T11:34:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/19/MiniGUI 自定义控件教程1/" title="MiniGUI 自定义控件教程1" itemprop="url">
+    <a href="/2015/01/31/[转] 那些 cache 和 buffer —— 下/" title="(转) 那些 cache 和 buffer —— 下" itemprop="url">
   
-    <h1 itemprop="name">MiniGUI 自定义控件教程1</h1>
+    <h1 itemprop="name">(转) 那些 cache 和 buffer —— 下</h1>
     
      
-           <p itemprop="description" >前言：
-MiniGUI 采用的机制是与win32十分类似的消息机制，基本上与win32的sdk一致。win32上经典的Framework MFC 采用的是C++，面向对象的方法，自定控件可以直接使用继承的方式，十分方便。MiniGUI 使用的是c语音，重所周知这是一个面向过程的语</p>
+           <p itemprop="description" >前面一篇文章 谈了一些Linux系统层面的cache和buffer。这里主要谈谈应用层面的那些cache。相比系统层面的cache集中在IO上，应用层面的cache就显得五花八门了。就从WEB说起吧。
+web服务器缓存
+web缓存对于服务器和客户端都是不可或缺的。对于web服务器</p>
         
     
-    <time datetime="2015-01-19T12:25:16.000Z" itemprop="datePublished">2015 1月 19</time>
+    <time datetime="2015-01-31T09:40:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/19/[转] float 类型在内存中的表示/" title="(转) float 类型在内存中的表示" itemprop="url">
+    <a href="/2015/01/31/[转] 那些 cache 和 buffer —— 上/" title="(转) 那些 cache 和 buffer —— 上" itemprop="url">
   
-    <h1 itemprop="name">(转) float 类型在内存中的表示</h1>
+    <h1 itemprop="name">(转) 那些 cache 和 buffer —— 上</h1>
     
      
-           <p itemprop="description" >标准
-先说一下计算机中二进制的算法：
-整数
-整数的二进制算法大家应该很熟悉，就是不断的除以2取余数，然后将余数倒序排列。比如求9的二进制： 
-
-9/2=4 余 1 
-4/2=2 余 0 
-2/2=1 余 0 
-1/2=0 余 1
- 
-
-一直计算到商为0为止，然后将得到的余数由下到</p>
+           <p itemprop="description" >江湖人称：cache is king。
+还有个与之类似的是buffer。这里就谈谈buffer和cache。那么他们到底是用来干什么的呢？其实他们就是在两个相对独立的系统之间的一个中间层，用来避免这两个系统之间不必要的交互和不不必要的或者重复的同步。同步，你懂的，不同数量级系统之</p>
         
     
-    <time datetime="2015-01-19T12:22:16.000Z" itemprop="datePublished">2015 1月 19</time>
+    <time datetime="2015-01-31T09:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
 
   <nav id="page-nav" class="clearfix">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
   </nav>
 
 </div>
@@ -259,17 +247,50 @@ MiniGUI 采用的机制是与win32十分类似的消息机制，基本上与win3
 <aside class="clearfix">
 
   
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>22</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
 <div class="tagslist">
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/basics/" title="basics">basics<sup>5</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
 		
-			<li><a href="/tags/linux/" title="linux">linux<sup>23</sup></a></li>
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		
-			<li><a href="/tags/minigui/" title="minigui">minigui<sup>9</sup></a></li>
+			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
 		
-			<li><a href="/tags/test/" title="test">test<sup>1</sup></a></li>
+			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
 		
 		</ul>
 </div>

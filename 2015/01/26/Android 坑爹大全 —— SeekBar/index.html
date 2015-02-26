@@ -1,0 +1,512 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>Android 坑爹大全 —— SeekBar | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="一般用 SeekBar 除了 google 自己那一票 app 以及系统，开发者几乎都不会直接用原来的 SeekBar 的图的，都要自己换图。这里就所说 SeekBar 换图的事。
+结构
+首先来看看 SeekBar 的构成：
+
+SeekBar 由一个进度条和上面的滑块构成。一般换图就换这2个东西就 ">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/26/Android 坑爹大全 —— SeekBar/" title="Android 坑爹大全 —— SeekBar" itemprop="url">Android 坑爹大全 —— SeekBar</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-26T15:48:16.000Z" itemprop="datePublished">2015 1月 26</time>
+    更新日期:<time datetime="2015-01-26T15:48:16.000Z" itemprop="dateModified">2015 1月 26</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#结构"><span class="toc-number">1.</span> <span class="toc-text">结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#坑爹的设计"><span class="toc-number">2.</span> <span class="toc-text">坑爹的设计</span></a></li></ol>
+		</div>
+		
+		<p>一般用 SeekBar 除了 google 自己那一票 app 以及系统，开发者几乎都不会直接用原来的 SeekBar 的图的，都要自己换图。这里就所说 SeekBar 换图的事。</p>
+<h2 id="结构">结构</h2>
+<p>首先来看看 SeekBar 的构成：</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/suck-problem-seek-bar/1.jpeg" alt=""></p>
+<p>SeekBar 由一个进度条和上面的滑块构成。一般换图就换这2个东西就 OK 了。一般是要准备3张图片：进度条2张，一张背景（background）、一张滑动的进度（progress）、一张是滑块（thumb）。</p>
+<p>拿个例子说事， UI 说界面的亮度调节的视觉是这样的：</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/suck-problem-seek-bar/2.jpeg" alt=""></p>
+<p>然后给了3张图，一般换图么， SeekBar 继承关系是： SeekBar —-&gt; AbsSeekBar —&gt; ProgressBar 。 换个 progressDrawable（ProgressBar的） 和 thumb（AbsSeekBar的） 就行了。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">SeekBar</span></span></div><div class="line">    <span class="attribute">android:layout_width</span>=<span class="value">"300dp"</span></div><div class="line">    <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></div><div class="line">    <span class="attribute">android:layout_centerInParent</span>=<span class="value">"true"</span></div><div class="line">    <span class="attribute">android:progressDrawable</span>=<span class="value">"@drawable/seek_drawable"</span></div><div class="line">    <span class="attribute">android:thumb</span>=<span class="value">"@drawable/seek_thumb"</span></div><div class="line">    /&gt;</div></pre></td></tr></table></figure>
+
+<p>thumb 的 drawable 直接是滑块的 png 就行。progressDrawable 如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">layer-list</span> <span class="attribute">xmlns:android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span> &gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">item</span> </span></div><div class="line">        <span class="attribute">android:id</span>=<span class="value">"@android:id/background"</span> </div><div class="line">        <span class="attribute">android:drawable</span>=<span class="value">"@drawable/seek_progress_bk"</span></div><div class="line">        &gt;</div><div class="line">    <span class="tag">&lt;/<span class="title">item</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">item</span> <span class="attribute">android:id</span>=<span class="value">"@android:id/progress"</span> &gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">clip</span> <span class="attribute">android:drawable</span>=<span class="value">"@drawable/seek_progress"</span> &gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">clip</span>&gt;</span></div><div class="line">     <span class="tag">&lt;/<span class="title">item</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">layer-list</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<p>progressDrawable 可以用 LayerDrawable 同时指定进度条的背景（background）和进度（progress），progress 的 clip 的意思是说：这个要用这个图片的一部门来表示进度，而不是用图片的全部来表示，想想看进度条的表示方式，就是这样的啦。这个 clip 还可以设置方向，进度条可以是水平的也可以是竖直的。</p>
+<p>然后坑就来了。一般 SeekBar 的滑块都会比进度条大，这里 UI 给的是 25x29 ，那个进度是 9-patch 的，20x6。我原来以为 SeekBar 的大小应该是 300 x 29，滑块是 25x29，然后那个进度条高度就是 6，居中显示。但是出来的结果确是滑块的大小确实 25x29，但是进度条却是 13 的高度（居中倒是居中），感觉肥了不少。</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/suck-problem-seek-bar/3.jpeg" alt=""></p>
+<p>刚开始以为 ProgressBar 可以设啥 padding 之类的东西，但是不找到，然后尝试把进度体的图改称和 thumb 的一样高（png 的用透明填充），但是发现还是达不到预期效果。无奈只好去翻代码了。 </p>
+<h2 id="坑爹的设计">坑爹的设计</h2>
+<p>先是在 ProgressBar.java 中发现 progressDrawable 设置的地方：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Drawable drawable = a.getDrawable(R.styleable.ProgressBar_progressDrawable);</div><div class="line"><span class="keyword">if</span> (drawable != <span class="keyword">null</span>) {</div><div class="line">    drawable = tileify(drawable, <span class="keyword">false</span>);</div><div class="line">    <span class="comment">// Calling this method can set mMaxHeight, make sure the corresponding</span></div><div class="line">    <span class="comment">// XML attribute for mMaxHeight is read after calling this method</span></div><div class="line">    setProgressDrawable(drawable);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这段在 ProgressBar 的构造函数中，发现 xml 里指定的 progressDrawable 其实调用 setProgressDrawable 来设置的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setProgressDrawable</span>(Drawable d) {</div><div class="line">    <span class="keyword">boolean</span> needUpdate;</div><div class="line">    <span class="keyword">if</span> (mProgressDrawable != <span class="keyword">null</span> && d != mProgressDrawable) {</div><div class="line">        mProgressDrawable.setCallback(<span class="keyword">null</span>);</div><div class="line">        needUpdate = <span class="keyword">true</span>;</div><div class="line">    } <span class="keyword">else</span> {</div><div class="line">        needUpdate = <span class="keyword">false</span>;</div><div class="line">    }</div><div class="line">            </div><div class="line">    <span class="keyword">if</span> (d != <span class="keyword">null</span>) {</div><div class="line">        d.setCallback(<span class="keyword">this</span>);</div><div class="line">        <span class="keyword">if</span> (canResolveLayoutDirection()) {</div><div class="line">            d.setLayoutDirection(getLayoutDirection());</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="comment">// Make sure the ProgressBar is always tall enough</span></div><div class="line">        <span class="keyword">int</span> drawableHeight = d.getMinimumHeight();</div><div class="line">        <span class="keyword">if</span> (mMaxHeight &lt; drawableHeight) {</div><div class="line">            mMaxHeight = drawableHeight;</div><div class="line">            requestLayout();</div><div class="line">        }</div><div class="line">    }</div><div class="line">    mProgressDrawable = d;</div><div class="line">    <span class="keyword">if</span> (!mIndeterminate) {</div><div class="line">        mCurrentDrawable = d;</div><div class="line">        postInvalidate();</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (needUpdate) {</div><div class="line">        updateDrawableBounds(getWidth(), getHeight());</div><div class="line">        updateDrawableState();</div><div class="line">        doRefreshProgress(R.id.progress, mProgress, <span class="keyword">false</span>, <span class="keyword">false</span>);</div><div class="line">        doRefreshProgress(R.id.secondaryProgress, mSecondaryProgress, <span class="keyword">false</span>, <span class="keyword">false</span>);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>然后 setProgressDrawable 是把设置的 progressDrawable 保存在了 mProgressDrawable 的成员变量中。然后通过搜索发现根据 ProgressBar 的样式 mProgressDrawable 为被选为 mCurrentDrawable：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">setIndeterminate</span>(<span class="keyword">boolean</span> indeterminate) {</div><div class="line">    <span class="keyword">if</span> ((!mOnlyIndeterminate || !mIndeterminate) && indeterminate != mIndeterminate) {</div><div class="line">        mIndeterminate = indeterminate;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (indeterminate) {</div><div class="line">            <span class="comment">// swap between indeterminate and regular backgrounds</span></div><div class="line">            mCurrentDrawable = mIndeterminateDrawable;</div><div class="line">            startAnimation();</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            mCurrentDrawable = mProgressDrawable;</div><div class="line">            stopAnimation();</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>然后去 onDraw 里面看看，原来 mCurrentDrawable 就是画进度条的东西：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Override</span> </div><div class="line"><span class="keyword">protected</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">onDraw</span>(Canvas canvas) {</div><div class="line">    <span class="keyword">super</span>.onDraw(canvas);</div><div class="line">    </div><div class="line">    Drawable d = mCurrentDrawable;</div><div class="line">    <span class="keyword">if</span> (d != <span class="keyword">null</span>) {</div><div class="line">        <span class="comment">// Translate canvas so a indeterminate circular progress bar with padding</span></div><div class="line">        <span class="comment">// rotates properly in its animation</span></div><div class="line">        canvas.save();</div><div class="line">        <span class="keyword">if</span>(isLayoutRtl()) { </div><div class="line">            canvas.translate(getWidth() - mPaddingRight, mPaddingTop);</div><div class="line">            canvas.scale(-<span class="number">1.0</span>f, <span class="number">1.0</span>f);</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            canvas.translate(mPaddingLeft, mPaddingTop);</div><div class="line">        }</div><div class="line">        <span class="keyword">long</span> time = getDrawingTime();</div><div class="line">        <span class="keyword">if</span> (mHasAnimation) {</div><div class="line">            mAnimation.getTransformation(time, mTransformation);</div><div class="line">            <span class="keyword">float</span> scale = mTransformation.getAlpha();</div><div class="line">            <span class="keyword">try</span> {</div><div class="line">                mInDrawing = <span class="keyword">true</span>;</div><div class="line">                d.setLevel((<span class="keyword">int</span>) (scale * MAX_LEVEL));</div><div class="line">            } <span class="keyword">finally</span> {</div><div class="line">                mInDrawing = <span class="keyword">false</span>;</div><div class="line">            }</div><div class="line">            postInvalidateOnAnimation();</div><div class="line">        }</div><div class="line">        d.draw(canvas);</div><div class="line">        canvas.restore();</div><div class="line">        <span class="keyword">if</span> (mShouldStartAnimationDrawable && d <span class="keyword">instanceof</span> Animatable) {</div><div class="line">            ((Animatable) d).start();</div><div class="line">            mShouldStartAnimationDrawable = <span class="keyword">false</span>;</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>onDraw 里面是直接使用 drawable 的 draw 方法来绘制的，那说明肯定是在哪个地方使用 setBounds 来设置 drawable 的 bound 来设置绘制位置的（这里称赞一下 android 的 drawable 家族的设计，真的很棒，抽象的很好，功能也强大，背景不管是 bitmap、9-patch、color、gradient、selector、layer 都只要 draw 就能画出来，只要是 drawable 都能够当作背景参数传入）。</p>
+<p>然后搜一下 setBrounds 的地方，发现并不多，然后和 mProgressDrawable 相关的 setBounds 的地方就一个：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">updateDrawableBounds</span>(<span class="keyword">int</span> w, <span class="keyword">int</span> h) {</div><div class="line">    <span class="comment">// onDraw will translate the canvas so we draw starting at 0,0.</span></div><div class="line">    <span class="comment">// Subtract out padding for the purposes of the calculations below.</span></div><div class="line">    w -= mPaddingRight + mPaddingLeft;</div><div class="line">    h -= mPaddingTop + mPaddingBottom;</div><div class="line"></div><div class="line">    <span class="keyword">int</span> right = w;</div><div class="line">    <span class="keyword">int</span> bottom = h;</div><div class="line">    <span class="keyword">int</span> top = <span class="number">0</span>;</div><div class="line">    <span class="keyword">int</span> left = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (mIndeterminateDrawable != <span class="keyword">null</span>) {</div><div class="line">        <span class="comment">// Aspect ratio logic does not apply to AnimationDrawables</span></div><div class="line">        <span class="keyword">if</span> (mOnlyIndeterminate && !(mIndeterminateDrawable <span class="keyword">instanceof</span> AnimationDrawable)) {</div><div class="line">            <span class="comment">// Maintain aspect ratio. Certain kinds of animated drawables</span></div><div class="line">            <span class="comment">// get very confused otherwise.</span></div><div class="line">            <span class="keyword">final</span> <span class="keyword">int</span> intrinsicWidth = mIndeterminateDrawable.getIntrinsicWidth();</div><div class="line">            <span class="keyword">final</span> <span class="keyword">int</span> intrinsicHeight = mIndeterminateDrawable.getIntrinsicHeight();</div><div class="line">            <span class="keyword">final</span> <span class="keyword">float</span> intrinsicAspect = (<span class="keyword">float</span>) intrinsicWidth / intrinsicHeight;</div><div class="line">            <span class="keyword">final</span> <span class="keyword">float</span> boundAspect = (<span class="keyword">float</span>) w / h;</div><div class="line">            <span class="keyword">if</span> (intrinsicAspect != boundAspect) {</div><div class="line">                <span class="keyword">if</span> (boundAspect &gt; intrinsicAspect) {</div><div class="line">                    <span class="comment">// New width is larger. Make it smaller to match height.</span></div><div class="line">                    <span class="keyword">final</span> <span class="keyword">int</span> width = (<span class="keyword">int</span>) (h * intrinsicAspect); </div><div class="line">                    left = (w - width) / <span class="number">2</span>;        </div><div class="line">                    right = left + width;          </div><div class="line">                } <span class="keyword">else</span> {</div><div class="line">                    <span class="comment">// New height is larger. Make it smaller to match width.</span></div><div class="line">                    <span class="keyword">final</span> <span class="keyword">int</span> height = (<span class="keyword">int</span>) (w * (<span class="number">1</span> / intrinsicAspect));</div><div class="line">                    top = (h - height) / <span class="number">2</span>;        </div><div class="line">                    bottom = top + height;         </div><div class="line">                }</div><div class="line">            }</div><div class="line">        }</div><div class="line">        <span class="keyword">if</span> (isLayoutRtl()) {           </div><div class="line">            <span class="keyword">int</span> tempLeft = left;           </div><div class="line">            left = w - right;              </div><div class="line">            right = w - tempLeft;</div><div class="line">        }</div><div class="line">        mIndeterminateDrawable.setBounds(left, top, right, bottom);</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (mProgressDrawable != <span class="keyword">null</span>) {</div><div class="line">        mProgressDrawable.setBounds(<span class="number">0</span>, <span class="number">0</span>, right, bottom);</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>加点打印看看设置的 bound 是多少（编译出来的是 frameworks.jar），发现是 （0，0，268，29），哎，这里的是 29 的高度啊。在 onDraw 再加点打印（把 drawable 的 getBounds() 打印出来），发现是 (0, 8, 268, 21) ，这里就和显示上的对上了，高度 13 ，肥了很多，那应该在别的地方有设置。</p>
+<p>分别去 SeekBar、AbsSeekBar 里搜索下 setBounds，发现 SeekBar 里没有， AbsSeekBar 里有：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">updateThumbPos</span>(<span class="keyword">int</span> w, <span class="keyword">int</span> h) {</div><div class="line">    Drawable d = getCurrentDrawable();</div><div class="line">    Drawable thumb = mThumb;</div><div class="line">    <span class="keyword">int</span> thumbHeight = thumb == <span class="keyword">null</span> ? <span class="number">0</span> : thumb.getIntrinsicHeight();</div><div class="line">    <span class="comment">// The max height does not incorporate padding, whereas the height</span></div><div class="line">    <span class="comment">// parameter does</span></div><div class="line">    <span class="keyword">int</span> trackHeight = Math.min(mMaxHeight, h - mPaddingTop - mPaddingBottom);</div><div class="line">        </div><div class="line">    <span class="keyword">int</span> max = getMax();</div><div class="line">    <span class="keyword">float</span> scale = max &gt; <span class="number">0</span> ? (<span class="keyword">float</span>) getProgress() / (<span class="keyword">float</span>) max : <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (thumbHeight &gt; trackHeight) {</div><div class="line">        <span class="keyword">if</span> (thumb != <span class="keyword">null</span>) {</div><div class="line">            setThumbPos(w, thumb, scale, <span class="number">0</span>); </div><div class="line">        }   </div><div class="line">        <span class="keyword">int</span> gapForCenteringTrack = (thumbHeight - trackHeight) / <span class="number">2</span>;</div><div class="line">        <span class="keyword">if</span> (d != <span class="keyword">null</span>) {</div><div class="line">            <span class="comment">// Canvas will be translated by the padding, so 0,0 is where we start drawing</span></div><div class="line">            d.setBounds(<span class="number">0</span>, gapForCenteringTrack, </div><div class="line">                    w - mPaddingRight - mPaddingLeft, h - mPaddingBottom - gapForCenteringTrack</div><div class="line">                    - mPaddingTop);</div><div class="line">        }   </div><div class="line">    } <span class="keyword">else</span> {</div><div class="line">        <span class="keyword">if</span> (d != <span class="keyword">null</span>) {</div><div class="line">            <span class="comment">// Canvas will be translated by the padding, so 0,0 is where we start drawing</span></div><div class="line">            d.setBounds(<span class="number">0</span>, <span class="number">0</span>, w - mPaddingRight - mPaddingLeft, h - mPaddingBottom</div><div class="line">                    - mPaddingTop);</div><div class="line">        }   </div><div class="line">        <span class="keyword">int</span> gap = (trackHeight - thumbHeight) / <span class="number">2</span>;</div><div class="line">        <span class="keyword">if</span> (thumb != <span class="keyword">null</span>) {</div><div class="line">            setThumbPos(w, thumb, scale, gap);</div><div class="line">        }   </div><div class="line">    }   </div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>哎，好多加、减的计算咧，分析上面的代码会发现是这样的： 如果 thumbHeight &gt; trackHeight 的，那么进度条的 bounds 其实是居中。thumbHeight 的是由设置的 thumb 的 drawable 的 IntrinsicHeight 来决定的（一般就是图片的高度）。主要在于 trackHeight 是多少， 打印出来发现是 13 : </p>
+<pre>
+int trackHeight = Math.min(mMaxHeight, h - mPaddingTop - mPaddingBottom);
+</pre>
+
+<p>打印出来发现，padding 是 0，高度 h 是 29，这个高度看 AbsSeekBar 的 onMeasure 函数可以知道如果没有明确指定 view 的高度（使用 wrap_content）的话，由 thumb 和 currentDrawable（progressDrawable） 中 IntrinsicHeight 最大（加上 padding ）的决定。这里 thumb 的 29 明显比 progressDrawable 的 6 要大，所以主要就看 mMaxHeight 了， 这个 mMaxHeight 在 AbsSeekBar 中没有定义，那就是父类 ProgressBar 的，跑去一看发现在构造函数中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mMaxHeight = a.getDimensionPixelSize(R.styleable.ProgressBar_maxHeight, mMaxHeight);</div></pre></td></tr></table></figure>
+
+<p>这个东西由 xml 中的 android:maxHeight 决定的，如果不指定，则使用系统 style 中的默认值，这里好像是 13。果然坑爹咧，进度条的高度系统不是用你图片的高度，而是使用 android:maxHeight 来决定（大多数情况下由这个决定，因为很前面的代码发现，这个需要 thumb 图片的高度比进度条的图片高才行，不过一般都是这样的）。</p>
+<p>所以我设了下 maxHeight 为 6 （进度条图片高度），果然进度条就不肥了，高度老老实实变成 6 了，官方文档啥都没说。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">SeekBar</span></span></div><div class="line">    <span class="attribute">android:layout_width</span>=<span class="value">"300dp"</span></div><div class="line">    <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></div><div class="line">    <span class="attribute">android:layout_centerInParent</span>=<span class="value">"true"</span></div><div class="line">    <span class="attribute">android:progressDrawable</span>=<span class="value">"@drawable/seek_drawable"</span></div><div class="line">    <span class="attribute">android:thumb</span>=<span class="value">"@drawable/seek_thumb"</span></div><div class="line">    <span class="attribute">android:maxHeight</span>=<span class="value">"6dp"</span></div><div class="line">    /&gt;</div></pre></td></tr></table></figure>
+
+<p>果然不肥了：</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/suck-problem-seek-bar/4.jpeg" alt=""></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Development/">Android Development</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/26/Android 坑爹大全 —— SeekBar/" data-title="Android 坑爹大全 —— SeekBar | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/26/Android 坑爹大全 —— Paint mask filter 无效/" title="Android 坑爹大全 —— Paint mask filter 无效">
+  <strong>上一篇:</strong><br/>
+  <span>
+  Android 坑爹大全 —— Paint mask filter 无效</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/26/hierarchyviewer 无法使用问题/"  title="hierarchyviewer 无法使用问题">
+ <strong>下一篇:</strong><br/> 
+ <span>hierarchyviewer 无法使用问题
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread" data-thread-key="Android 坑爹大全 —— SeekBar" data-title="Android 坑爹大全 —— SeekBar" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2015/01/26/Android 坑爹大全 —— SeekBar/">
+    </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#结构"><span class="toc-number">1.</span> <span class="toc-text">结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#坑爹的设计"><span class="toc-number">2.</span> <span class="toc-text">坑爹的设计</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>22</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li> <i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="5" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2015 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

@@ -81,155 +81,167 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/13/Repo 命令备忘/" title="Repo 命令备忘" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——拦截应用内置广告.检测篇/" title="工作小笔记——拦截应用内置广告.检测篇" itemprop="url">
   
-    <h1 itemprop="name">Repo 命令备忘</h1>
+    <h1 itemprop="name">工作小笔记——拦截应用内置广告.检测篇</h1>
     
      
-           <p itemprop="description" >repo 其实本身就是一个 git 仓库，只不过这个仓库记录了别的 git 仓库的地址，版本号信息而已。这个 git 仓库在项目的根目录的 .repo/mainfests 下面。其实就是一个 xml 文件，然后里面记录了各个项目的版本号而已，repo 自身是一个脚本。
-downl</p>
+           <p itemprop="description" >最近步步高的平板被熊孩子的家长爆料了，说里面有有黄色内容。后面发现是一些免费的第三放学习应用内置广告，在后台弹窗口广告，结果有些无节操的广告就蹦出来了，例如下面那个：
+
+然后这边就让想办法屏蔽这些第三方应用内的广告。发现市场上有不少工具类的软件可以检测，并且拦截第三应用内的广告。</p>
         
     
-    <time datetime="2015-01-13T12:37:16.000Z" itemprop="datePublished">2015 1月 13</time>
+    <time datetime="2015-01-31T02:44:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/13/Rsa 验证简介/" title="Rsa 验证简介" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——Android 自带的应用统计服务[UsageStatsService]/" title="工作小笔记——Android 自带的应用统计服务（UsageStatsService）" itemprop="url">
   
-    <h1 itemprop="name">Rsa 验证简介</h1>
+    <h1 itemprop="name">工作小笔记——Android 自带的应用统计服务（UsageStatsService）</h1>
     
      
-           <p itemprop="description" >如果不是用密码来进行验证的话，那么就可以使用 rsa 数据签名来进行验证。签名分为公钥和私钥2个。公钥是可以公开出来的，密钥是自己个人持有的。一般来使用 RSA 验证的话，是自己生成一对公钥/私钥。然后把公钥放置到服务器上，自己持有公钥和私钥，然后就可以通过公钥来验证了。下面上使</p>
+           <p itemprop="description" >继续占个坑～～services/java/com/android/server/am/UsageStatsService.java</p>
         
     
-    <time datetime="2015-01-13T12:33:16.000Z" itemprop="datePublished">2015 1月 13</time>
+    <time datetime="2015-01-31T02:33:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/13/Git 使用备忘/" title="Git 使用备忘" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——利用反射需要注意的问题/" title="工作小笔记——利用反射需要注意的问题" itemprop="url">
   
-    <h1 itemprop="name">Git 使用备忘</h1>
+    <h1 itemprop="name">工作小笔记——利用反射需要注意的问题</h1>
     
      
-           <p itemprop="description" >简单的 git 使用教程。
-常用命令
-
-git clone
-
-从服务拷贝代码副本到本地（类似 svn checkout）
-
-git add
-
-添加本机文件到服务器
-
-查看git仓库路径
-
-这个好像没直接的命令可以查看，可以去 git 代码的根目录下的 .git/config 里去</p>
+           <p itemprop="description" >java 中的反射可以实现很多方便的功能。例如在配置文中写一些布局文件，运行的时候载入配置文件，然后利用反射创建配置文件中的对象（android 的 LayoutInflater 就是利用反射的）。
+运用得好的话，会很方便，但是需要注意一点。混淆过后，就导致通过名字创建对象的反射</p>
         
     
-    <time datetime="2015-01-13T12:13:16.000Z" itemprop="datePublished">2015 1月 13</time>
+    <time datetime="2015-01-31T02:31:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/11/GDB 命令备忘/" title="GDB 命令备忘" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——Android 动态切换系统字体/" title="工作小笔记——Android 动态切换系统字体" itemprop="url">
   
-    <h1 itemprop="name">GDB 命令备忘</h1>
+    <h1 itemprop="name">工作小笔记——Android 动态切换系统字体</h1>
     
      
-           <p itemprop="description" >一些常用的 gdb 使用命令备忘。help 可以查看命令，help xx 可以查看具体命令的所有参数。
-编译带调试符号的程序
-要想用 gdb 调试，编译的时候要带上 debug 符号，就是用 gcc 编译的时候带上 -g 参数编译（bu要带 -o 开启优化模式，这个会把所有的调试</p>
+           <p itemprop="description" >最近在调研一个东西，就是动态切换 android 的系统字体。我的手机是三棒的 Galaxy SIII，系统设置中自带的了这个功能：
+
+既然别人都弄出来了，应该是可行的。于是开始琢磨（这里事先申明下，以下是基于 4.1.2 的源码的）。
+初步了解
+经过几番百度， Typeface</p>
         
     
-    <time datetime="2015-01-10T16:25:16.000Z" itemprop="datePublished">2015 1月 11</time>
+    <time datetime="2015-01-31T02:19:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/11/VI 命令备忘/" title="VI 命令备忘" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——Android 多用户下的要注意的问题/" title="工作小笔记——Android 多用户下的要注意的问题" itemprop="url">
   
-    <h1 itemprop="name">VI 命令备忘</h1>
+    <h1 itemprop="name">工作小笔记——Android 多用户下的要注意的问题</h1>
     
      
-           <p itemprop="description" >我的一些常用的 vi 使用命令备忘。
-新建
-
-在 shell 直接 vi file 就能创建以 file 命名的文件。
-:e file，在里面内存打开（创建）file 文件。（其中 ： 表示是命令模式）
-
-保存
-
-:s，保存当前文件。
-:q!，退出，不保存。
-:q，退出当前窗口。</p>
+           <p itemprop="description" >之前有篇小笔记也遇到了类似的问题。就是如果你的系统要使用多用户功能，自己写的一些东西（或是以前写的）就要注意用户问题， android 增加了很多带 userID 的参数的接口，如果发起调用的用户和当前的用户不配对的话，要么崩溃，要么抛权限异常。
+不知道从什么时候开始 core/</p>
         
     
-    <time datetime="2015-01-10T16:12:16.000Z" itemprop="datePublished">2015 1月 11</time>
+    <time datetime="2015-01-31T02:12:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/10/Linux 命令备忘/" title="Linux 命令备忘" itemprop="url">
+    <a href="/2015/01/31/工作小笔记——Android 多用户切换无法启动应用的问题/" title="工作小笔记——Android 多用户切换无法启动应用的问题" itemprop="url">
   
-    <h1 itemprop="name">Linux 命令备忘</h1>
+    <h1 itemprop="name">工作小笔记——Android 多用户切换无法启动应用的问题</h1>
     
      
-           <p itemprop="description" >百度、google都能搜得到，但是很杂。这里记录下我记不清的，但是又比较常用的一些linux命令用法。
-mount
-挂载设备命令，一般挂载存储设备就用这个了（硬盘、U盘等）。
-
-mount [-t vfstype] [-o options] device dir
-
-
-其中：
-
--</p>
+           <p itemprop="description" >Android 好像是从 3.0 开始引入多用户相关的支持，到 4.4 的是已经比较成熟了，相关的功能都有了，例如独立的用户空间（4.4 之后，android 把 flash 模拟成几个分区 0、1 等，对应 用户0、用户1），不同用户安装不同应用隔离等等。
+多用户功能可以关闭的</p>
         
     
-    <time datetime="2015-01-10T15:55:16.000Z" itemprop="datePublished">2015 1月 10</time>
+    <time datetime="2015-01-31T01:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/10/Test/" title="Test" itemprop="url">
+    <a href="/2015/01/30/工作小笔记——扩展字库乱码排查/" title="工作小笔记——扩展字库乱码排查" itemprop="url">
   
-    <h1 itemprop="name">Test</h1>
+    <h1 itemprop="name">工作小笔记——扩展字库乱码排查</h1>
     
      
-           <p itemprop="description" >Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the </p>
+           <p itemprop="description" >起源
+前几天市场反馈说，我们的平板上用浏览器在百度搜索的时候某些页面会有乱码现象：
+
+我们的平板的字库文件是被我们自己扩展过的。因为我们的应用需要显示一些特殊的符号（不在 unicode 编码里面），所以我们系统中的 ttf 字体是被我们扩展了很多东西进去。找到相关人员问了下，当</p>
         
     
-    <time datetime="2015-01-10T03:07:14.000Z" itemprop="datePublished">2015 1月 10</time>
+    <time datetime="2015-01-30T09:00:16.000Z" itemprop="datePublished">2015 1月 30</time>
   </a>
 </section>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/1986/12/20/文章索引/" title="文章索引" itemprop="url">
+    <a href="/2015/01/30/Android 一些有意思的命令小工具 —— service/" title="Android 一些有意思的命令小工具 —— service" itemprop="url">
   
-    <h1 itemprop="name">文章索引</h1>
+    <h1 itemprop="name">Android 一些有意思的命令小工具 —— service</h1>
     
      
-           <p itemprop="description" >Linux
-Linux 命令备忘VI 命令备忘GDB 命令备忘Git 使用备忘Rsa 验证简介Repo 命令备忘GitwebLinux shell 环境脚本分析Linux Shell 进阶环境脚本分析BBK 工作编译脚本分析使用 pkg-configubuntu 使用问题总结ub</p>
+           <p itemprop="description" >android 自带了很多 cmds 的小工具，都挺用有的，也有些比较有意思。这里介绍的是 service 这个工具。说之前先把相关源码位置说下（4.4 的）：
+12# service 命令模块frameworks/native/cmds/service
+
+作用
+这个工具的作用是</p>
         
     
-    <time datetime="1986-12-19T16:00:16.000Z" itemprop="datePublished">1986 12月 20</time>
+    <time datetime="2015-01-30T08:32:16.000Z" itemprop="datePublished">2015 1月 30</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/30/Android 一些有意思的命令小工具 —— dumpsys/" title="Android 一些有意思的命令小工具 —— dumpsys" itemprop="url">
+  
+    <h1 itemprop="name">Android 一些有意思的命令小工具 —— dumpsys</h1>
+    
+     
+           <p itemprop="description" >android 自带了很多 cmds 的小工具，都挺用有的，也有些比较有意思。这里介绍的是 dumpsys 这个工具。说之前先把相关源码位置说下（4.4 的）：
+12# service 命令模块frameworks/native/cmds/dumpsys
+
+作用
+这个工具的作用是</p>
+        
+    
+    <time datetime="2015-01-30T08:30:16.000Z" itemprop="datePublished">2015 1月 30</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/28/Android Binder 分析——死亡通知[DeathRecipient]/" title="Android Binder 分析——死亡通知（DeathRecipient）" itemprop="url">
+  
+    <h1 itemprop="name">Android Binder 分析——死亡通知（DeathRecipient）</h1>
+    
+     
+           <p itemprop="description" >binder 是跨进程间的通信，那就是说有本地和远程之说，通过前面几篇也知道 Bp 需要发请求到 Bn 端。但是写过网络通信程序的都知道，远程不一定“靠谱”，就是说可能某些时候远程服务器挂了。所以一般网络通信程序会弄一个心跳的机制，就是每隔一段时间向服务发一些东西，看服务是否还有</p>
+        
+    
+    <time datetime="2015-01-28T14:12:16.000Z" itemprop="datePublished">2015 1月 28</time>
   </a>
 </section>
 
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/3/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span>
+    <a class="extend prev" rel="prev" href="/page/3/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/5/">Next &raquo;</a>
   </nav>
 
 </div>
@@ -240,17 +252,50 @@ Linux 命令备忘VI 命令备忘GDB 命令备忘Git 使用备忘Rsa 验证简�
 <aside class="clearfix">
 
   
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>22</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
 <div class="tagslist">
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/basics/" title="basics">basics<sup>5</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
 		
-			<li><a href="/tags/linux/" title="linux">linux<sup>23</sup></a></li>
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		
-			<li><a href="/tags/minigui/" title="minigui">minigui<sup>9</sup></a></li>
+			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
 		
-			<li><a href="/tags/test/" title="test">test<sup>1</sup></a></li>
+			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
 		
 		</ul>
 </div>

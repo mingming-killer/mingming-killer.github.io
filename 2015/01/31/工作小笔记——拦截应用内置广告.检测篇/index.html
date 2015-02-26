@@ -1,0 +1,471 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>工作小笔记——拦截应用内置广告.检测篇 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="最近步步高的平板被熊孩子的家长爆料了，说里面有有黄色内容。后面发现是一些免费的第三放学习应用内置广告，在后台弹窗口广告，结果有些无节操的广告就蹦出来了，例如下面那个：
+
+然后这边就让想办法屏蔽这些第三方应用内的广告。发现市场上有不少工具类的软件可以检测，并且拦截第三应用内的广告。例如腾讯手机管家、3">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/31/工作小笔记——拦截应用内置广告.检测篇/" title="工作小笔记——拦截应用内置广告.检测篇" itemprop="url">工作小笔记——拦截应用内置广告.检测篇</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-31T02:44:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    更新日期:<time datetime="2015-01-31T02:44:16.000Z" itemprop="dateModified">2015 1月 31</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
+		
+		<p>最近步步高的平板被熊孩子的家长爆料了，说里面有有黄色内容。后面发现是一些免费的第三放学习应用内置广告，在后台弹窗口广告，结果有些无节操的广告就蹦出来了，例如下面那个：</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/Worknote-antiad-scan/1.jpeg" alt=""></p>
+<p>然后这边就让想办法屏蔽这些第三方应用内的广告。发现市场上有不少工具类的软件可以检测，并且拦截第三应用内的广告。例如腾讯手机管家、360安全卫士等。下载下来研究了下，从这些软件检测出来的结果好像可以看出一点线索：</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/Worknote-antiad-scan/2.jpeg" alt=""><br>（上面那个是腾讯手机管家的）</p>
+<p>它列出的广告软件，后面都带有一些包名。虽然后面那些 a、b、c 之类应该是混淆过的，但是前面的前缀就很明显了。一般应用的广告都是集成一些广告或是平台的 sdk 。这里 sdk 一般都是 jar 包，虽然可以混淆，但是一般包名的前缀会保留，一般如果全部混淆弄成 a、b、c 之类，作为库来说，极易和其他混淆后的库或是程序本身的名字冲突。</p>
+<p>这就给我们检测提供了机会了。我发现腾讯管家在扫描的时候会提示，正在扫描应用，然后之后会提示正在云端检测。好，这下我就能确定了（虽然可以反编译 apk 然后慢慢看，但是腾讯管家代码太多了，拦截广告只是它的一个小功能，我就懒得慢慢看了，这种时候需要大胆猜猜，呵呵）。它应该是可以扫描出 apk 调用了哪些类，然后应该有个广告的类名字数据库，本地匹配玩之后，再到它们的服务进行匹配（前面说了就算混淆了，但是前缀就能够识别了）。</p>
+<p>于是去度娘了一下（度娘能解决的，就不请谷姐了，免得天天翻墙），发现 android 的 dex 还真有接口可以枚举出一个 apk 调用哪些 class 文件。下面直接上代码了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">collectInstalledPkgs</span>(ArrayList&lt;String&gt; output) {</div><div class="line">	<span class="keyword">if</span> (<span class="keyword">null</span> == output) {</div><div class="line">		Log.d(TAG, <span class="string">"output data is null, we can't collect installed pkgs"</span>);</div><div class="line">		<span class="keyword">return</span>;</div><div class="line">	}</div><div class="line">	</div><div class="line">	List&lt;PackageInfo&gt; pkgInfos = mPm.getInstalledPackages(<span class="number">0</span>);</div><div class="line">	</div><div class="line">	output.clear();</div><div class="line">	<span class="keyword">for</span> (PackageInfo info : pkgInfos) {</div><div class="line">		<span class="keyword">if</span> (<span class="keyword">null</span> == info) <span class="keyword">continue</span>;</div><div class="line">		output.add(info.packageName);</div><div class="line">		Log.d(TAG, <span class="string">"collect pkg: "</span> + info.packageName);</div><div class="line">	}</div><div class="line">	</div><div class="line">	pkgInfos.clear();</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">scanPkgDexFile</span>(String pkgName) {</div><div class="line">	<span class="keyword">if</span> (<span class="keyword">null</span> == pkgName) {</div><div class="line">		Log.d(TAG, <span class="string">"the target pkgName can't null !"</span>);</div><div class="line">		<span class="keyword">return</span>;</div><div class="line">	}</div><div class="line">	</div><div class="line">	ApplicationInfo info = <span class="keyword">null</span>;</div><div class="line">	</div><div class="line">	<span class="keyword">try</span> {</div><div class="line">		info = mPm.getApplicationInfo(pkgName, <span class="number">0</span>);</div><div class="line">	} <span class="keyword">catch</span> (NameNotFoundException e) {</div><div class="line">		e.printStackTrace();</div><div class="line">		<span class="keyword">return</span>;</div><div class="line">	}</div><div class="line">	<span class="keyword">if</span> (<span class="keyword">null</span> == info) {</div><div class="line">		<span class="keyword">return</span>;</div><div class="line">	}</div><div class="line">	</div><div class="line">	<span class="comment">// we ignore system app or our bbk app</span></div><div class="line">	<span class="keyword">if</span> ((info.flags & ApplicationInfo.FLAG_SYSTEM) != <span class="number">0</span> </div><div class="line">			|| (info.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != <span class="number">0</span> </div><div class="line">			|| pkgName.startsWith(<span class="string">"com.eebbk"</span>) </div><div class="line">			|| pkgName.startsWith(<span class="string">"com.bbk"</span>)) {</div><div class="line">		Log.d(TAG, <span class="string">"pkg: "</span> + pkgName + <span class="string">" is system app or bbk app, we ignore it."</span>);</div><div class="line">		<span class="keyword">return</span>;</div><div class="line">	}</div><div class="line">	</div><div class="line">	<span class="keyword">try</span> {</div><div class="line">		DexFile dexFile = <span class="keyword">new</span> DexFile(info.sourceDir);</div><div class="line">		Enumeration&lt;String&gt; entries = dexFile.entries();</div><div class="line">		Log.d(TAG, <span class="string">"scan pkg: "</span> + pkgName + <span class="string">" source path: "</span> + info.sourceDir);</div><div class="line">		<span class="keyword">while</span> (entries.hasMoreElements()) {</div><div class="line">			Log.d(TAG, entries.nextElement());</div><div class="line">		}</div><div class="line">		Log.d(TAG, <span class="string">" "</span>);</div><div class="line">	} <span class="keyword">catch</span> (IOException e) {</div><div class="line">		e.printStackTrace();</div><div class="line">		Log.e(TAG, <span class="string">"scan dex file failed !"</span>);</div><div class="line">	}</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>然后贴下输出：</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/Worknote-antiad-scan/3.jpeg" alt=""><br>(很明显这个是 google 的 admob)</p>
+<p>但是感觉好像和腾讯的有点不太一样。然后我在 framework 的 DexFile.java(ibcore/dalvik/src/main/java/dalvik/system/DexFile.java) 中加了打印，发现腾讯的好像没调这个接口。有点奇怪了，不知道它是通过什么方式检测的，可能通过 DexFile 是比较初级的办法，不过这个确实可以检测得出来。</p>
+<p>另外在 AndroidManifest.xml 里面申明广告 sdk 的 activity 的一般都是插屏广告（就是那种弹出式的，整个大屏幕的）。也有接口可以解析 AndroidManifest 中申明的 activity 的，这样可以更加细化检测到的广告。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Framework/">Android Framework</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/31/工作小笔记——拦截应用内置广告.检测篇/" data-title="工作小笔记——拦截应用内置广告.检测篇 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/31/工作小笔记——拦截应用内置广告.拦截篇/" title="工作小笔记——拦截应用内置广告.拦截篇">
+  <strong>上一篇:</strong><br/>
+  <span>
+  工作小笔记——拦截应用内置广告.拦截篇</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/31/工作小笔记——Android 自带的应用统计服务[UsageStatsService]/"  title="工作小笔记——Android 自带的应用统计服务（UsageStatsService）">
+ <strong>下一篇:</strong><br/> 
+ <span>工作小笔记——Android 自带的应用统计服务（UsageStatsService）
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread" data-thread-key="工作小笔记——拦截应用内置广告.检测篇" data-title="工作小笔记——拦截应用内置广告.检测篇" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2015/01/31/工作小笔记——拦截应用内置广告.检测篇/">
+    </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>22</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li> <i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="5" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2015 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

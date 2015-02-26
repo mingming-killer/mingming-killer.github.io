@@ -1,0 +1,481 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>(转) 那些 cache 和 buffer —— 上 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="江湖人称：cache is king。
+还有个与之类似的是buffer。这里就谈谈buffer和cache。那么他们到底是用来干什么的呢？其实他们就是在两个相对独立的系统之间的一个中间层，用来避免这两个系统之间不必要的交互和不不必要的或者重复的同步。同步，你懂的，不同数量级系统之间的同步，你也懂的。">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/31/[转] 那些 cache 和 buffer —— 上/" title="(转) 那些 cache 和 buffer —— 上" itemprop="url">(转) 那些 cache 和 buffer —— 上</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-31T09:38:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    更新日期:<time datetime="2015-01-31T09:38:16.000Z" itemprop="dateModified">2015 1月 31</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#文件IO"><span class="toc-number">1.</span> <span class="toc-text">文件IO</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#读缓存（cache）"><span class="toc-number">2.</span> <span class="toc-text">读缓存（cache）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#socket_缓冲"><span class="toc-number">3.</span> <span class="toc-text">socket 缓冲</span></a></li></ol>
+		</div>
+		
+		<p>江湖人称：cache is king。</p>
+<p>还有个与之类似的是buffer。这里就谈谈buffer和cache。那么他们到底是用来干什么的呢？其实他们就是在两个相对独立的系统之间的一个中间层，用来避免这两个系统之间不必要的交互和不不必要的或者重复的同步。同步，你懂的，不同数量级系统之间的同步，你也懂的。比如内存和磁盘之间，比如应用和数据库之间。buffer针对写，cache针对读。这篇文章先来看看Linux里面系统的那些cache和buffer（至于硬件里面的一些cache如cpu指令缓存这里就不谈了）。</p>
+<h2 id="文件IO">文件IO</h2>
+<p>对于写操作通常我们会遇到两个两个缓冲 （buffer）：</p>
+<ul>
+<li><p><strong>一个是内核缓冲:</strong><br>当我们调用write写文件时，write返回之后其实内容并没有立刻写到硬盘上，而是写到了内核的缓存中。什么时候写到磁盘？内核有一套刷缓存的机制。这样做有很明显的好处，比如我们调用1次write写1kb和调用1k次write每次写1b的数据，所花的时间是差不多的。后者所花的用户态/内核态切换时间多些，但是写磁盘的次数却是一样的。这样就大大提高了效率。</p>
+</li>
+<li><p><strong>另外一个是glibc维护的用户态缓冲:</strong><br>这个缓冲又是用来干什么的呢？内核和硬盘是两个相对独立的系统，内核缓冲在这两个之间避免了很多不必要的同步。那么同样，内核和用户程序也是两个相对独立的系统，每次系统调用也是要花代价的。所以上面1次write写1kb和调用1k次write每次写1b的数据的例子，前后两种方法还是有差距的，差距就在于后者需要做1k此用户态和内核态的切换。所以，glibc在用户态上又做了一个缓冲。当我们调用glibc提供的printf输出的时候，并没有直接映射到一次write系统调用，而是存在了glibc管理的缓冲中，当条件满足时（下面会说上面时候满足）再调用一次write，把用户态的缓冲写到内核态去。所以，调用1此printf到文件1kb字符和1k此print每次1个字符，所花的时间就真差不多了。</p>
+</li>
+</ul>
+<h2 id="读缓存（cache）">读缓存（cache）</h2>
+<p>用read读文件，其实就是读的内核的缓存。当内核缓存中没有的时候，会从磁盘读些内容到缓存，然后从缓存返回给用户。 注意，在某些情况下我们还可以做进一步的优化。考虑一下，我们从头到尾读文件，只读1次1kb和读1k次每次1b的时间是不是也差不多呢？这就需要内核在 read的时候事先读1kb的内容到缓存才行（这叫：read ahead）。而内核有不知道我们后续的read调用是从头到尾顺序读还是胡乱读，如果是随机读那么read ahead就会适得其反。还好posix规定了posix_fadvise()系统调用，让我们告诉内核，我们读文件的方式。用这个调用告诉内核我们是顺序读。read的性能就上来了。爽啊。</p>
+<p>下面列举一下glibc默认的缓冲的行为（可以通过setvbuf修改）：</p>
+<ul>
+<li>如果文件是stderr，则默认是没缓冲，每次printf对应一次write。</li>
+<li>如同文件是终端，则默认是行缓冲，每当遇到换行的时候write一次</li>
+<li>如果文件对应的是磁盘文件，则默认是全缓冲，当缓存区满或者文件关闭时会write。</li>
+<li>当然，任何时候，你都可以调用fflush()来强制用户态的缓存写到内核缓冲中。</li>
+</ul>
+<h2 id="socket_缓冲">socket 缓冲</h2>
+<p>对！socket也是有缓冲的。同样的例子我们应用到socket上：1次send 1kb和1k次send每次1b。哪个费时费力呢？显然是后者，因为如果我们知道，IP包头，TCP包头都是要花带宽的。如果一个大大的IP包中只有1字节的数据，显然是大大的浪费了带宽。所以，John Nagle提出了Nagle算法，将这些凌乱的小包缓冲起来，集齐N个组成一个大包，再发出去。这样就大大提高了网络效率。</p>
+<p>当然，这样做也是有负面作用的，当我们应用对网络的实时性要求比较高的时候，可能会因为这个机制而增加了网络延迟（毕竟要等集齐了才发嘛）。这时还是用setsockopt+TCP_NODELAY参数把这个优化禁用了吧。还有吗？当然，cache和buffer无处不在。内存管理中到处有cache。就那用户空间来说，glibc中的ptmalloc2，google的TCMalloc都有cache的存在。由于这部分复杂度极高，后面有机会再分析吧。这篇文章就这样吧。</p>
+<p>所以说：cache is king!</p>
+<p><a href="http://blog.dccmx.com/2011/06/about-cache-and-buffer-1/" title="原始出处" target="_blank" rel="external">原始出处</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/basics/">basics</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Basics-Knowledge/">Basics Knowledge</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/31/[转] 那些 cache 和 buffer —— 上/" data-title="(转) 那些 cache 和 buffer —— 上 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/31/[转] 那些 cache 和 buffer —— 下/" title="(转) 那些 cache 和 buffer —— 下">
+  <strong>上一篇:</strong><br/>
+  <span>
+  (转) 那些 cache 和 buffer —— 下</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/31/[转] eclipse 代码补齐、注释小窗口崩溃解决方法/"  title="(转) eclipse 代码补齐、注释小窗口崩溃解决方法">
+ <strong>下一篇:</strong><br/> 
+ <span>(转) eclipse 代码补齐、注释小窗口崩溃解决方法
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread" data-thread-key="(转) 那些 cache 和 buffer —— 上" data-title="(转) 那些 cache 和 buffer —— 上" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2015/01/31/[转] 那些 cache 和 buffer —— 上/">
+    </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#文件IO"><span class="toc-number">1.</span> <span class="toc-text">文件IO</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#读缓存（cache）"><span class="toc-number">2.</span> <span class="toc-text">读缓存（cache）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#socket_缓冲"><span class="toc-number">3.</span> <span class="toc-text">socket 缓冲</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>22</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li> <i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="5" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2015 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

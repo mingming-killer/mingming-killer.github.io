@@ -1,0 +1,504 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>编译 Android 按键映射分析 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="android 能够将不同的低层 scancode 转化成上层使用的统一的 keycode （以下分析为 android 2.2 froyo 的）。下面说的几个相关的源代码文件都在 framework/base/libs/ui 下。
+EventHub.cpp
+先看看下面这段代码：
+123456789">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/27/Android 按键映射分析/" title="编译 Android 按键映射分析" itemprop="url">编译 Android 按键映射分析</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-27T15:32:16.000Z" itemprop="datePublished">2015 1月 27</time>
+    更新日期:<time datetime="2015-01-27T15:32:16.000Z" itemprop="dateModified">2015 1月 27</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#EventHub-cpp"><span class="toc-number">1.</span> <span class="toc-text">EventHub.cpp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#kl_文件"><span class="toc-number">2.</span> <span class="toc-text">kl 文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#KeycodeLabels-h"><span class="toc-number">3.</span> <span class="toc-text">KeycodeLabels.h</span></a></li></ol>
+		</div>
+		
+		<p>android 能够将不同的低层 scancode 转化成上层使用的统一的 keycode （以下分析为 android 2.2 froyo 的）。下面说的几个相关的源代码文件都在 framework/base/libs/ui 下。</p>
+<h2 id="EventHub-cpp">EventHub.cpp</h2>
+<p>先看看下面这段代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 在 open_device 函数里</span></div><div class="line"><span class="keyword">if</span> ((device-&gt;classes&CLASS_KEYBOARD) != <span class="number">0</span>) { </div><div class="line">   <span class="keyword">char</span> devname[PROPERTY_VALUE_MAX];</div><div class="line">   <span class="keyword">char</span> keylayoutFilename[<span class="number">300</span>];</div><div class="line"></div><div class="line">   <span class="keyword">const</span> <span class="keyword">char</span>* root = getenv(<span class="string">"ANDROID_ROOT"</span>);</div><div class="line">   property_get(<span class="string">"persist.sys.keylayout"</span>, devname, <span class="string">"qwerty"</span>);</div><div class="line">   <span class="built_in">snprintf</span>(keylayoutFilename, <span class="keyword">sizeof</span>(keylayoutFilename), <span class="string">"%s/usr/keylayout/%s.kl"</span>, root, devname);</div><div class="line">   <span class="keyword">bool</span> defaultKeymap = access(keylayoutFilename, R_OK);</div><div class="line">   <span class="keyword">if</span> (defaultKeymap) {</div><div class="line">      <span class="built_in">strcpy</span>(devname, <span class="string">"qwerty"</span>);</div><div class="line">      <span class="built_in">snprintf</span>(keylayoutFilename, <span class="keyword">sizeof</span>(keylayoutFilename),</div><div class="line">                     <span class="string">"%s/usr/keylayout/%s.kl"</span>, root, devname);</div><div class="line">   }</div><div class="line">   LOGI(<span class="string">"keylayout = %s, Filename = %s"</span>, devname, keylayoutFilename);</div><div class="line">   device-&gt;layoutMap-&gt;load(keylayoutFilename);</div></pre></td></tr></table></figure>
+
+<p>这段代码是打开键盘设备，并读取按键映射表的。从代码里可以看得到映射文件是从 root/usr/keylayout/qwerty.kl （root 一般是 system）下读取的（这个 qwerty.kl 各个设备厂商应该可以自己改，我看的 x86 的默认使用的是这个）。</p>
+<h2 id="kl_文件">kl 文件</h2>
+<p>这个文件就是 android 的按键映射文件，结构如下：</p>
+<ul>
+<li><p><strong>BACK</strong>:</p>
+<ul>
+<li>BEGIN: key</li>
+<li>SCANCODE: 1 </li>
+<li>KEYCODE: BACK</li>
+<li>FLAG: WACK_DROPPED</li>
+</ul>
+</li>
+<li><p><strong>POWER</strong>:</p>
+<ul>
+<li>BEGIN: key</li>
+<li>SCANCODE: 116 </li>
+<li>KEYCODE: POWER</li>
+<li>FLAG: WACK</li>
+</ul>
+</li>
+</ul>
+<p>这里配合看下下面的代码，在 KeyLayoutMap.cpp 里：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div></pre></td><td class="code"><pre><div class="line">status_t</div><div class="line">KeyLayoutMap::load(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</div><div class="line">{</div><div class="line">    <span class="keyword">int</span> fd = open(filename, O_RDONLY);</div><div class="line">    <span class="keyword">if</span> (fd &lt; <span class="number">0</span>) {</div><div class="line">        LOGE(<span class="string">"error opening file=%s err=%s\n"</span>, filename, strerror(errno));</div><div class="line">        m_status = errno;</div><div class="line">        <span class="keyword">return</span> errno;</div><div class="line">    }</div><div class="line"></div><div class="line">    off_t len = lseek(fd, <span class="number">0</span>, SEEK_END);</div><div class="line">    off_t errlen = lseek(fd, <span class="number">0</span>, SEEK_SET);</div><div class="line">    <span class="keyword">if</span> (len &lt; <span class="number">0</span> || errlen &lt; <span class="number">0</span>) {</div><div class="line">        close(fd);</div><div class="line">        LOGE(<span class="string">"error seeking file=%s err=%s\n"</span>, filename, strerror(errno));</div><div class="line">        m_status = errno;</div><div class="line">        <span class="keyword">return</span> errno;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">char</span>* buf = (<span class="keyword">char</span>*)<span class="built_in">malloc</span>(len+<span class="number">1</span>);</div><div class="line">    <span class="keyword">if</span> (read(fd, buf, len) != len) {</div><div class="line">        LOGE(<span class="string">"error reading file=%s err=%s\n"</span>, filename, strerror(errno));</div><div class="line">        m_status = errno != <span class="number">0</span> ? errno : ((<span class="keyword">int</span>)NOT_ENOUGH_DATA);</div><div class="line">        <span class="keyword">return</span> errno != <span class="number">0</span> ? errno : ((<span class="keyword">int</span>)NOT_ENOUGH_DATA);</div><div class="line">    }</div><div class="line">    errno = <span class="number">0</span>;</div><div class="line">    buf[len] = <span class="string">'\0'</span>;</div><div class="line"></div><div class="line">    int32_t scancode = -<span class="number">1</span>;</div><div class="line">    int32_t keycode = -<span class="number">1</span>;</div><div class="line">    uint32_t flags = <span class="number">0</span>;</div><div class="line">    uint32_t tmp;</div><div class="line">    <span class="keyword">char</span>* end;</div><div class="line">    status_t err = NO_ERROR;</div><div class="line">    <span class="keyword">int</span> line = <span class="number">1</span>;</div><div class="line">    <span class="keyword">char</span> <span class="keyword">const</span>* p = buf;</div><div class="line">    <span class="keyword">enum</span> { BEGIN, SCANCODE, KEYCODE, FLAG } state = BEGIN;</div><div class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) {</div><div class="line">        String8 token = next_token(&p, &line);</div><div class="line">        <span class="keyword">if</span> (*p == <span class="string">'\0'</span>) {</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        }</div><div class="line">        <span class="keyword">switch</span> (state)</div><div class="line">        {</div><div class="line">            <span class="keyword">case</span> BEGIN:</div><div class="line">                <span class="keyword">if</span> (token == <span class="string">"key"</span>) {</div><div class="line">                    state = SCANCODE;</div><div class="line">                } <span class="keyword">else</span> {</div><div class="line">                    LOGE(<span class="string">"%s:%d: expected key, got '%s'\n"</span>, filename, line,</div><div class="line">                            token.<span class="built_in">string</span>());</div><div class="line">                    err = BAD_VALUE;</div><div class="line">                    <span class="keyword">goto</span> done;</div><div class="line">                }</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> SCANCODE:</div><div class="line">                scancode = strtol(token.<span class="built_in">string</span>(), &end, <span class="number">0</span>);</div><div class="line">                <span class="keyword">if</span> (*end != <span class="string">'\0'</span>) {</div><div class="line">                    LOGE(<span class="string">"%s:%d: expected scancode (a number), got '%s'\n"</span>,</div><div class="line">                            filename, line, token.<span class="built_in">string</span>());</div><div class="line">                    <span class="keyword">goto</span> done;</div><div class="line">                }</div><div class="line">                <span class="comment">//LOGI("%s:%d: got scancode %d\n", filename, line, scancode );</span></div><div class="line">                state = KEYCODE;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> KEYCODE:</div><div class="line">                keycode = token_to_value(token.<span class="built_in">string</span>(), KEYCODES);</div><div class="line">                <span class="comment">//LOGI("%s:%d: got keycode %d for %s\n", filename, line, keycode, token.string() );</span></div><div class="line">                <span class="keyword">if</span> (keycode == <span class="number">0</span>) {</div><div class="line">                    LOGE(<span class="string">"%s:%d: expected keycode, got '%s'\n"</span>,</div><div class="line">                            filename, line, token.<span class="built_in">string</span>());</div><div class="line">                    <span class="keyword">goto</span> done;</div><div class="line">                }</div><div class="line">                state = FLAG;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> FLAG:</div><div class="line">                <span class="keyword">if</span> (token == <span class="string">"key"</span>) {</div><div class="line">                    <span class="keyword">if</span> (scancode != -<span class="number">1</span>) {</div><div class="line">                        <span class="comment">//LOGI("got key decl scancode=%d keycode=%d"</span></div><div class="line">                        <span class="comment">//       " flags=0x%08x\n", scancode, keycode, flags);</span></div><div class="line">                        Key k = { keycode, flags };</div><div class="line">                        m_keys.add(scancode, k);</div><div class="line">                        state = SCANCODE;</div><div class="line">                        scancode = -<span class="number">1</span>;</div><div class="line">                        keycode = -<span class="number">1</span>;</div><div class="line">                        flags = <span class="number">0</span>;</div><div class="line">                        <span class="keyword">break</span>;</div><div class="line">                    }</div><div class="line">                }</div><div class="line">                tmp = token_to_value(token.<span class="built_in">string</span>(), FLAGS);</div><div class="line">                <span class="comment">//LOGI("%s:%d: got flags %x for %s\n", filename, line, tmp, token.string() );</span></div><div class="line">                <span class="keyword">if</span> (tmp == <span class="number">0</span>) {</div><div class="line">                    LOGE(<span class="string">"%s:%d: expected flag, got '%s'\n"</span>,</div><div class="line">                            filename, line, token.<span class="built_in">string</span>());</div><div class="line">                    <span class="keyword">goto</span> done;</div><div class="line">                }</div><div class="line">                flags |= tmp;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">        }</div><div class="line">    }</div><div class="line">    <span class="keyword">if</span> (state == FLAG && scancode != -<span class="number">1</span> ) {</div><div class="line">        <span class="comment">//LOGI("got key decl scancode=%d keycode=%d"</span></div><div class="line">        <span class="comment">//       " flags=0x%08x\n", scancode, keycode, flags);</span></div><div class="line">        Key k = { keycode, flags };</div><div class="line">        m_keys.add(scancode, k);</div><div class="line">    }</div><div class="line"></div><div class="line">done:</div><div class="line">    <span class="built_in">free</span>(buf);</div><div class="line">    close(fd);</div><div class="line"></div><div class="line">    m_status = err;</div><div class="line">    <span class="keyword">return</span> err;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>可以看得出，android 会解析 kl 文件里的项目，然后把解析后的结果保存到一个 Vector 结构里（android 自己写一个 vector，不是 c++ std 的）。 kl 文件的每一项分为4段：</p>
+<ul>
+<li><p><strong>BEGIN</strong><br>这一段统一是 “key”，应该是按键映射的标识。</p>
+</li>
+<li><p><strong>SCANCODE</strong><br>这一段直接将字符串转化为数字，也就是说 kl 文件里的这一段存储的是数字。这里值就是从低层硬件读取出来值。也就是我们在 OM  项目中， vfb 应该发送给 android 的值。这个值不是 android sdk 中描述的值（这个值是上层应用使用的）。不同的硬件会不一样。</p>
+</li>
+<li><p><strong>KEYCODE</strong><br>这个值就是 android sdk 里描述的啦。不过这一段有很多都是字符串，不是直接保存数值的，这个有个转化关系，具体的后面再说。</p>
+</li>
+<li><p><strong>FLAG</strong><br>这里目前来说就2个值 WAKE 和 WAKE_DROPPED 。好像 WAKE 代表可以在锁机状态下唤醒屏幕。</p>
+</li>
+</ul>
+<h2 id="KeycodeLabels-h">KeycodeLabels.h</h2>
+<p>上面说了 KEYCODE 那里很多是保存字符串的，那么转化的地方就在这个文件里（这个文件在 framework/base/include/ui 下）：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">struct</span> KeycodeLabel {</div><div class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *literal;</div><div class="line">    <span class="keyword">int</span> value;</div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// 这里不贴全了，都在这</span></div><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> KeycodeLabel KEYCODES[] = { </div><div class="line">    { <span class="string">"SOFT_LEFT"</span>, <span class="number">1</span> },</div><div class="line">    { <span class="string">"SOFT_RIGHT"</span>, <span class="number">2</span> },</div><div class="line">    { <span class="string">"HOME"</span>, <span class="number">3</span> },</div><div class="line">    { <span class="string">"BACK"</span>, <span class="number">4</span> },</div><div class="line">    { <span class="string">"CALL"</span>, <span class="number">5</span> },</div><div class="line">    { <span class="string">"ENDCALL"</span>, <span class="number">6</span> },</div><div class="line">    { <span class="string">"0"</span>, <span class="number">7</span> },</div><div class="line">    { <span class="string">"1"</span>, <span class="number">8</span> },</div><div class="line">    { <span class="string">"2"</span>, <span class="number">9</span> },</div><div class="line">    { <span class="string">"3"</span>, <span class="number">10</span> },</div><div class="line">    { <span class="string">"4"</span>, <span class="number">11</span> },</div><div class="line">    { <span class="string">"5"</span>, <span class="number">12</span> },</div><div class="line">    { <span class="string">"6"</span>, <span class="number">13</span> },</div><div class="line">    { <span class="string">"7"</span>, <span class="number">14</span> },</div><div class="line">    { <span class="string">"8"</span>, <span class="number">15</span> },</div><div class="line">    { <span class="string">"9"</span>, <span class="number">16</span> },</div><div class="line">    { <span class="string">"STAR"</span>, <span class="number">17</span> },</div><div class="line">    { <span class="string">"POUND"</span>, <span class="number">18</span> },</div><div class="line">    { <span class="string">"DPAD_UP"</span>, <span class="number">19</span> },</div><div class="line">    ... ...</div></pre></td></tr></table></figure>
+
+<p>前面说的那个 load 代码里 KEYCODE 那一段的 keycode = token_to_value(token.string(), KEYCODES); 中的 token_to_value 就是通过上面这个数组来得到对应的数值的。这个数值就是 android sdk 里写的给上层应用程序使用的按键值了。所以一般来说，我们修改 kl 文件就可以改变按键映射了。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Framework/">Android Framework</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/27/Android 按键映射分析/" data-title="编译 Android 按键映射分析 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/27/在源码中修改 Android 系统配置/" title="在源码中修改 Android 系统配置">
+  <strong>上一篇:</strong><br/>
+  <span>
+  在源码中修改 Android 系统配置</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/27/编译 Android 源码问题总结/"  title="编译 Android 源码问题总结">
+ <strong>下一篇:</strong><br/> 
+ <span>编译 Android 源码问题总结
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread" data-thread-key="编译 Android 按键映射分析" data-title="编译 Android 按键映射分析" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2015/01/27/Android 按键映射分析/">
+    </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#EventHub-cpp"><span class="toc-number">1.</span> <span class="toc-text">EventHub.cpp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#kl_文件"><span class="toc-number">2.</span> <span class="toc-text">kl 文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#KeycodeLabels-h"><span class="toc-number">3.</span> <span class="toc-text">KeycodeLabels.h</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>22</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li> <i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="5" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2015 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>
