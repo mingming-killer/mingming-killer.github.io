@@ -110,7 +110,7 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一_相关下载"><span class="toc-number">1.</span> <span class="toc-text">一 相关下载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二_软件安装"><span class="toc-number">2.</span> <span class="toc-text">二 软件安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三_Eclipse配置"><span class="toc-number">3.</span> <span class="toc-text">三 Eclipse配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1_安装android_开发插件"><span class="toc-number">4.</span> <span class="toc-text">1 安装android 开发插件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2_配置android_sdk"><span class="toc-number">4.1.</span> <span class="toc-text">2 配置android sdk</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3_新建Android项目"><span class="toc-number">4.2.</span> <span class="toc-text">3 新建Android项目</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四_结束语"><span class="toc-number">5.</span> <span class="toc-text">四 结束语</span></a></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一_相关下载"><span class="toc-number">1.</span> <span class="toc-text">一 相关下载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二_软件安装"><span class="toc-number">2.</span> <span class="toc-text">二 软件安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三_Eclipse配置"><span class="toc-number">3.</span> <span class="toc-text">三 Eclipse配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1_安装android_开发插件"><span class="toc-number">4.</span> <span class="toc-text">1 安装android 开发插件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2_配置android_sdk"><span class="toc-number">4.1.</span> <span class="toc-text">2 配置android sdk</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3_新建Android项目"><span class="toc-number">4.2.</span> <span class="toc-text">3 新建Android项目</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四_结束语"><span class="toc-number">5.</span> <span class="toc-text">四 结束语</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#更新"><span class="toc-number">6.</span> <span class="toc-text">更新</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java_版本过低问题"><span class="toc-number">6.1.</span> <span class="toc-text">java 版本过低问题</span></a></li></ol></li></ol>
 		</div>
 		
 		<h2 id="一_相关下载">一 相关下载</h2>
@@ -206,6 +206,19 @@
 <p>测试程序运行结果</p>
 <h2 id="四_结束语">四 结束语</h2>
 <p>至此，android开发环境搭建完毕，有问题请留言。在这里要注意，我这里只是下载了android sdk r4升级工具，没有下载具体的SDK，而是通过在Eclipse里面的Android Sdk管理工具升级的，你也可以直接下载具体的SDK版本，如: Android sdk 2.1 r1 上面有这个的下载链接，但我任务用升级工具更好。</p>
+<hr>
+<h2 id="更新">更新</h2>
+<p>上面转载的可以统统不用管，忘记步骤的去官网看下文档就行： <a href="http://developer.android.com/tools/help/adt.html" title="Eclipse with ADT" target="_blank" rel="external">Eclipse with ADT</a> (请自备 vpn，啥百度教程都抵不上官方的)。</p>
+<h3 id="java_版本过低问题">java 版本过低问题</h3>
+<p>最近更新了 5.1 的 sdk，挂 vpn 下载后，把 ADT 也更新到最新的了，但是打开 eclipse 发现报这个错误： </p>
+<pre>
+"Loading data for Android 5.0" has encountered a problem.
+
+Parsing Data for android-21 failed
+unsupported major.minor version 51.0
+</pre>
+
+<p>刚开始没注意，但是发现用 5.0 的 sdk 编任何工程都出错，换成 4.4 的就能编过了，刚开始还没搞明白咋回事，后面 google 才知道是 java 的版本太低了（当时装的是 jdk6），51.0 要至少 jdk7 以上的，把 jdk6 换成 jdk7 以上的就好了。重新装 jdk 有“困难”的看这里： <a href="http://light3moon.com/2015/01/19/ubuntu 安装 jdk" title="ubuntu 安装 jdk" target="_blank" rel="external">ubuntu 安装 jdk</a> </p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -268,7 +281,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一_相关下载"><span class="toc-number">1.</span> <span class="toc-text">一 相关下载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二_软件安装"><span class="toc-number">2.</span> <span class="toc-text">二 软件安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三_Eclipse配置"><span class="toc-number">3.</span> <span class="toc-text">三 Eclipse配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1_安装android_开发插件"><span class="toc-number">4.</span> <span class="toc-text">1 安装android 开发插件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2_配置android_sdk"><span class="toc-number">4.1.</span> <span class="toc-text">2 配置android sdk</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3_新建Android项目"><span class="toc-number">4.2.</span> <span class="toc-text">3 新建Android项目</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四_结束语"><span class="toc-number">5.</span> <span class="toc-text">四 结束语</span></a></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一_相关下载"><span class="toc-number">1.</span> <span class="toc-text">一 相关下载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二_软件安装"><span class="toc-number">2.</span> <span class="toc-text">二 软件安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三_Eclipse配置"><span class="toc-number">3.</span> <span class="toc-text">三 Eclipse配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1_安装android_开发插件"><span class="toc-number">4.</span> <span class="toc-text">1 安装android 开发插件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2_配置android_sdk"><span class="toc-number">4.1.</span> <span class="toc-text">2 配置android sdk</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3_新建Android项目"><span class="toc-number">4.2.</span> <span class="toc-text">3 新建Android项目</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四_结束语"><span class="toc-number">5.</span> <span class="toc-text">四 结束语</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#更新"><span class="toc-number">6.</span> <span class="toc-text">更新</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java_版本过低问题"><span class="toc-number">6.1.</span> <span class="toc-text">java 版本过低问题</span></a></li></ol></li></ol>
   </div>
 
 <div id="asidepart">
@@ -282,7 +295,7 @@
 		
 			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
 		
-			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>46</sup></a></li>
 		
 			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
 		
@@ -303,11 +316,11 @@
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>76</sup></a></li>
 		
 			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		
-			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
 		
 			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
 		

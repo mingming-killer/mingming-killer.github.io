@@ -100,7 +100,7 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#如何在_Android-mk_中添加自定义库"><span class="toc-number">1.</span> <span class="toc-text">如何在 Android.mk 中添加自定义库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译_framework_自动增加自定义资源"><span class="toc-number">2.</span> <span class="toc-text">编译 framework 自动增加自定义资源</span></a></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#如何在_Android-mk_中添加自定义库"><span class="toc-number">1.</span> <span class="toc-text">如何在 Android.mk 中添加自定义库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译_framework_自动增加自定义资源"><span class="toc-number">2.</span> <span class="toc-text">编译 framework 自动增加自定义资源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#增加_overlay_文件夹"><span class="toc-number">3.</span> <span class="toc-text">增加 overlay 文件夹</span></a></li></ol>
 		</div>
 		
 		<h2 id="如何在_Android-mk_中添加自定义库">如何在 Android.mk 中添加自定义库</h2>
@@ -119,6 +119,11 @@ add-resource type="xx" name="xx"
 LOCAL_AAPT_FLAGS := --auto-add-overlay
 </pre>
 
+<h2 id="增加_overlay_文件夹">增加 overlay 文件夹</h2>
+<p>为了方便 OEM 定制， android 中在很多个地方可以增加 overlay 文件夹，覆盖一些 xml 中的定义和替换资源文件（图片等）。其中一个地方就是 /device/vendor/product 下面，例如说 asus 代工的 nexus7 的可以是 /device/asus/flo/overlay。但是新增文件夹还需要告诉编译系统 overlay 的路径是什么。在 /device/vendor/product 下面自定义的 mk（例如说 BoardConfig.mk，在哪个 mk 文件里加可以看自己的具体情况） 文件中加上一句：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#override </div><div class="line">DEVICE_PACKAGE_OVERLAYS := device/$(vendor)/$(TARGET_PRODUCT)/overlay</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>配合上面那个自动增加自定义资源的更好用 ^_^ </p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -181,7 +186,7 @@ LOCAL_AAPT_FLAGS := --auto-add-overlay
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#如何在_Android-mk_中添加自定义库"><span class="toc-number">1.</span> <span class="toc-text">如何在 Android.mk 中添加自定义库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译_framework_自动增加自定义资源"><span class="toc-number">2.</span> <span class="toc-text">编译 framework 自动增加自定义资源</span></a></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#如何在_Android-mk_中添加自定义库"><span class="toc-number">1.</span> <span class="toc-text">如何在 Android.mk 中添加自定义库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译_framework_自动增加自定义资源"><span class="toc-number">2.</span> <span class="toc-text">编译 framework 自动增加自定义资源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#增加_overlay_文件夹"><span class="toc-number">3.</span> <span class="toc-text">增加 overlay 文件夹</span></a></li></ol>
   </div>
 
 <div id="asidepart">
@@ -195,7 +200,7 @@ LOCAL_AAPT_FLAGS := --auto-add-overlay
 		
 			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
 		
-			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>46</sup></a></li>
 		
 			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
 		
@@ -216,11 +221,11 @@ LOCAL_AAPT_FLAGS := --auto-add-overlay
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>76</sup></a></li>
 		
 			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		
-			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
 		
 			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
 		

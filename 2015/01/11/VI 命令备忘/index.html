@@ -197,7 +197,7 @@
 <h2 id=":nohl">:nohl</h2>
 <p>这是vi里的一个命令来的，就是去掉一些搜索结果时候的高亮显示。有时候高亮太多时，用这个比较好。</p>
 <h2 id="16进制编辑">16进制编辑</h2>
-<p>%!xxd 或者 %!xxd -r</p>
+<p>需要借助 linux 下的命令行工具 xxd（一般系统都自带了的）： xxd text &gt; text-hex，然后再用 vi 打开就行了，最好不好在 vi 中用使用调用外部命令的方式（:!xxd）直接改变当前的文本，容易出现转化错误。在外面转化出另外一个临时文件比较好。</p>
 <h2 id="外部命令">外部命令</h2>
 <p>在命令模式下，前面加 ！ 号，然后后面就可以执行外部 shell 命令。例如 :！pwd 就是显示当前路径。</p>
 <h2 id="插件使用">插件使用</h2>
@@ -299,7 +299,7 @@
 		
 			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
 		
-			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>46</sup></a></li>
 		
 			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
 		
@@ -320,11 +320,11 @@
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>76</sup></a></li>
 		
 			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		
-			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
 		
 			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
 		

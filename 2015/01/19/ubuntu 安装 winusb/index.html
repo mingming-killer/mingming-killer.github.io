@@ -5,18 +5,13 @@
   <meta charset="UTF-8">
 
   
-    <title>ubuntu 10.10 安装 jdk | Light.Moon</title>
+    <title>ubuntu 安装 winusb | Light.Moon</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="Mingming">
     
-    <meta name="description" content="在 /etc/apt/sources.list 里新建一个源文件：
-
-deb  http://archive.canonical.com/ubuntu maverick partner
-
-
-
-然后 apt-get update —&amp;gt; apt-get install sun-java6-jdk ">
+    <meta name="description" content="今天 win8 突然蓝屏启动不了，说什么 boot File:\BCD 损坏了，我擦，搞什么飞机。只好切换到 ubuntu 下想办法制作个 win8.1 的启动盘修复一下。
+度娘了一下，发现 ubuntu 下有个叫 winusb 的软件可以制作 win 的启动盘，但是 14.04 没有对应的源（或者">
     
     
     
@@ -88,15 +83,15 @@ deb  http://archive.canonical.com/ubuntu maverick partner
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/01/19/ubuntu 10.10 安装 jdk/" title="ubuntu 10.10 安装 jdk" itemprop="url">ubuntu 10.10 安装 jdk</a>
+      <a href="/2015/01/19/ubuntu 安装 winusb/" title="ubuntu 安装 winusb" itemprop="url">ubuntu 安装 winusb</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-01-19T01:59:16.000Z" itemprop="datePublished">2015 1月 19</time>
-    更新日期:<time datetime="2015-01-19T01:59:16.000Z" itemprop="dateModified">2015 1月 19</time>
+    <time datetime="2015-01-19T02:25:16.000Z" itemprop="datePublished">2015 1月 19</time>
+    更新日期:<time datetime="2015-01-19T02:25:16.000Z" itemprop="dateModified">2015 1月 19</time>
     
   </p>
 </header>
@@ -108,51 +103,32 @@ deb  http://archive.canonical.com/ubuntu maverick partner
 		
 		</div>
 		
-		<ul>
-<li><p>在 /etc/apt/sources.list 里新建一个源文件：</p>
-<pre>
-deb  http://archive.canonical.com/ubuntu maverick partner
+		<p>今天 win8 突然蓝屏启动不了，说什么 boot File:\BCD 损坏了，我擦，搞什么飞机。只好切换到 ubuntu 下想办法制作个 win8.1 的启动盘修复一下。</p>
+<p>度娘了一下，发现 ubuntu 下有个叫 winusb 的软件可以制作 win 的启动盘，但是 14.04 没有对应的源（或者话说被屏蔽掉了）。然后 google 了一个老外的办法，手动安装：</p>
+<p>64 bit 的：</p>
+<pre config="brush:bash;toolbar:false;">
+wget https://launchpad.net/~colingille/+archive/freshlight/+files/winusb_1.0.11+saucy1_amd64.deb
 </pre>
 
-<ul>
-<li><p>然后 apt-get update —&gt; apt-get install sun-java6-jdk 。</p>
-</li>
-<li><p>值得注意的是，默认ubuntu10.10已经安装了open-JDK 可以使用java -version命令查看，当前默认使用的JDK是哪个类型的。如果直接卸载了openJDK软件包，再使用java -version命令，系统还是使用的open-JDK，这时需要修改ubuntu默认使用JDK的配置，配置默认Java使用哪个</p>
-</li>
-</ul>
-</li>
-</ul>
-<pre>
-sudo update-alternatives –config java
+<p>32 bit 的：</p>
+<pre config="brush:bash;toolbar:false;">
+wget https://launchpad.net/~colingille/+archive/freshlight/+files/winusb_1.0.11+saucy1_i386.deb
 </pre>
 
-<p>选择“2”，再查看系统使用java的版本。注意：wordpress不好的地方就是在写代码时，经常会修改代码里的内容，上面在sudo update-alternatives –config java这句，config前面是两个“-”,wordpress会显示为一个长“-”。</p>
-<ul>
-<li><p>更新下 13.04 安装 sun jdk 的方法： </p>
-<ul>
-<li><p>如果安装了 open jdk 的，要先把 open jdk 卸掉： apt-get purge openjdk*</p>
-</li>
-<li><p>添加 sun java 源： add-apt-repository ppa:webupd8team/java （如果有问题可以先安装： apt-get install software-properties-common ），然后更新源列表： apt-get update</p>
-</li>
-<li><p>然后就可以安装 jdk 了： apt-get install oracle-java7-installer（这里装的是7，也可以安装6或是8 oracle-java6-installer, oralce-java8-installer）</p>
-</li>
-<li><p>如果要卸载之前安装的 sun jdk，用 apt-get purge oracle-java<em> 就行了，不要用 apt-get purge java</em> ，这样能删掉很多别的东西的。</p>
-</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li><p>ubuntu 13.10 之后软件源里面就没 oracle-java6-installer 了，但是如果是编译 android 的话，必须要 jdk6 才行。所以只能去 oracle 官网去下载： <a href="http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase6-419409.html#jdk-6u45-oth-JPR" target="_blank" rel="external">oracle jdk6</a>。 我选的是 *.rpm.bin 下载的（下载还必须要注册 oracle 的帐号才能下，恶心）。然后就是手动安装了。</p>
-<ul>
-<li><p>先是 chmod+x <em>.rpm.bin ，给这个玩意加上执行权限，然后执行一下，会解压出很多 </em>.rpm 包出来，可能这个东西会自动安装的吧，但是在我到机子上报错了，所以我只好手动安装这票 rpm 包了。</p>
-</li>
-<li><p>先要装 alien (apt-get install alien)，然后用 alien 把这些 rpm 包转化为 deb 包： alien —scripts —keep-version -d *.rpm 。耐心等一下，就会转化好 deb 包。</p>
-</li>
-<li><p>安装转化好到 deb 包： dpkg -i *.deb 。就终于装好 oracle-jdk-6 了。</p>
-</li>
-</ul>
-</li>
-</ul>
+<p>然后：</p>
+<pre config="brush:bash;toolbar:false;">
+sudo dpkg -i winusb_1.0.11+saucy1*
+</pre>
+
+<p>然后好像会出错的，然后再修复下依赖关系：</p>
+<pre config="brush:bash;toolbar:false;">
+sudo apt-get -f install
+</pre>
+
+<p>最后修复依赖关系那会让你装一堆东西，装就行，中间好像让你装 GRUB，然后让你选安装的地方，按 esc 退出去，然后选 yes 不安装 GRUB，这个东西别乱选，不然把 ubuntu 的引导都搞坏了就麻烦了（我的 window 已经歇菜了）。</p>
+<p>然后命令行 winusbgui 就可以启动带 gui 的 winusb 了，用起来挺简单的：</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/linux/winusb/1.png" alt=""></p>
+<p>最后说一句，NND，电脑上多装一个系统还是保险点，无缘无故给老子启动文件损坏，操，操~~ &gt;_&lt;</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -172,7 +148,7 @@ sudo update-alternatives –config java
 
 <div class="article-share" id="share">
 
-  <div data-url="http://www.light3moon.com/2015/01/19/ubuntu 10.10 安装 jdk/" data-title="ubuntu 10.10 安装 jdk | Light.Moon" data-tsina="null" class="share clearfix">
+  <div data-url="http://www.light3moon.com/2015/01/19/ubuntu 安装 winusb/" data-title="ubuntu 安装 winusb | Light.Moon" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -182,18 +158,18 @@ sudo update-alternatives –config java
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2015/01/19/ubuntu libtool 错误/" title="ubuntu libtool 错误">
+ <a href="/2015/01/19/[转] unlocked_ioctl 和堵塞（waitqueue）读写函数的实现/" title="(转) unlocked_ioctl 和堵塞（waitqueue）读写函数的实现">
   <strong>上一篇:</strong><br/>
   <span>
-  ubuntu libtool 错误</span>
+  (转) unlocked_ioctl 和堵塞（waitqueue）读写函数的实现</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2015/01/19/ubuntu minicom 使用问题总结/"  title="ubuntu minicom 使用问题总结">
+<a href="/2015/01/19/[转] gimp中如何查看拾色器拾取的颜色的alpha值/"  title="(转) gimp中如何查看拾色器拾取的颜色的alpha值">
  <strong>下一篇:</strong><br/> 
- <span>ubuntu minicom 使用问题总结
+ <span>(转) gimp中如何查看拾色器拾取的颜色的alpha值
 </span>
 </a>
 </div>
@@ -203,9 +179,9 @@ sudo update-alternatives –config java
 
 	
 <section class="comment">
-	<div class="ds-thread" data-thread-key="ubuntu 10.10 安装 jdk" data-title="ubuntu 10.10 安装 jdk" 
+	<div class="ds-thread" data-thread-key="ubuntu 安装 winusb" data-title="ubuntu 安装 winusb" 
       data-author-key="mingming" data-limit=10
-      data-url="light3moon.com/2015/01/19/ubuntu 10.10 安装 jdk/">
+      data-url="light3moon.com/2015/01/19/ubuntu 安装 winusb/">
     </div>
 </section>
 
@@ -229,7 +205,7 @@ sudo update-alternatives –config java
 		
 			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>30</sup></a></li>
 		
-			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>44</sup></a></li>
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>46</sup></a></li>
 		
 			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
 		
@@ -250,11 +226,11 @@ sudo update-alternatives –config java
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/android/" title="android">android<sup>74</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>76</sup></a></li>
 		
 			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		
-			<li><a href="/tags/install/" title="install">install<sup>8</sup></a></li>
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
 		
 			<li><a href="/tags/linux/" title="linux">linux<sup>26</sup></a></li>
 		
