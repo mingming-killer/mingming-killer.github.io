@@ -96,15 +96,46 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/31/工作小笔记——Android 自带的应用统计服务[UsageStatsService]/" title="工作小笔记——Android 自带的应用统计服务（UsageStatsService）" itemprop="url">
+    <a href="/2015/01/22/Android Broadcast 分析——注册/" title="Android Broadcast 分析——注册" itemprop="url">
   
-    <h1 itemprop="name">工作小笔记——Android 自带的应用统计服务（UsageStatsService）</h1>
+    <h1 itemprop="name">Android Broadcast 分析——注册</h1>
     
      
-           <p itemprop="description" >最近要弄在 framework 中弄一个统计应用使用时长的功能。刚开始想着要怎么是不是要在 ActivityManagerService（AMS）的几个 Activity 的生命周期那埋几个统计点，后面发现 android 自带了一个 UsageStatsService（USS）</p>
+           <p itemprop="description" >背景
+我们的平板增加了一个关机闹钟的功能。就是设备在关机的情况也能唤醒然后响闹钟。实现方法是：在 kernel 中增加一个 RTC 时钟（关机情况下，板载的 RTC 时钟还在运行的，所以你关机一段时间发现电池会变少），然后提前一段时间开机（我们设定的是1分钟，得给点时间给开机，我</p>
         
     
-    <time datetime="2015-01-31T02:33:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    <time datetime="2015-01-22T02:07:16.000Z" itemprop="datePublished">2015 1月 22</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/22/Android Broadcast 分析——发送、处理/" title="Android Broadcast 分析——发送、处理" itemprop="url">
+  
+    <h1 itemprop="name">Android Broadcast 分析——发送、处理</h1>
+    
+     
+           <p itemprop="description" >上一篇分析了广播的注册流程，这篇来分析下广播的发送、处理流程。这里为什么把发送和处理和来一起说咧，那是因为其实这是一个过程，发送接口里面差不多就是处理过程了。我们先照例把相关代码位置啰嗦一下（4.2.2）：
+123456789101112131415161718192021222</p>
+        
+    
+    <time datetime="2015-01-22T02:15:16.000Z" itemprop="datePublished">2015 1月 22</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/22/Android Broadcast 分析——超时或异常/" title="Android Broadcast 分析——超时或异常" itemprop="url">
+  
+    <h1 itemprop="name">Android Broadcast 分析——超时或异常</h1>
+    
+     
+           <p itemprop="description" >上一篇（处理篇）最后留了一个问题：串行广播需要一个接着一个执行，如果其中某一个接收器处理的时候挂掉了，或者耗时很长还没处理完，是不是后面的接收器就无法处理了呢。我们在这里看一下 android 是不是已经想到这些了。我们先照例把相关代码位置啰嗦一下（4.2.2）：
+12345# </p>
+        
+    
+    <time datetime="2015-01-22T02:17:16.000Z" itemprop="datePublished">2015 1月 22</time>
   </a>
 </section>
 
@@ -197,35 +228,6 @@
   </a>
 </section>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/28/Android Binder 分析——普通服务 Binder 对象的传递/" title="Android Binder 分析——普通服务 Binder 对象的传递" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——普通服务 Binder 对象的传递</h1>
-    
-     
-           <p itemprop="description" >上一篇把 SS 传递 binder 对象说了， SS 传递是要依靠 SM 的。但是普通应用的服务是没权向 SM 注册的，就是说普通应用获取普通服务的接口不能像 SS 那样，通过 SM 的接口去取。这篇就来讲讲普通应用中 binder 对象的传递。
-那这篇主要就是分析这些，照例先把</p>
-        
-    
-    <time datetime="2015-01-28T13:33:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/28/Android Binder 分析——多线程支持/" title="Android Binder 分析——多线程支持" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——多线程支持</h1>
-    
-     
-           <p itemprop="description" >前面普通服务篇那里说到 ActivityManager（AM） 里锁的问题，其实不光 AM，WindowManager（WM）、PackageMananger（PM）中基本上很多对外的业务函数里面都是加锁的，所以这些 SS 里面有会有带 Locked 结尾的函数（这些函数都是在锁</p>
-        
-    
-    <time datetime="2015-01-28T13:42:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
 
   <nav id="page-nav" class="clearfix">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -255,6 +257,8 @@
 		
 			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
 		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
 			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
 		
 		</ul>
@@ -265,6 +269,8 @@
 <div class="tagslist">
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
+		
+			<li><a href="/tags/Server/" title="Server">Server<sup>1</sup></a></li>
 		
 			<li><a href="/tags/android/" title="android">android<sup>77</sup></a></li>
 		
@@ -370,7 +376,7 @@
 	</div>
 -->
 
-		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2015 
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2016 
 		
 		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
 		

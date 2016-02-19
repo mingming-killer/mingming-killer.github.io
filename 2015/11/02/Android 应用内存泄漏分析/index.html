@@ -91,7 +91,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-11-01T16:35:16.000Z" itemprop="datePublished">2015 11月 2</time>
-    更新日期:<time datetime="2015-11-01T16:35:16.000Z" itemprop="dateModified">2015 11月 2</time>
+    更新日期:<time datetime="2016-03-31T02:35:16.000Z" itemprop="dateModified">2016 3月 31</time>
     
   </p>
 </header>
@@ -159,7 +159,7 @@ exclude weak/soft references
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 假设我们的应用需要监听系统的剪切板，来完成某个功能</span></div><div class="line">mClipboardManager.addPrimaryClipChangedListener(<span class="keyword">this</span>);</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>我们把 activity 对象传递给了系统的 ClipboardManager。查阅一下 API 文档会发现 ClipboardManager 还有一个 removePrimaryClipChangedListener 的接口。很多 android 新手几乎不会调用系统提供的一些 remove 接口，就只会 add。因为他们认为 java 会自动帮他们管理内存，java 不存在内存泄漏，但是你想想看，为什么 android 还会提供一个 remove 的接口？为什么 ClipboardManager 的监听接口叫 add，而 View 的 OnClickListener 叫 set。很简单啊，有 add 就有 remove 么，就是要让你成对调用（还记得 C++ 要成对调用 new 和 delete 么），但是 set 就不需要。所以这种系统服务的 add 接口很猫腻的。</p>
-<p>我就来稍微解释下，为什么不调用 remove 方法会造成 activity 残留（进而导致内存泄漏），因为 ClipboardManager 里面那个了一个 list 来保存要监听剪切版变化的接口，因为系统服务只有一个，要让大家都能监听，所以只好拿一个 list 来保存咯，然后系统服务是一直存在的（你可以理解为是 static 的），所以你只 add，不 remove 的话，你传递过去的 activity 对象会被这个系统服务持有，但是你的 activity onDestroy 了，系统认为它应该被销毁掉了，所以下次会重新创建一个 activity 对象，这样来来回回，activity 对象就会越来越多，activity 持有的对象也会越来越多，典型的就是 activity 中的 view ，然后那些 view 的背景是图片的之类的话，就会很恐怖了。</p>
+<p>我就来稍微解释下，为什么不调用 remove 方法会造成 activity 残留（进而导致内存泄漏），因为 ClipboardManager 里面那个了一个 list 来保存要监听剪切版变化的接口，因为系统服务只有一个，要让大家都能监听，所以只好拿一个 list 来保存咯，然后系统服务是一直存在的（你可以理解为是 static 的），所以你只 add，不 remove 的话，你传递过去的 activity 对象会被这个系统服务持有，但是你的 activity onDestroy 了，系统认为它应该被销毁掉了，所以下次会重新创建一个 activity 对象，这样来来回回，activity 对象就会越来越多，activity 持有的对象也会越来越来，典型的就是 activity 中的 view ，然后那些 view 的背景是图片的之类的话，就会很恐怖了。</p>
 <p>要改这个问题很简单，在 onDestroy 加上 ClipboardManager 的 removePrimaryClipChangedListener 方法调用就行了：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Override</span></div><div class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span>() {</div><div class="line">    <span class="keyword">super</span>.onDestroy();</div><div class="line"></div><div class="line">    mDrList.clear();</div><div class="line">    mAdapter.notifyDataSetChanged();</div><div class="line"></div><div class="line">    mClipboardManager.removePrimaryClipChangedListener(<span class="keyword">this</span>);</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
 
@@ -212,9 +212,9 @@ exclude weak/soft references
  
 
 <div class="next">
-<a href="/2015/01/31/工作小笔记——Android 自带的应用统计服务[UsageStatsService]/"  title="工作小笔记——Android 自带的应用统计服务（UsageStatsService）">
+<a href="/2015/01/22/Android Broadcast 分析——注册/"  title="Android Broadcast 分析——注册">
  <strong>下一篇:</strong><br/> 
- <span>工作小笔记——Android 自带的应用统计服务（UsageStatsService）
+ <span>Android Broadcast 分析——注册
 </span>
 </a>
 </div>
@@ -260,6 +260,8 @@ exclude weak/soft references
 		
 			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
 		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
 			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
 		
 		</ul>
@@ -270,6 +272,8 @@ exclude weak/soft references
 <div class="tagslist">
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
+		
+			<li><a href="/tags/Server/" title="Server">Server<sup>1</sup></a></li>
 		
 			<li><a href="/tags/android/" title="android">android<sup>77</sup></a></li>
 		
@@ -375,7 +379,7 @@ exclude weak/soft references
 	</div>
 -->
 
-		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2015 
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2016 
 		
 		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
 		
