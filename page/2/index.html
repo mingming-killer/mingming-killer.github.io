@@ -81,6 +81,21 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
+    <a href="/2015/01/28/Android Binder 分析——系统服务 Binder 对象的传递/" title="Android Binder 分析——系统服务 Binder 对象的传递" itemprop="url">
+  
+    <h1 itemprop="name">Android Binder 分析——系统服务 Binder 对象的传递</h1>
+    
+     
+           <p itemprop="description" >前面 binder 说了那多，但是有一个关键的一点前面忽略掉了，就是 binder 对象是传递给另外一个进程使用的，然后还引伸出一个问题，Proc A 是怎么通过 binder 接口找到 Proc B 进行 IPC 调用的。
+那这篇主要就是分析这些，照例先把源代码位置啰嗦一下（4</p>
+        
+    
+    <time datetime="2015-01-28T13:23:16.000Z" itemprop="datePublished">2015 1月 28</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
     <a href="/2015/01/28/Android Binder 分析——普通服务 Binder 对象的传递/" title="Android Binder 分析——普通服务 Binder 对象的传递" itemprop="url">
   
     <h1 itemprop="name">Android Binder 分析——普通服务 Binder 对象的传递</h1>
@@ -207,20 +222,6 @@
   </a>
 </section>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/02/06/Android SystemUI 分析——最近任务列表/" title="Android SystemUI 分析——最近任务列表" itemprop="url">
-  
-    <h1 itemprop="name">Android SystemUI 分析——最近任务列表</h1>
-    
-     
-           <p itemprop="description" >Android 4.1 SystemUI 的最近任务列表和 4.2 的区别还是很大的。4.1 的是一个 BAR_PANEL，是一个 view 添加到 window manager 里面 show 出来的。4.2 变成了依附一个 Activity 了（其实都是 window）。功能</p>
-        
-    
-    <time datetime="2015-02-06T02:15:16.000Z" itemprop="datePublished">2015 2月 6</time>
-  </a>
-</section>
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
@@ -238,7 +239,7 @@
 	<p class="asidetitle">分类</p>
 		<ul>
 		
-			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>31</sup></a></li>
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>32</sup></a></li>
 		
 			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>46</sup></a></li>
 		
@@ -263,7 +264,7 @@
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/android/" title="android">android<sup>77</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>78</sup></a></li>
 		
 			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		
