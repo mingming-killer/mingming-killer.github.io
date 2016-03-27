@@ -99,7 +99,7 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置"><span class="toc-number">2.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#例子"><span class="toc-number">3.</span> <span class="toc-text">例子</span></a></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置"><span class="toc-number">2.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#例子"><span class="toc-number">3.</span> <span class="toc-text">例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#注意问题"><span class="toc-number">4.</span> <span class="toc-text">注意问题</span></a></li></ol>
 		</div>
 		
 		<p>对于服务器来说 log 是很重要的，通过 log 能够分析服务器运行是否正常，以及监控访问等。但是如果不加以限制的话，log 很容易就会爆满。例如说之前我们公司的 nginx 的访问 log 就把服务器的磁盘爆满了，导致磁盘没空间，然后访问各种异常。可能有人觉得 log 应该不会那么大，最开始我也是这么认为了，但是我们公司的 nginx 一天也就几十万次的请求，然后 nginx 默认会把每次请求记录下来，然后几个星期后，几十G 的 log 就产生了，加上我挪用了下服务器用来下 android 源码（大概 2、30G这样），服务器 128G 的 ssd 就爆了（我们公司买的 Linode 比较便宜的服务器作为一个节点）。</p>
@@ -166,6 +166,11 @@
 <p>这里我把 nginx 的转储配置改为了每天转储一次，然后转储文件数量为3：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">/var/log/nginx/*.log {</div><div class="line">    daily</div><div class="line">    missingok</div><div class="line">    rotate <span class="number">3</span></div><div class="line">    compress</div><div class="line">    delaycompress</div><div class="line">    notifempty</div><div class="line">    create <span class="number">0640</span> www-data adm </div><div class="line">    sharedscripts</div><div class="line">    prerotate</div><div class="line">        <span class="keyword">if</span> [ <span class="operator">-d</span> /etc/logrotate.d/httpd-prerotate ]; <span class="keyword">then</span> \</div><div class="line">            run-parts /etc/logrotate.d/httpd-prerotate; \</div><div class="line">        <span class="keyword">fi</span> \</div><div class="line">    endscript</div><div class="line">    postrotate</div><div class="line">        [ <span class="operator">-s</span> /run/nginx.pid ] && kill -USR1 `cat /run/nginx.pid`</div><div class="line">    endscript</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
 
+<h2 id="注意问题">注意问题</h2>
+<p>最后要说下 logrotate 配置的一些问题。虽然 logrotate 可以配置成按天、周、月和文件大小进行日志转储。但是 logrotate 也是有一定限制的，这里稍微说下 logrotate 的实现原理。其实 logrotate 并不是一个守护进程，而是通过 linux 的定时任务机制 cron 来实现的（关于 cron 的用法，可以去网上找下资料）。在 /etc/cron.daily 有一个 logrotate 文件，是在 logrotate 安装的时候创建的，这个就是定时执行 logrotate 轮询脚本了 。 /etc/crontab 是 cron 的配置文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># /etc/crontab: system-wide crontab</span></div><div class="line"><span class="comment"># Unlike any other crontab you don't have to run the `crontab'</span></div><div class="line"><span class="comment"># command to install the new version when you edit this file</span></div><div class="line"><span class="comment"># and files in /etc/cron.d. These files also have username fields,</span></div><div class="line"><span class="comment"># that none of the other crontabs do.</span></div><div class="line"></div><div class="line">SHELL=/bin/sh</div><div class="line">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin</div><div class="line"></div><div class="line"><span class="comment"># m h dom mon dow user  command</span></div><div class="line"><span class="number">17</span> *    * * *   root    <span class="built_in">cd</span> / && run-parts --report /etc/cron.hourly</div><div class="line"><span class="number">25</span> <span class="number">6</span>    * * *   root    test -x /usr/sbin/anacron || ( <span class="built_in">cd</span> / && run-parts --report /etc/cron.daily )</div><div class="line"><span class="number">47</span> <span class="number">6</span>    * * <span class="number">7</span>   root    test -x /usr/sbin/anacron || ( <span class="built_in">cd</span> / && run-parts --report /etc/cron.weekly )</div><div class="line"><span class="number">52</span> <span class="number">6</span>    <span class="number">1</span> * *   root    test -x /usr/sbin/anacron || ( <span class="built_in">cd</span> / && run-parts --report /etc/cron.monthly )</div><div class="line"><span class="comment">#</span></div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>可以看到默认系统是在每天 6：25 的时候执行 logrotate 的轮询的。也就是说其实你配置了按文件大小进行转储，也要等到每天 logrotate 出发轮询才会生效。当然既然是通过 cron 来实现的，也可以自己修改配置文件，调高 logrotate 轮询的间隔（例如一天2次之类的）。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -195,10 +200,10 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2015/01/28/Android Binder 分析——懒人的工具[AIDL]/" title="Android Binder 分析——懒人的工具（AIDL）">
+ <a href="/2016/03/27/Linux 实用工具总结/" title="Linux 实用工具总结">
   <strong>上一篇:</strong><br/>
   <span>
-  Android Binder 分析——懒人的工具（AIDL）</span>
+  Linux 实用工具总结</span>
 </a>
 </div>
 
@@ -228,7 +233,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置"><span class="toc-number">2.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#例子"><span class="toc-number">3.</span> <span class="toc-text">例子</span></a></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置"><span class="toc-number">2.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#例子"><span class="toc-number">3.</span> <span class="toc-text">例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#注意问题"><span class="toc-number">4.</span> <span class="toc-text">注意问题</span></a></li></ol>
   </div>
 
 <div id="asidepart">
@@ -240,13 +245,13 @@
 	<p class="asidetitle">分类</p>
 		<ul>
 		
-			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>32</sup></a></li>
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>33</sup></a></li>
 		
 			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>46</sup></a></li>
 		
 			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
 		
-			<li><a href="/categories/Linux/" title="Linux">Linux<sup>23</sup></a></li>
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
 		
 			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
 		
@@ -265,7 +270,9 @@
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/android/" title="android">android<sup>78</sup></a></li>
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>79</sup></a></li>
 		
 			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		
