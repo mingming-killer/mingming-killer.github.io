@@ -1,0 +1,505 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>Support Design 库使用简介 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="Material Design 是 google 大力推广的 android app 设计模式。我个人还是挺喜欢的，因为界面比较简洁，动画效果也不错。但是要从头实现这些效果也不是一件容易的事，所以为了拉拢开发者，google 推出了一系列 support library： support-v7-ap">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/11/Support Design 库使用简介/" title="Support Design 库使用简介" itemprop="url">Support Design 库使用简介</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2016-04-11T15:06:16.000Z" itemprop="datePublished">2016 4月 11</time>
+    更新日期:<time datetime="2016-04-24T02:50:16.000Z" itemprop="dateModified">2016 4月 24</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简单使用"><span class="toc-number">1.</span> <span class="toc-text">简单使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#特殊需求"><span class="toc-number">2.</span> <span class="toc-text">特殊需求</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CoordinatorLayout_简介"><span class="toc-number">2.1.</span> <span class="toc-text">CoordinatorLayout 简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解决需求"><span class="toc-number">2.2.</span> <span class="toc-text">解决需求</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小结"><span class="toc-number">3.</span> <span class="toc-text">小结</span></a></li></ol>
+		</div>
+		
+		<p>Material Design 是 google 大力推广的 android app 设计模式。我个人还是挺喜欢的，因为界面比较简洁，动画效果也不错。但是要从头实现这些效果也不是一件容易的事，所以为了拉拢开发者，google 推出了一系列 support library： support-v7-appcompat, support-v7-cardview, support-v7-recyclerview, support-v7-palette 已经今天要介绍的 support-design。开发者通过这些库能够很方便的构造出 Material Design 模式的界面。</p>
+<h2 id="简单使用">简单使用</h2>
+<p>其实我用 support design 的初衷是因为头要仿 ios 短信的一个效果，就是在列表上面有个搜索框，向下滑动的时候会消失，向上滑动又回出来，就像这样：</p>
+<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/support-design-use/design-scrolling.gif" alt=""></p>
+<p>于是我就发现用 support-design 库正好有这个效果（google 不要怪我拿你的库是仿 ios 哈）。首先要引用 support-design 可以直接在 build.gradle 中直接写：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">dependencies</span> {</div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.android.support:appcompat-v7:22.2.0'</span></div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.android.support:recyclerview-v7:22.2.0'</span></div><div class="line">	<span class="keyword">compile</span> <span class="string">'com.android.support:design:22.2.0'</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>但是一般我还是会按照 <a href="http://light3moon.com/2016/03/27/使用 gradle 定制渠道包" title="使用 gradle 定制渠道包" target="_blank" rel="external">使用 gradle 定制渠道包</a> 这里的做法弄成本地库来引用的。support-design 需要依赖 support-v4, support-v7-appcompat, support-v7-recycleriew, 所以需要先把这些库弄好（这里就不说 gradle 怎么配置了，上一篇有介绍）。</p>
+<p>然后实现这个功能的是 <strong>CoordinatorLayout</strong> 。它是一个功能很强大的 layout，同时也挺复杂的。它继承自 ViewGroup （support-design 的源码在 framework/support/design 下面）。主要是依靠 childview 中定义的 Behavior 产生不同的表现，进而实现不同的 UI 效果。我现在仿 ios 的就是其中的一个 Behavior 实现的。这个用法其实很简单，在布局中这么用就行了：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></div><div class="line"><span class="tag">&lt;<span class="title">RelativeLayout</span> <span class="attribute">xmlns:android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span></span></div><div class="line"><span class="tag">    <span class="attribute">xmlns:app</span>=<span class="value">"http://schemas.android.com/apk/res-auto"</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:layout_height</span>=<span class="value">"match_parent"</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- 这个是测试用的故意固定在最上面 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">LinearLayout</span></span></div><div class="line"><span class="tag">        <span class="attribute">android:id</span>=<span class="value">"@+id/top"</span></span></div><div class="line"><span class="tag">        <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span></div><div class="line"><span class="tag">        <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></span></div><div class="line"><span class="tag">        <span class="attribute">android:orientation</span>=<span class="value">"horizontal"</span></span></div><div class="line"><span class="tag">        <span class="attribute">android:background</span>=<span class="value">"#ffff0000"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">Button</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:id</span>=<span class="value">"@+id/btn_scroll"</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:layout_width</span>=<span class="value">"wrap_content"</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:text</span>=<span class="value">"scroll"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">Button</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:id</span>=<span class="value">"@+id/btn_fix"</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:layout_width</span>=<span class="value">"wrap_content"</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:text</span>=<span class="value">"fix"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">LinearLayout</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="title">android.support.design.widget.CoordinatorLayout</span></span></div><div class="line"><span class="tag">        <span class="attribute">android:id</span>=<span class="value">"@+id/main_content"</span></span></div><div class="line"><span class="tag">        <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span></div><div class="line"><span class="tag">        <span class="attribute">android:layout_height</span>=<span class="value">"match_parent"</span></span></div><div class="line"><span class="tag">        <span class="attribute">android:layout_below</span>=<span class="value">"@+id/top"</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="comment">&lt;!-- </span></div><div class="line"><span class="comment">          下面使用 appbar_scrolling_view_behavior 这个 Behavior，</span></div><div class="line"><span class="comment">          要收缩的 view 必须要放到 AppBarLayout 这个 design 库的 layout 中</span></div><div class="line"><span class="comment">        --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">android.support.design.widget.AppBarLayout</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:id</span>=<span class="value">"@+id/app_bar"</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:theme</span>=<span class="value">"@style/ThemeOverlay.AppCompat.Dark.ActionBar"</span>&gt;</span></div><div class="line">            <span class="comment">&lt;!-- 滑动收缩的 view 给他指定一个 layout_scrollFlags 的属性 --&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="title">EditText</span></span></div><div class="line"><span class="tag">                <span class="attribute">android:id</span>=<span class="value">"@+id/edit_text"</span></span></div><div class="line"><span class="tag">                <span class="attribute">app:layout_scrollFlags</span>=<span class="value">"scroll|enterAlways"</span></span></div><div class="line"><span class="tag">                <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span></div><div class="line"><span class="tag">                <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></span></div><div class="line"><span class="tag">                <span class="attribute">android:textSize</span>=<span class="value">"14sp"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="title">android.support.design.widget.AppBarLayout</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="comment">&lt;!-- 下面的 list 指定 behavior --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="title">android.support.v7.widget.RecyclerView</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:id</span>=<span class="value">"@+id/list_view"</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span></div><div class="line"><span class="tag">            <span class="attribute">android:layout_height</span>=<span class="value">"match_parent"</span></span></div><div class="line"><span class="tag">            <span class="attribute">app:layout_behavior</span>=<span class="value">"@string/appbar_scrolling_view_behavior"</span>/&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;/<span class="title">android.support.design.widget.CoordinatorLayout</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="title">RelativeLayout</span>&gt;</span></div><div class="line"></div></pre></td></tr></table></figure>
+
+
+
+<p>就这样就能有上面 gif 上那个效果了。还真的方便咧。不过需要注意下面提供滑动的 view 支持 ListView、GridView、RecyclerView，好像不支持 ScrollView 。</p>
+<h2 id="特殊需求">特殊需求</h2>
+<p>但是仿 ios 还有一个需求，就是在搜索框输入了内容进入搜索模式后，搜索框就要固定在顶部，不能消失，直到退出搜索模式才会恢复滑动收缩。用上面的列子说：这就要求能够动态改变 EditText 滑动收缩的属性。在讨论如何动态设置 EditView 的滑动收缩属性的时候，我们先来简单看下 CoordinatorLayout 的一些原理，上面就在 xml 里定义几个属性就能实现这么 cool 的效果，是不是有点神奇咧，而且也有点怪。</p>
+<h3 id="CoordinatorLayout_简介">CoordinatorLayout 简介</h3>
+<p>前面说了 CoordinatorLayout 是依靠 childview 的 Behavior 来产生不同的 UI 效果的。 Behavior 是 CoordinatorLayout 中的定义的一个抽象类，主要是一些 onTocuhEvent, onInterceptTouchEvent, 还有一些布局之类的接口的定义（这里不展开讲实现，这个还是挺复杂的，这里只是简介一下）。在 CoordinatorLayout 的内部类 LayoutParams 里（虽然说是简介，也简单讲下代码）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line">        LayoutParams(Context context, AttributeSet attrs) {</div><div class="line">            <span class="keyword">super</span>(context, attrs);</div><div class="line"></div><div class="line">            <span class="keyword">final</span> TypedArray a = context.obtainStyledAttributes(attrs,</div><div class="line">                    R.styleable.CoordinatorLayout_LayoutParams);</div><div class="line"></div><div class="line">            <span class="keyword">this</span>.gravity = a.getInteger(</div><div class="line">                    R.styleable.CoordinatorLayout_LayoutParams_android_layout_gravity,</div><div class="line">                    Gravity.NO_GRAVITY);</div><div class="line">            mAnchorId = a.getResourceId(R.styleable.CoordinatorLayout_LayoutParams_layout_anchor,</div><div class="line">                    View.NO_ID);</div><div class="line">            <span class="keyword">this</span>.anchorGravity = a.getInteger(</div><div class="line">                    R.styleable.CoordinatorLayout_LayoutParams_layout_anchorGravity,</div><div class="line">                    Gravity.NO_GRAVITY);</div><div class="line"></div><div class="line">            <span class="keyword">this</span>.keyline = a.getInteger(R.styleable.CoordinatorLayout_LayoutParams_layout_keyline,</div><div class="line">                    -<span class="number">1</span>); </div><div class="line"></div><div class="line">            <span class="comment">// 这里会解析 layout xml 中 layout_behavior 指定的 Behavior</span></div><div class="line">            mBehaviorResolved = a.hasValue(</div><div class="line">                    R.styleable.CoordinatorLayout_LayoutParams_layout_behavior);</div><div class="line">            <span class="keyword">if</span> (mBehaviorResolved) {</div><div class="line">                mBehavior = parseBehavior(context, attrs, a.getString(</div><div class="line">                        R.styleable.CoordinatorLayout_LayoutParams_layout_behavior));</div><div class="line">            }    </div><div class="line"></div><div class="line">            a.recycle();</div><div class="line">        }    </div><div class="line"></div><div class="line">... ... </div><div class="line"></div><div class="line">    <span class="comment">// 这里其实是通过 java 通过类全名字的方法实例化 xml 指定的 Behavior 的对象</span></div><div class="line">    <span class="keyword">static</span> Behavior parseBehavior(Context context, AttributeSet attrs, String name) {</div><div class="line">        <span class="keyword">if</span> (TextUtils.isEmpty(name)) { </div><div class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="keyword">final</span> String fullName;</div><div class="line">        <span class="keyword">if</span> (name.startsWith(<span class="string">"."</span>)) {    </div><div class="line">            <span class="comment">// Relative to the app package. Prepend the app package name.</span></div><div class="line">            fullName = context.getPackageName() + name;</div><div class="line">        } <span class="keyword">else</span> <span class="keyword">if</span> (name.indexOf(<span class="string">'.'</span>) &gt;= <span class="number">0</span>) {</div><div class="line">            <span class="comment">// Fully qualified package name.</span></div><div class="line">            fullName = name;</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            <span class="comment">// Assume stock behavior in this package.</span></div><div class="line">            fullName = WIDGET_PACKAGE_NAME + <span class="string">'.'</span> + name;</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            Map&lt;String, Constructor&lt;Behavior&gt;&gt; constructors = sConstructors.get();</div><div class="line">            <span class="keyword">if</span> (constructors == <span class="keyword">null</span>) {    </div><div class="line">                constructors = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">                sConstructors.set(constructors);</div><div class="line">            }</div><div class="line">            Constructor&lt;Behavior&gt; c = constructors.get(fullName);</div><div class="line">            <span class="keyword">if</span> (c == <span class="keyword">null</span>) {</div><div class="line">                <span class="keyword">final</span> Class&lt;Behavior&gt; clazz = (Class&lt;Behavior&gt;) Class.forName(fullName, <span class="keyword">true</span>,</div><div class="line">                        context.getClassLoader());     </div><div class="line">                c = clazz.getConstructor(CONSTRUCTOR_PARAMS);</div><div class="line">                c.setAccessible(<span class="keyword">true</span>);         </div><div class="line">                constructors.put(fullName, c); </div><div class="line">            }</div><div class="line">            <span class="keyword">return</span> c.newInstance(context, attrs); </div><div class="line">        } <span class="keyword">catch</span> (Exception e) {        </div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Could not inflate Behavior subclass "</span> + fullName, e);</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>然后上面 xml 中指定的 @string/appbar_scrolling_view_behavior 在 design 的 res/values/string.xml 中的定义是：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">string</span> <span class="attribute">name</span>=<span class="value">"appbar_scrolling_view_behavior"</span> <span class="attribute">translatable</span>=<span class="value">"false"</span>&gt;</span>android.support.design.widget.AppBarLayout$ScrollingViewBehavior<span class="tag">&lt;/<span class="title">string</span>&gt;</span></div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>其实就是 AppBarLayout 中的内部类 ScrollingViewBehavior，这个是继承了 CoordinatorLayout.Behavior 的，实现了上面的那种搜索效果。所以你如果要自定义实现一些其它的比较 cool 的 UI 效果，可以自己实现 Behavior，不过这个还是挺费劲的（这里提的需求不要自己实现 Behavior）。</p>
+<p>但是大家会觉得奇怪，不是应该每一个 CoordinatorLayout 的 childview 都应该有 Behavior 么，为什么 AppBarLayout 没指定咧。是的，我们是没有给 AppBarLayout 指定 Behavior，但是好像工作正常的样子。这个其实要看下 CoordinatorLayout 的这部分代码了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">LayoutParams getResolvedLayoutParams(View child) {</div><div class="line">    <span class="keyword">final</span> LayoutParams result = (LayoutParams) child.getLayoutParams();</div><div class="line">    <span class="comment">// 从上面的代码看得出, 如果 childview 指定了 layout_behavior, 并且是能成功实现化的</span></div><div class="line">    <span class="comment">// mBehaviorResolved 就会为 true， 所以像 AppBarLayout 这样没指定的，就会跑下面的代码</span></div><div class="line">    <span class="keyword">if</span> (!result.mBehaviorResolved) {</div><div class="line">        Class&lt;?&gt; childClass = child.getClass();</div><div class="line">        DefaultBehavior defaultBehavior = <span class="keyword">null</span>;</div><div class="line">        <span class="comment">// 这段代码的意思其实是：在这个 childview 的类里面找用 @ 注释写了 CoordinatorLayout.DefaultBehavior 的类</span></div><div class="line">        <span class="comment">// 如果这个 childview 的类找不到会找它的父类，知道找到为止（或是已经到达根类 Object）</span></div><div class="line">        <span class="keyword">while</span> (childClass != <span class="keyword">null</span> &&</div><div class="line">                (defaultBehavior = childClass.getAnnotation(DefaultBehavior.class)) == <span class="keyword">null</span>) {</div><div class="line">            childClass = childClass.getSuperclass();</div><div class="line">        }</div><div class="line">        <span class="comment">// 如果有找到的话，就实例化，用这个作为这个 childview 的 behavior</span></div><div class="line">        <span class="keyword">if</span> (defaultBehavior != <span class="keyword">null</span>) {</div><div class="line">            <span class="keyword">try</span> {</div><div class="line">                result.setBehavior(defaultBehavior.value().newInstance());</div><div class="line">            } <span class="keyword">catch</span> (Exception e) {</div><div class="line">                Log.e(TAG, <span class="string">"Default behavior class "</span> + defaultBehavior.value().getName() +</div><div class="line">                        <span class="string">" could not be instantiated. Did you forget a default constructor?"</span>, e);</div><div class="line">            }</div><div class="line">        }</div><div class="line">        result.mBehaviorResolved = <span class="keyword">true</span>;</div><div class="line">    }</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>上面那个说 @ 注释的，好像不太好理解，那稍微看下 AppBarLayout 的代码就能马上理解了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@CoordinatorLayout</span>.DefaultBehavior(AppBarLayout.Behavior.class)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppBarLayout</span> <span class="keyword">extends</span> <span class="title">LinearLayout</span> </span>{</div><div class="line"></div><div class="line">... ... </div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line"><span class="comment">     * The default {@link Behavior} for {@link AppBarLayout}. Implements the necessary nested</span></div><div class="line"><span class="comment">     * scroll handling with offsetting.</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Behavior</span> <span class="keyword">extends</span> <span class="title">ViewOffsetBehavior</span>&lt;<span class="title">AppBarLayout</span>&gt; </span>{</div><div class="line">... ... </div><div class="line">    }</div><div class="line"></div><div class="line">... ...</div><div class="line"></div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>这里 google 是玩了比较高级玩意，利用注释来写代码了 … 所以如果你没有指定 AppBarLayout 的 behavior 就会默认用它内部的一个默认实现。所以如果你要使用上面这种收缩效果，你必须要使用 AppBarLayout 来包裹你要收缩的 childview , 这也解释了为什么刚开始的时候，我以为随便拿个 FrameLayout 把上面的要收缩的 view 包裹，但是发现没用。如果你想省事，就老老实实用 design 库提供的这些容器来玩，否则你就得啥轮子都自己造，design 库就只提供了一个架子而已。</p>
+<h3 id="解决需求">解决需求</h3>
+<p>铺垫了这么多该说怎么实现我们的特殊需求了。这个需求其实就是说要能够动态开关 AppBarLayout 中的 childview 的那个收缩属性。其实这个属性也是在 xml 中定义的，由 AppBarLayout 的 LayoutParams 解析：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="title">LayoutParams</span>(Context c, AttributeSet attrs) {</div><div class="line">    <span class="keyword">super</span>(c, attrs);</div><div class="line">    TypedArray a = c.obtainStyledAttributes(attrs, R.styleable.AppBarLayout_LayoutParams);</div><div class="line">    mScrollFlags = a.getInt(R.styleable.AppBarLayout_LayoutParams_layout_scrollFlags, <span class="number">0</span>);</div><div class="line">    <span class="keyword">if</span> (a.hasValue(R.styleable.AppBarLayout_LayoutParams_layout_scrollInterpolator)) {</div><div class="line">        <span class="keyword">int</span> resId = a.getResourceId(   </div><div class="line">                R.styleable.AppBarLayout_LayoutParams_layout_scrollInterpolator, <span class="number">0</span>);</div><div class="line">        mScrollInterpolator = android.view.animation.AnimationUtils.loadInterpolator(</div><div class="line">                c, resId);                     </div><div class="line">    }</div><div class="line">    a.recycle();</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>然后我发现 AppBarLayout.LayoutParams 有一个方法，好像可以动态设置 mScrollFlags:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*</span></div><div class="line"><span class="comment"> * Set the scrolling flags.</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment"> * @param flags bitwise int of {@link #SCROLL_FLAG_SCROLL},</span></div><div class="line"><span class="comment"> *             {@link #SCROLL_FLAG_EXIT_UNTIL_COLLAPSED}, {@link #SCROLL_FLAG_ENTER_ALWAYS}</span></div><div class="line"><span class="comment"> *             and {@link #SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED}.</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment"> * @see #getScrollFlags()</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment"> * @attr ref android.support.design.R.styleable#AppBarLayout_LayoutParams_layout_scrollFlags</span></div><div class="line"><span class="comment"> */</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setScrollFlags</span>(@ScrollFlags <span class="keyword">int</span> flags) {</div><div class="line">    mScrollFlags = flags;          </div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>于是我试了下修改这个标志：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 这个是我 app 的代码</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setScrollEnable</span>(<span class="keyword">boolean</span> enable) {</div><div class="line">    AppBarLayout.LayoutParams appbarLp = (AppBarLayout.LayoutParams)</div><div class="line">        mEditText.getLayoutParams();</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == appbarLp) {</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (enable) {</div><div class="line">        appbarLp.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL</div><div class="line">            | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);</div><div class="line">    } <span class="keyword">else</span> {</div><div class="line">        appbarLp.setScrollFlags(<span class="number">0</span>);</div><div class="line">    }</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>设置了之后，好像没作用，但是但是界面动几下就生效了。我稍微翻了下代码，好像是修改了这个 mScrollFlags 之后还需要重新布局的，所以加了下面这句就 OK 了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setScrollEnable</span>(<span class="keyword">boolean</span> enable) {</div><div class="line">    AppBarLayout.LayoutParams appbarLp = (AppBarLayout.LayoutParams)</div><div class="line">        mEditText.getLayoutParams();</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == appbarLp) {</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (enable) {</div><div class="line">        appbarLp.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL</div><div class="line">            | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);</div><div class="line">    } <span class="keyword">else</span> {</div><div class="line">        appbarLp.setScrollFlags(<span class="number">0</span>);</div><div class="line">    }</div><div class="line">    <span class="comment">// let CoordinatorLayout relayout to let scroll flags become effective</span></div><div class="line">    mCoordinatorLayout.requestLayout();</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>这样就能动态开关 childview 的搜索属性了。</p>
+<h2 id="小结">小结</h2>
+<p>这个 design 库还是挺不错的，带了不少 Material Design 的 UI 效果，其实这个 CoordinatorLayout 设计思路和实现都很强大，有时间好好吃透了（哎 … 有时间 … →_→ ）。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Development/">Android Development</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2016/04/11/Support Design 库使用简介/" data-title="Support Design 库使用简介 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/03/27/使用 gradle 定制渠道包/"  title="使用 gradle 定制渠道包">
+ <strong>下一篇:</strong><br/> 
+ <span>使用 gradle 定制渠道包
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread" data-thread-key="Support Design 库使用简介" data-title="Support Design 库使用简介" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2016/04/11/Support Design 库使用简介/">
+    </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简单使用"><span class="toc-number">1.</span> <span class="toc-text">简单使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#特殊需求"><span class="toc-number">2.</span> <span class="toc-text">特殊需求</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CoordinatorLayout_简介"><span class="toc-number">2.1.</span> <span class="toc-text">CoordinatorLayout 简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解决需求"><span class="toc-number">2.2.</span> <span class="toc-text">解决需求</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小结"><span class="toc-number">3.</span> <span class="toc-text">小结</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>34</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>46</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>80</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li><i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="6" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接 o(^▽^)o</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2016 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>
