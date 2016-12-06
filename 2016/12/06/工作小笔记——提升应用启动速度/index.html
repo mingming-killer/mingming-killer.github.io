@@ -1,0 +1,499 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>工作小笔记——提升应用启动速度 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="应用开发了几个版本，功能越来越多，集成的 sdk 也越来越多，突然发现，在应用冷启动速度很慢，特别在某些手机上，特别是第一次安装的时候。严重的时候从点击图标启动应用，到看到第一个页面，有些时候需要 6、7s，所以就需要优化一下。
+这里优化的是优化冷启动需要的时间，android 应用启动方面的讲解可">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/12/06/工作小笔记——提升应用启动速度/" title="工作小笔记——提升应用启动速度" itemprop="url">工作小笔记——提升应用启动速度</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2016-12-06T09:46:16.000Z" itemprop="datePublished">2016 12月 6</time>
+    更新日期:<time datetime="2016-12-07T09:46:16.000Z" itemprop="dateModified">2016 12月 7</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#冷启动出现的时机"><span class="toc-number">1.</span> <span class="toc-text">冷启动出现的时机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分析手段"><span class="toc-number">2.</span> <span class="toc-text">分析手段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分析结果"><span class="toc-number">3.</span> <span class="toc-text">分析结果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#解决办法"><span class="toc-number">4.</span> <span class="toc-text">解决办法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多_dex_优化"><span class="toc-number">5.</span> <span class="toc-text">多 dex 优化</span></a></li></ol>
+		</div>
+		
+		<p>应用开发了几个版本，功能越来越多，集成的 sdk 也越来越多，突然发现，在应用冷启动速度很慢，特别在某些手机上，特别是第一次安装的时候。严重的时候从点击图标启动应用，到看到第一个页面，有些时候需要 6、7s，所以就需要优化一下。</p>
+<p>这里优化的是优化冷启动需要的时间，android 应用启动方面的讲解可以参考下我以前写的2篇文章中相关的章节： <a href="http://light3moon.com/2015/01/22/Android Broadcast 分析——发送、处理" title="Android Broadcast 分析——发送、处理" target="_blank" rel="external">Android Broadcast 分析——发送、处理</a> 和 <a href="http://light3moon.com/2015/01/28/Android Binder 分析——普通服务 Binder 对象的传递" title="Android Binder 分析——普通服务 Binder 对象的传递" target="_blank" rel="external">Android Binder 分析——普通服务 Binder 对象的传递</a> </p>
+<h2 id="冷启动出现的时机">冷启动出现的时机</h2>
+<p>这里解释一下，android 上所谓的冷启动，在技术上是指：应用 Application 不存在的情况下，打开应用需要启动 Application。从用户的角度来说，在4种情况下会出现冷启动：</p>
+<ol>
+<li>第一次安装</li>
+<li>升级应用</li>
+<li>切换到后台，一段时间后（不固定）</li>
+<li>应用某种原因崩溃</li>
+</ol>
+<h2 id="分析手段">分析手段</h2>
+<p>虽然说，从点击图标，到看到一个页面的时间，人为上可以感官到，但是作为优化性能的分析，还是有一些数值统计会更加直观。android 从 4.4 开始，activity manager（am）会统计 activity 从启动到显示的时间。这里就可以通过统计应用的第一个页面（通常是 Splash 闪屏页）的显示时间，从而评估应用启动的时间。</p>
+<p>am 的打印为类似下面这些：</p>
+<pre>
+ActivityManager: Displayed com.kk.dict/.activity.SplashActivity: +354ms
+</pre>
+
+<p>这个是在 ActivityRecord 中的 full draw report 函数中打印的 log（具体的源码这里不分析了）。但是注意，这个统计会受到一些场景的影响，例如说，你在启动的闪屏页中又启动的其他不可见的 activity，这个统计有些时候就不会显示（例如说，我们的应用在 Application 中会启动一个不可见空白的 activity 来提供统计日活数据）。所以在调试的过程中，可以暂时先把这些 activity 关掉（后面发现这种 activity 对启动速度影响不大）。</p>
+<p>还有一种最简单的手段就是自己统计时间，通过 log 打印，但是由于应用层缺乏 activity 完全显示的回调，所以可以2种方法结合来调试。</p>
+<h2 id="分析结果">分析结果</h2>
+<p>通过 am 的打印，和自己的 log 打印，发现我们的应用，在下面几个方面存在大量耗时：</p>
+<ol>
+<li>Application 中初始化的一些第三方 sdk：例如 友盟推送，bugly 统计，tusdk 等。其中 友盟推送 和 bugly 2个加起来，平均差不多耗时 1s</li>
+<li>Splash 页面布局不够简洁，其中还有一开始就启动了异步线程就初始化一些数据库</li>
+<li>第一次安装时，Application 通过添加系统同步框架的帐号，导致系统 ACCOUNT CHANGE 广播，导致大量第三方进程启动，严重拖慢系统性能，导致自己的应用初始化缓慢</li>
+</ol>
+<h2 id="解决办法">解决办法</h2>
+<p>根据上面的分析，逐条给出解决办法：</p>
+<p><strong>1</strong>. 这个可以把初始化的第三方 sdk 区分一下（区分是否重型，可以通过自己的 log 统计初始化时间）：</p>
+<p>  (1). 一些初始化快，但是马上就要用到的，例如说： imageloader，volley 等，可以直接放在 Application 的 onCreate 中初始化。</p>
+<p>  (2). 一些重新的 sdk，但是又不是马上就要用到的，例如说 tusdk（图像处理，不进入图片拾取页面不会调用），可以采用懒加载的方法，稍微封装一下，在使用的界面再初始化</p>
+<p>  (3). 一些重型的 sdk，在后台使用的，例如说一些推送类的 sdk，可以在 Application 的 onCreate 中，使用一个 Handler 延迟一段时间再初始化。例如留 1s 给闪屏页先展示出来</p>
+<p><strong>2</strong>. 简洁闪屏页的布局。如果说确实需要复杂布局的，可以优化固定一个简单的样式，例如一个 ImageView 展示一个 log，配上背景色，让 UI 尽快渲染出来。如果闪屏页还需要开线程去加载数据，同样也是利用 Handler 延迟个 300ms 左右再去加载（不要以为异步线程就不会影响 UI），先留时间让 UI 渲染。</p>
+<p><strong>3</strong>. 这个最坑了，结合之前的一篇工作笔记，我们的应用利用了 android 的同步框架来保活。但是这个手段，却导致一次安装的时候大量第三方应用的进程启动，严重拖慢系统性能，从而导致自己的应用启动缓慢。这个以前是放在 Application 中初始化的，可以放到闪屏页的延迟 Handler 中初始化。</p>
+<p>经过上面的优化后，应用的启动速度已经很快了（基本上看到闪屏页在 1s 以内）。但是还是能看到启动的闪屏页面黑屏。这个黑屏是 activity 的 window background。这个可以通过设置透明的 activity 背景解决：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">style</span> <span class="attribute">name</span>=<span class="value">"SplashTheme"</span> <span class="attribute">parent</span>=<span class="value">"@android:style/Theme.Translucent.NoTitleBar"</span>&gt;</span><span class="css"></span></div><div class="line"><span class="css">    &lt;<span class="tag">item</span> <span class="tag">name</span>="<span class="tag">android</span><span class="pseudo">:windowDisablePreview"</span>&gt;<span class="tag">true</span>&lt;/<span class="tag">item</span>&gt;</span></div><div class="line"><span class="css"></span><span class="tag">&lt;/<span class="title">style</span>&gt;</span></div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>但是不要以为光光设置透明背景能解决启动速度慢的问题。关键在于 Application onCreate 要快，第一个页面的渲染速度要快才行，不然速度慢的话，就算设置了透明背景，体验会更差的（用户看不到黑屏或者白屏，并且长时间没任何反应，效果更差）。</p>
+<h2 id="多_dex_优化">多 dex 优化</h2>
+<p>当 app 方法数太多的时候，需要拆分多个 dex 文件，这个会对应用启动速度有一定的影响。但是我们的应用大多数还是一个 dex，所以这里没深入研究这方面。facebook 开源了一个 redex（主要目的是通过优化 apk 字节码来减少 apk 体积的），其中有一项是 Interdex ，通过让更多启动需要的类集中在主 dex 来提升多 dex 的启动速度。具体分析可以常见这里： <a href="http://mp.weixin.qq.com/s?__biz=MzA3NTYzODYzMg==&amp;mid=2653578240&amp;idx=1&amp;sn=b6a721e3eb0b3b0ee3ecb427452ef60e&amp;chksm=84b3b607b3c43f11ad53b6338d11f22e9727b6bc7a2c7ca5aa899dbec5da4527cc8bc3e830cb&amp;mpshare=1&amp;scene=23&amp;srcid=1206P5QXqHyWlpMvrLCukho7#rd" title="Redex 初探与 Interdex：Andorid 冷启动优化" target="_blank" rel="external">Redex 初探与 Interdex：Andorid 冷启动优化</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Development/">Android Development</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2016/12/06/工作小笔记——提升应用启动速度/" data-title="工作小笔记——提升应用启动速度 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/12/06/工作小笔记——提升 Application 存活概率/"  title="工作小笔记——提升 Application 存活概率">
+ <strong>下一篇:</strong><br/> 
+ <span>工作小笔记——提升 Application 存活概率
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread" data-thread-key="工作小笔记——提升应用启动速度" data-title="工作小笔记——提升应用启动速度" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2016/12/06/工作小笔记——提升应用启动速度/">
+    </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#冷启动出现的时机"><span class="toc-number">1.</span> <span class="toc-text">冷启动出现的时机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分析手段"><span class="toc-number">2.</span> <span class="toc-text">分析手段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分析结果"><span class="toc-number">3.</span> <span class="toc-text">分析结果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#解决办法"><span class="toc-number">4.</span> <span class="toc-text">解决办法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多_dex_优化"><span class="toc-number">5.</span> <span class="toc-text">多 dex 优化</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li><i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="6" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接 o(^▽^)o</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2016 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

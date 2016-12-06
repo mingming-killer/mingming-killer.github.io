@@ -81,6 +81,41 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
+    <a href="/2015/01/21/MiniGUI DC 分析/" title="MiniGUI DC 分析" itemprop="url">
+  
+    <h1 itemprop="name">MiniGUI DC 分析</h1>
+    
+     
+           <p itemprop="description" >相关术语
+这里先解释下相关术语吧（呃～～是按我的理解）：
+
+GDIGDI（Graphics Device Interface）: 图形设备接口。这应该是一个抽象层，在这一些为上层应用程序提供了一系列图形绘制相关的接口：例如画点、画线、矩形填充、块传送、加载图片文件等等。它衔接底层</p>
+        
+    
+    <time datetime="2015-01-21T13:15:16.000Z" itemprop="datePublished">2015 1月 21</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/21/MiniGUI 源码分析笔记/" title="MiniGUI 源码分析笔记" itemprop="url">
+  
+    <h1 itemprop="name">MiniGUI 源码分析笔记</h1>
+    
+     
+           <p itemprop="description" >随手记记，免得忘记。
+线程版启动的线程
+线程版的 MiniGUI 在 InitGUI 后，会启动额外3个线程：
+
+__mg_desktop（pthread_t）：桌面线程，线程函数 DesktopMain。这个线程用于运行桌面处理函数，处理各种桌面消息，以及分发各种消息给所需要的</p>
+        
+    
+    <time datetime="2015-01-21T13:12:16.000Z" itemprop="datePublished">2015 1月 21</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
     <a href="/2015/01/21/MiniGUI 消息机制源码分析/" title="MiniGUI 消息机制源码分析" itemprop="url">
   
     <h1 itemprop="name">MiniGUI 消息机制源码分析</h1>
@@ -203,48 +238,6 @@ MiniGUI 采用的机制是与win32十分类似的消息机制，基本上与win3
   </a>
 </section>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/19/[转] float 类型在内存中的表示/" title="(转) float 类型在内存中的表示" itemprop="url">
-  
-    <h1 itemprop="name">(转) float 类型在内存中的表示</h1>
-    
-     
-           <p itemprop="description" >标准
-先说一下计算机中二进制的算法：
-整数
-整数的二进制算法大家应该很熟悉，就是不断的除以2取余数，然后将余数倒序排列。比如求9的二进制： 
-
-9/2=4 余 1 
-4/2=2 余 0 
-2/2=1 余 0 
-1/2=0 余 1
- 
-
-一直计算到商为0为止，然后将得到的余数由下到</p>
-        
-    
-    <time datetime="2015-01-19T12:22:16.000Z" itemprop="datePublished">2015 1月 19</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/19/Endianness/" title="Endianness" itemprop="url">
-  
-    <h1 itemprop="name">Endianness</h1>
-    
-     
-           <p itemprop="description" >大、小端这个东西，每隔一段时间我就会忘记，发现维基上有2张图太形象了，记不得的时候看下这2张图就能想起来了：
-
-
-然后总结下，有个简单的记得方法：如果是大端存储的话，那么就是大的数值（专有名词叫 The most significant byte (MSB），俗称高位，就是好说个</p>
-        
-    
-    <time datetime="2015-01-19T12:18:16.000Z" itemprop="datePublished">2015 1月 19</time>
-  </a>
-</section>
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/11/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><a class="page-number" href="/page/14/">14</a><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/13/">Next &raquo;</a>
@@ -262,9 +255,9 @@ MiniGUI 采用的机制是与win32十分类似的消息机制，基本上与win3
 	<p class="asidetitle">分类</p>
 		<ul>
 		
-			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>34</sup></a></li>
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
 		
-			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>46</sup></a></li>
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
 		
 			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
 		
@@ -289,7 +282,7 @@ MiniGUI 采用的机制是与win32十分类似的消息机制，基本上与win3
 		
 			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
 		
-			<li><a href="/tags/android/" title="android">android<sup>80</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
 		
 			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		

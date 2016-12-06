@@ -81,6 +81,46 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
+    <a href="/2015/01/19/交叉编译静态库常见问题/" title="交叉编译静态库常见问题" itemprop="url">
+  
+    <h1 itemprop="name">交叉编译静态库常见问题</h1>
+    
+     
+           <p itemprop="description" >交叉编译静态库，会遇到一些比较郁闷的问题，现在总结一下。
+编译库
+编译静态库的时候，一般不要指定 LDFLAGS 中的 -lxx 去链接某个库（可以设置 -Lxx 链接库的路径）。因为好像指定的话，它老会去链接某些依赖库的 .so（假设之前你这些库都是编成 .a 的）。
+编译应用</p>
+        
+    
+    <time datetime="2015-01-19T02:07:16.000Z" itemprop="datePublished">2015 1月 19</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/19/ubuntu 开启 ftp 服务/" title="ubuntu 开启 ftp 服务" itemprop="url">
+  
+    <h1 itemprop="name">ubuntu 开启 ftp 服务</h1>
+    
+     
+           <p itemprop="description" >安装vsftpd
+直接从源里面安装：
+
+sudo apt-get install vsftpd
+
+
+安装完毕后或许会自动生成一个帐户”ftp”，/home下也会增加一个文件夹。如果没有生成这个用户的话可以手动来，生成了就不用了：
+
+sudo useradd -m ftp
+sudo</p>
+        
+    
+    <time datetime="2015-01-19T02:03:16.000Z" itemprop="datePublished">2015 1月 19</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
     <a href="/2015/01/19/ubuntu libtool 错误/" title="ubuntu libtool 错误" itemprop="url">
   
     <h1 itemprop="name">ubuntu libtool 错误</h1>
@@ -218,36 +258,6 @@ bashrc
   </a>
 </section>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/13/Gitweb/" title="Gitweb" itemprop="url">
-  
-    <h1 itemprop="name">Gitweb</h1>
-    
-     
-           <p itemprop="description" >Git web 是一个可以在 web 上查看 git 仓库的程序。例如可以在 web 上查看所有的 git 分支， git 的 commit、diff 等。
-参考资料： ubuntu 上安装 gitweb</p>
-        
-    
-    <time datetime="2015-01-13T12:48:16.000Z" itemprop="datePublished">2015 1月 13</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/13/Repo 命令备忘/" title="Repo 命令备忘" itemprop="url">
-  
-    <h1 itemprop="name">Repo 命令备忘</h1>
-    
-     
-           <p itemprop="description" >repo 其实本身就是一个 git 仓库，只不过这个仓库记录了别的 git 仓库的地址，版本号信息而已。这个 git 仓库在项目的根目录的 .repo/mainfests 下面。其实就是一个 xml 文件，然后里面记录了各个项目的版本号而已，repo 自身是一个脚本。
-downl</p>
-        
-    
-    <time datetime="2015-01-13T12:37:16.000Z" itemprop="datePublished">2015 1月 13</time>
-  </a>
-</section>
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/13/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/15/">Next &raquo;</a>
@@ -265,9 +275,9 @@ downl</p>
 	<p class="asidetitle">分类</p>
 		<ul>
 		
-			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>34</sup></a></li>
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
 		
-			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>46</sup></a></li>
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
 		
 			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
 		
@@ -292,7 +302,7 @@ downl</p>
 		
 			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
 		
-			<li><a href="/tags/android/" title="android">android<sup>80</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
 		
 			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		
