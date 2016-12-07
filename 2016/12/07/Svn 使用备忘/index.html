@@ -1,0 +1,583 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>Svn 使用备忘 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="我个人是觉得 git 比 svn 好用得多的 … 但是公司版本管理用的是 svn，那也得用咯。
+常用命令
+
+svn co
+
+git checkout … 可以接完整仓库的 url，例如： https://svn.yy.com/repos/src/dwmobile/kktest 。也可以接某个分支的 ">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/12/07/Svn 使用备忘/" title="Svn 使用备忘" itemprop="url">Svn 使用备忘</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2016-12-07T09:24:16.000Z" itemprop="datePublished">2016 12月 7</time>
+    更新日期:<time datetime="2016-12-07T09:24:16.000Z" itemprop="dateModified">2016 12月 7</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#常用命令"><span class="toc-number">1.</span> <span class="toc-text">常用命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码提交流程里"><span class="toc-number">2.</span> <span class="toc-text">代码提交流程里</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#忽略规则配置"><span class="toc-number">3.</span> <span class="toc-text">忽略规则配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分支管理"><span class="toc-number">4.</span> <span class="toc-text">分支管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#创建"><span class="toc-number">4.1.</span> <span class="toc-text">创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#合并"><span class="toc-number">4.2.</span> <span class="toc-text">合并</span></a></li></ol></li></ol>
+		</div>
+		
+		<p>我个人是觉得 git 比 svn 好用得多的 … 但是公司版本管理用的是 svn，那也得用咯。</p>
+<h2 id="常用命令">常用命令</h2>
+<ul>
+<li>svn co</li>
+</ul>
+<p>git checkout … 可以接完整仓库的 url，例如： <a href="https://svn.yy.com/repos/src/dwmobile/kktest" target="_blank" rel="external">https://svn.yy.com/repos/src/dwmobile/kktest</a> 。也可以接某个分支的 url，例如： <a href="https://svn.yy.com/repos/src/dwmobile/kktest/android/trunk" target="_blank" rel="external">https://svn.yy.com/repos/src/dwmobile/kktest/android/trunk</a> 。一般开发用 trunk 的话，就只下载 trunk 就行了，不然时间久了，tags 和 branch 一多，一个 svn 的完整仓库能有几十G（svn 一个 tags 或是 branch 就是完整的 copy 整个项目文件过去的，和 git 比起来，简直就是原始时代） 。</p>
+<p>如果要添加用户名和密码的话，可以接下面的参数：</p>
+<pre>
+--username username --password passwd 
+</pre>
+
+<p>如果要下载指定 commit 的可以加 -rxx ，例如说：</p>
+<pre>
+svn co https://svn.yy.com/repos/src/dwmobile/kktest --username username --password passwd -r1395089
+</pre>
+
+
+<ul>
+<li>svn add, rm</li>
+</ul>
+<p>git add， rm … svn add 没 —all 命令，文件需要一个一个自己添加 … 我都不想吐槽了 … 还有一个 <strong>rename</strong> 命令，用来重命名文件名，如果你直接自己修改文件名，那么 svn 无法识别出这个仅仅是文件名变动了，需要 rm 旧的，再 add 新的（git 简直完爆） … </p>
+<ul>
+<li>svn info</li>
+</ul>
+<p>查看 svn 仓库的信息 url，branch 等。</p>
+<ul>
+<li>svn log</li>
+</ul>
+<p>git log … 但是如果 commit 多了，速度非常慢，而且会从头一直显示到尾，简直就不想让在终端下用 … 终端下的话，只要重定到文件，再查看（我已经不想说 git log 比这个好多少了 … ）。</p>
+<p>如果要想要 git log -p file 的效果（查看指定文件的修改记录列表），可以这么使用： <strong>svn log —diff file</strong></p>
+<ul>
+<li>svn st</li>
+</ul>
+<p>git status … 这个终于相差不大了</p>
+<ul>
+<li>svn diff</li>
+</ul>
+<p>git diff … 这个也相差不大， svn diff file -rcommit1:commit2 这个可以查看指定文件2个版本之间的修改</p>
+<ul>
+<li>svn merge</li>
+</ul>
+<p>git merge … 简单的使用还是差不多的（目前我也没用到太复杂的）</p>
+<ul>
+<li>svn revert</li>
+</ul>
+<p>撤销修改</p>
+<h2 id="代码提交流程里">代码提交流程里</h2>
+<ul>
+<li><p>先确定下本地的修改： svn st</p>
+</li>
+<li><p>看下diff: svn diff</p>
+</li>
+<li><p>提交修改代码：svn add xx/svn rm xx</p>
+</li>
+<li><p>确认提交修改：svn commit -m”xx”</p>
+</li>
+<li><p>如果没冲突的话就，提交上去了，svn up 更新一下版本号。如果别人有修改，就 svn up 更新一下，如果有冲突就解决冲突后再 commit</p>
+</li>
+<li><p>可以查看下提交记录： svn log</p>
+</li>
+</ul>
+<h2 id="忽略规则配置">忽略规则配置</h2>
+<p>svn 的忽略规则比和 git 相比麻烦死了 … 需要在对应的文件夹下编辑，例如说：</p>
+<pre>
+svn propedit svn:ignore android/trunk/demo
+</pre>
+
+<p>然后就会弹出一个编辑界面，就可以添加 ignore 文件了（规则和 git 的类似），用 vi 编辑保存退出后，提交就可以。<strong>但是</strong> svn 是分文件夹的，所以说你得为每个文件夹添加一次 … 而且编辑的文件夹还必须已经纳入 svn 的管理（也就是文件夹要先提交到 svn）</p>
+<h2 id="分支管理">分支管理</h2>
+<h3 id="创建">创建</h3>
+<p>在 svn 中主干代码一般是放置在 trunk 目录下的，如果要新建 branch 的话则放置在 branchs 目录下。(注意这是一种约定，svn 并不强制你这样做) 注意 branhs 和 trunk 目录要平级，不能有嵌套，要不会引起混乱。</p>
+<pre>
+  myproject/
+      trunk/
+      branches/
+      tags/
+</pre>
+
+<p>但是我们公司移动的项目是这样的（其实也没太大关系）：</p>
+<pre>
+  myproject/
+      android/
+        trunk/
+        branches/
+        tags/
+      ios/
+        trunk/
+        branches/
+        tags/
+      docs/
+</pre>
+
+
+<p>创建一个 branch 也相当简单，只需要一条命令即可：</p>
+<pre>
+svn copy http://example.com/repos/myproject/trunk http://example.com/repos/myproject/branches/releaseForAug -m 'create branch for release on August'
+</pre>
+
+<p>从 trunk 中创建一个 releaseForAug 的分支。之后你就可以通过 svn co <a href="http://example.com/repos/myproject/branches/releaseForAug" target="_blank" rel="external">http://example.com/repos/myproject/branches/releaseForAug</a> 来迁出你的 branch 源文件，在上面进行修改和提交了。</p>
+<p>其实 svn 并没有 branch 的内部概念。我们只是创建了一个 repo 的副本，并自己赋予这个副本作为 branch 的意义，所以这与 git 中的 branch 有很大不同。需要注意的是 branch 和 trunk 使用同一套版本号，也就是说无论在 branch 还是 trunk 的提交都会引起主版本号的增加。这是因为 svn copy 只支持同一个 repo 内的文件 copy，并不支持跨 repo 的 copy，所以新创建的 branch 和 trunk 都属于同一个 repo。</p>
+<h3 id="合并">合并</h3>
+<p>既然要创建分支也需要合并分支。基本的合并也是蛮简单的。假设现在 branch 上 fix 了一系列的 bug，现在我们想把针对 branch 的改变同步到 trunk 上，那么应该怎么做那？保证当前 branch 分支是 clean 的，也就是说使用 svn st 看不到任何的本地修改。命令行下切换到 trunk 目录中，使用 svn merge <a href="http://example.com/repos/myproject/branches/releaseForAug" target="_blank" rel="external">http://example.com/repos/myproject/branches/releaseForAug</a> 来将 branch 分支上的改动 merge 回 trunk 下。</p>
+<p>如果出现 merge 冲突则进行解决，然后执行svn ci -m ‘description’ 来提交变动。当然在 merge 你也可以指定 branch 上那些版本变更可以合并到 trunk 中:</p>
+<pre>
+svn merge  http://example.com/repos/myproject/branches/releaseForAug -r150:HEAD
+</pre>
+
+
+
+
+
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Linux/">Linux</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2016/12/07/Svn 使用备忘/" data-title="Svn 使用备忘 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/12/06/工作小笔记——提升应用启动速度/" title="工作小笔记——提升应用启动速度">
+  <strong>上一篇:</strong><br/>
+  <span>
+  工作小笔记——提升应用启动速度</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/12/06/工作小笔记——提升 Application 存活概率/"  title="工作小笔记——提升 Application 存活概率">
+ <strong>下一篇:</strong><br/> 
+ <span>工作小笔记——提升 Application 存活概率
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+<section class="comment">
+	<div class="ds-thread" data-thread-key="Svn 使用备忘" data-title="Svn 使用备忘" 
+      data-author-key="mingming" data-limit=10
+      data-url="light3moon.com/2016/12/07/Svn 使用备忘/">
+    </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#常用命令"><span class="toc-number">1.</span> <span class="toc-text">常用命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码提交流程里"><span class="toc-number">2.</span> <span class="toc-text">代码提交流程里</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#忽略规则配置"><span class="toc-number">3.</span> <span class="toc-text">忽略规则配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分支管理"><span class="toc-number">4.</span> <span class="toc-text">分支管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#创建"><span class="toc-number">4.1.</span> <span class="toc-text">创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#合并"><span class="toc-number">4.2.</span> <span class="toc-text">合并</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>25</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>28</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+    <ul>
+      <li><i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="commentlist">
+  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
+    <ul>
+      <ul class="ds-recent-comments" 
+        data-num-items="6" 
+        data-show-avatars="1" 
+        data-show-title="1"   
+        data-show-time="1" 
+        data-show-admin="1" 
+        data-excerpt-length="30">
+      </ul>
+      <!-- duoshou js begin load, one page only load once -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"mingming"};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = 'http://static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+      <!-- duoshou js load end -->
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接 o(^▽^)o</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	
+		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
+		         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2016 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"mingming"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>
