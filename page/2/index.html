@@ -81,52 +81,6 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android Binder 分析——原理/" title="Android Binder 分析——原理" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——原理</h1>
-    
-     
-           <p itemprop="description" >分析之前说一下原理。为要 android 要搞这么复杂的一个东西。那是因为 android 是个多进程的系统，进程间的数据交换、相互调用（某几个程序配合完成某些业务）就涉及跨进程通信。2个进程不能直接访问数据的原因：
-
-每个进程的地址空间的独立的，所以进程A中某个数据的地址在进程</p>
-        
-    
-    <time datetime="2015-01-28T12:17:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/28/Android Binder 分析——通信模型/" title="Android Binder 分析——通信模型" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——通信模型</h1>
-    
-     
-           <p itemprop="description" >通信就要搞一些协议，binder 的比较简单，但是也有一个基本的模型，这里以最基本的一次 IPC 调用来说明一下。然后涉及的代码主要在（这里不列 java 层的代码了，java 层的代码前面原理篇分析过了，主要是挂马甲调用 native 的方法的）：
-123456789# nat</p>
-        
-    
-    <time datetime="2015-01-28T12:29:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/28/Android Binder 分析——数据传递者[Parcel]/" title="Android Binder 分析——数据传递者（Parcel）" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——数据传递者（Parcel）</h1>
-    
-     
-           <p itemprop="description" >前面 binder 原理和通信模型中在接口实现部分（Bp 和 Bn）中应该看到很多地方都有使用 parcel。这个 android 专门设计用来跨进程传递数据的，实现在 native，java 层有接口（基本上是 jni 马甲）。照例先说下源代码位置（4.4 的）：
-123456</p>
-        
-    
-    <time datetime="2015-01-28T12:41:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
     <a href="/2015/01/28/Android Binder 分析——匿名共享内存[Ashmem]/" title="Android Binder 分析——匿名共享内存（Ashmem）" itemprop="url">
   
     <h1 itemprop="name">Android Binder 分析——匿名共享内存（Ashmem）</h1>
@@ -199,6 +153,20 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
+    <a href="/2015/01/28/Android Binder 分析——懒人的工具[AIDL]/" title="Android Binder 分析——懒人的工具（AIDL）" itemprop="url">
+  
+    <h1 itemprop="name">Android Binder 分析——懒人的工具（AIDL）</h1>
+    
+     
+           <p itemprop="description" >前面说了 binder 的原理，和 parcel，当时也说了实现 IBinder 接口（Bp 端、Bn 端）代码都非常的机械，人工写的话，不仅浪费时间，而且很有可能会出错（复制、粘贴后忘记改某个地方）。所以 android 弄了代码自动生成的东西。然后还美名其曰 XX 语言—— </p>
+        
+    
+    <time datetime="2015-01-28T13:53:16.000Z" itemprop="datePublished">2015 1月 28</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
     <a href="/2015/01/28/Android Binder 分析——死亡通知[DeathRecipient]/" title="Android Binder 分析——死亡通知（DeathRecipient）" itemprop="url">
   
     <h1 itemprop="name">Android Binder 分析——死亡通知（DeathRecipient）</h1>
@@ -213,15 +181,49 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/28/Android Binder 分析——懒人的工具[AIDL]/" title="Android Binder 分析——懒人的工具（AIDL）" itemprop="url">
+    <a href="/2016/03/27/使用 gradle 定制渠道包/" title="使用 gradle 定制渠道包" itemprop="url">
   
-    <h1 itemprop="name">Android Binder 分析——懒人的工具（AIDL）</h1>
+    <h1 itemprop="name">使用 gradle 定制渠道包</h1>
     
      
-           <p itemprop="description" >前面说了 binder 的原理，和 parcel，当时也说了实现 IBinder 接口（Bp 端、Bn 端）代码都非常的机械，人工写的话，不仅浪费时间，而且很有可能会出错（复制、粘贴后忘记改某个地方）。所以 android 弄了代码自动生成的东西。然后还美名其曰 XX 语言—— </p>
+           <p itemprop="description" >gradle 目前 android studio 采用的全新打包方式，其实也算不上全新了，因为已经改用 2、3 年了吧。相对 ant 来说，gradle 在打不同渠道包，和不同渠道包的定制上比 ant 要优秀不少。改用 gradle 也快一年了，这里稍微记录一下用法和一些坑。
+简</p>
         
     
-    <time datetime="2015-01-28T13:53:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    <time datetime="2016-03-27T03:33:16.000Z" itemprop="datePublished">2016 3月 27</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2016/12/07/Svn 使用备忘/" title="Svn 使用备忘" itemprop="url">
+  
+    <h1 itemprop="name">Svn 使用备忘</h1>
+    
+     
+           <p itemprop="description" >我个人是觉得 git 比 svn 好用得多的 … 但是公司版本管理用的是 svn，那也得用咯。
+常用命令
+
+svn co
+
+git checkout … 可以接完整仓库的 url，例如： https://svn.yy.com/repos/src/dwmobile/kktest 。</p>
+        
+    
+    <time datetime="2016-12-07T09:24:16.000Z" itemprop="datePublished">2016 12月 7</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2016/04/11/Support Design 库使用简介/" title="Support Design 库使用简介" itemprop="url">
+  
+    <h1 itemprop="name">Support Design 库使用简介</h1>
+    
+     
+           <p itemprop="description" >Material Design 是 google 大力推广的 android app 设计模式。我个人还是挺喜欢的，因为界面比较简洁，动画效果也不错。但是要从头实现这些效果也不是一件容易的事，所以为了拉拢开发者，google 推出了一系列 support library： sup</p>
+        
+    
+    <time datetime="2016-04-11T15:06:16.000Z" itemprop="datePublished">2016 4月 11</time>
   </a>
 </section>
 
@@ -375,7 +377,7 @@
 	</div>
 -->
 
-		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2016 
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2017 
 		
 		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
 		
