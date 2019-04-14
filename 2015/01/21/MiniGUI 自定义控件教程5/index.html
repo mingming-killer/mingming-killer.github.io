@@ -114,7 +114,7 @@ MiniGUI原来的单行编辑框控件 CTRL_SLEdit 除了具有编辑框的基本
 </ol>
 <h2 id="二、概要设计">二、概要设计</h2>
 <p>这里因为继承了 <code>CTRL_SLEDIT</code>，所有只需专注控件的扩展功能就行了。要实现以上功能，最关键的就是在 <code>CTRL_SLEDIT</code> 接受到键盘输入之后，把输入显示到屏幕上之前，进行自己的过滤算法判定；当输入的是不符合用户设定的字符则截断，不发送给父类 CTRL_SLEDIT 处理（这样它就显示不出来了）；当输入是符合用户设定的字符就发送给父类处理（这样它就能正常显示出来）。流程图如下：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/custom-control5/1.jpeg" alt="图 1 CTRL_SLEDIT流程图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/custom-control5/1.jpeg" alt="图 1 CTRL_SLEDIT流程图"></p>
 <ul>
 <li>1：EEXMODE_TEXT</li>
 </ul>

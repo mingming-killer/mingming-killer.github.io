@@ -119,7 +119,7 @@
 <p>首先在滑动的时候观察 Memory 的变动情况（idea 和 android studio 有），发现没优化前，内存变动很频繁，gc 很多，虽然内存涨幅不大，但是变化很快，稍微涨上去点就 gc 掉下来，很频繁（因为是动态图，我就不截图了）。</p>
 <h3 id="TraceView">TraceView</h3>
 <p>然后使用 TraceView 进行分析。idea 中好像没有直接调用的按钮，可以点击工具栏上的 Android Device Monitor 调出单独的 DDMS 界面，左边选中要调试的进程，然后简单工具栏上面的 Start Method Profiling 按钮，会弹出一个框让你选择采样的方式，我是选择第一种默认的每隔 1000ms 采样一次（我还没试过第二种方式，以后再说咯）。点击确定后，就开始采样了，然后去滑动一下，感觉差不多了，就选择 Stop Method Profiling，会在 /tmp/ 下生成一个 ddmsxxxxx.trace 的文件（linux 版下的目录），并且会自动帮你打开（你可以把这个文件保存到别的地方，然后以后也可用 DDMS open file 打开来查看的）。打开后就是下面这个样子的：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/profiling-tools/1.png" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/profiling-tools/1.png" alt=""></p>
 <p>其实结果是分上下2部分的，上面的是时间轴，我不太会看上面的时间轴，目前只是看下面的方法分析的。下面会根据耗费 cpu 的时间（单位 ms）来列出排在前面的方法。我们稍微找一下（这里主要是找自己写的方法，一般排在前面几个的都是 android framework 的一些方法），发现排在 20 位的是我们自己写的 Adapter 的 getView 方法。这里稍微介绍一下后面几个指标的含义（我也是从网上看来的，官方文档竟然没有这些指标的介绍）：</p>
 <ul>
 <li><strong>1. Incl Cpu Time:</strong><br>Incl Cpu Time表示方法top执行的总时间，假如说方法top的执行时间为10ms，方法a执行了1ms，方法b执行了2ms，方法c执行了3ms，方法d执行了4ms（这里是为了举个列子，实际情况中方法a、b、c、d的执行总时间肯定比方法top的执行总时间要小一点）。而且调用方法top的方法的执行时间是100ms，那么：</li>
@@ -153,9 +153,9 @@ d    40%
 <h3 id="Allocation_Tracking">Allocation Tracking</h3>
 <p>我们通过 TraceView 大概知道 getView 中的 getNotificationQuerySql 有问题，然后根据之前的 Memroy 工具发现 gc 很频繁。所以猜想是不是有什么地方在频繁的 new 对象。所以应该是 getNotificationQuerySql 函数里面有什么地方在不停的 new 对象出来导致卡顿。至于具体原因，我们就再通过另外一个工具来分析一下，这个工具就是 Allocation Tracking。这个工具能够分析出一段时间内，应用申请了哪些对象，还能精确到函数，这样就能知道你写的函数是不是在频繁的申请对象，导致频繁的 gc。</p>
 <p>点击 idea 中的 Memory 监视工具旁边有一个 Start Allocation Tracking 的按钮（就在 dump heap 按钮的下面），就开始监视了，然后滑动一段时间后，再点击 Stop Allocation Tracking（同一个按钮），就会在你的工程目录下创建一个 captures 的文件夹，然后创建一个 Allocations_xxxx.xx.xx_xx.xx.xx.alloc（以时间命名） 的文件，并且会帮你自动打开，打开后是这个样子的：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/profiling-tools/2.png" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/profiling-tools/2.png" alt=""></p>
 <p>它能按照2种方式显示，一种是按照申请的对象类型：例如说是 java.lang.String、java.lang.Integer 等这些。我们看到按照类型来看，AbstractStringBuilder 这个类占了将近 71% 的内存，这很夸张啊，字符串占了这么多的内存。接下来我们换第二种显示，按照函数显示：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/profiling-tools/3.png" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/profiling-tools/3.png" alt=""></p>
 <p>发现在 getNotificationQuerySql 这个方法中申请的对象将近占了 86%，而下面的 StringBuilder 中的 append 方法占了将近 61%，toString 方法占了将近 24%。回头去看下 getNotificationQuerySql 这个方法中，每次返回的 SQL 语句都是通过字符串拼接出来的（使用 String 重载的 + 号），并且这个语句很复杂，拼接次数很多。其实每一次的 String 拼接都会创建新的 String 对象返回。所以这个做法特别在 getView 中造成大量的对象创建，所以滑动的时候伴随着大量 String 对象的创建，会频繁的引发 gc（本身大量的字符串拼接也比较耗时），所以消耗了大量 cpu 时间，造成 UI 卡顿。解决方法很简单，不要每次都拼接就行了，我的改进方法是，使用一个 static 变量保存拼接好的对象，每次返回这个 static 对象就能避免频繁的字符串拼接操作。</p>
 <h2 id="小结">小结</h2>
 <p>其实可以看到有些时候优化其实代码只需要改动一点，同时也说明，平常要是不注意的话，一、二句代码就能引发很严重的问题（上次说的内存分析中就是一个系统回调没有注销就能引发内存泄漏）。当然这次例子其实不是很好，被我把问题放大了，其实如果不放大的话，在简单的 ListView 中不会很卡的 ╮(“╯₃╰)╭ 。但是这个问题确实是我工作中遇到过的，只不过当时没记录下来而已，这里就当抛砖引玉，记录下如何使用这些工具排查 app 性能问题了。</p>

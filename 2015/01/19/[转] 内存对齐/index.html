@@ -109,9 +109,9 @@
 <p>对于所有直接操作内存的程序员来说,数据对齐都是很重要的问题.数据对齐对你的程序的表现甚至能否正常运行都会产生影响.就像本文章阐述的一样,理解了对齐的本质还能够解释一些处理器的”奇怪的”行为.</p>
 <h3 id="内存存取粒度">内存存取粒度</h3>
 <p>程序员通常倾向于认为内存就像一个字节数组.在C及其衍生语言中,char * 用来指代”一块内存”,甚至在JAVA中也有byte[]类型来指代物理内存.</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/linux/memory-align/1.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/linux/memory-align/1.jpeg" alt=""></p>
 <p>然而,你的处理器并不是按字节块来存取内存的.它一般会以双字节,四字节,8字节,16字节甚至32字节为单位来存取内存.我们将上述这些存取单位称为内存存取粒度.</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/linux/memory-align/2.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/linux/memory-align/2.jpeg" alt=""></p>
 <p>高层(语言)程序员认为的内存形态和处理器对内存的实际处理方式之间的差异产生了许多有趣的问题.如果你不理解内存对齐,你编写的程序将有可能产生下面的问题,按严重程度递增:</p>
 <ol>
 <li>程序运行速度变慢</li>
@@ -122,17 +122,17 @@
 <h3 id="内存对齐基础">内存对齐基础</h3>
 <p>为了说明内存对齐背后的原理,我们考察一个任务,并观察内存存取粒度是如何对该任务产生影响的.这个任务很简单:先从地址0读取4个字节到寄存器,然后从地址1读取4个字节到寄存器.</p>
 <p>首先考察内存存取粒度为1byte的情况:</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/linux/memory-align/3.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/linux/memory-align/3.jpeg" alt=""></p>
 <p>这迎合了那些天真的程序员的观点:从地址0和地址1读取4字节数据都需要相同的4次操作.现在再看看存取粒度为双字节的处理器(像最初的68000处理器)的情况:</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/linux/memory-align/4.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/linux/memory-align/4.jpeg" alt=""></p>
 <p>从地址0读取数据,双字节存取粒度的处理器读内存的次数是单字节存取粒度处理器的一半.因为每次内存存取都会产生一个固定的开销,最小化内存存取次数将提升程序的性能.</p>
 <p>但从地址1读取数据时由于地址1没有和处理器的内存存取边界对齐,处理器就会做一些额外的工作.地址1这样的地址被称作非对齐地址.由于地址1是非对齐的,双字节存取粒度的处理器必须再读一次内存才能获取想要的4个字节,这减缓了操作的速度.</p>
 <p>最后我们再看一下存取粒度为4字节的处理器(像68030,PowerPC® 601)的情况:</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/linux/memory-align/5.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/linux/memory-align/5.jpeg" alt=""></p>
 <p>在对齐的内存地址上,四字节存取粒度处理器可以一次性的将4个字节全部读出;而在非对齐的内存地址上,读取次数将加倍.既然你理解了内存对齐背后的原理,那么你就可以探索该领域相关的一些问题了.</p>
 <h3 id="懒惰的处理器">懒惰的处理器</h3>
 <p>处理器对非对齐内存的存取有一些技巧.考虑上面的四字节存取粒度处理器从地址1读取4字节的情况,你肯定想到了下面的解决方法:</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/linux/memory-align/6.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/linux/memory-align/6.jpeg" alt=""></p>
 <p>处理器先从非对齐地址读取第一个4字节块,剔除不想要的字节,然后读取下一个4字节块,同样剔除不要的数据,最后留下的两块数据合并放入寄存器.这需要做很多工作.</p>
 <p>有些处理器并不情愿为你做这些工作.最初的68000处理器的存取粒度是双字节,没有应对非对齐内存地址的电路系统.当遇到非对齐内存地址的存取时,它将抛出一个异常.最初的Mac OS并没有妥善处理这个异常,它会直接要求用户重启机器.悲剧.</p>
 <p>随后的680x0系列,像68020,放宽了这个的限制,支持了非对齐内存地址存取的相关操作.这解释了为什么一些在68020上正常运行的旧软件会在68000上崩溃.这也解释了为什么当时一些老Mac编程人员会将指针初始化成奇数地址.在最初的Mac机器上如果指针在使用前没有被重新赋值成有效地址,Mac会立即跳到调试器.通常他们通过检查调用堆栈会找到问题所在.</p>

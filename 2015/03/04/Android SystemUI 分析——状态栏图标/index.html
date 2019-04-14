@@ -108,7 +108,7 @@
 
 <h2 id="区分">区分</h2>
 <p>我们先来看一张图：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/SystemUI-status-bar-icon/status-icon.png" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/SystemUI-status-bar-icon/status-icon.png" alt=""></p>
 <p>图中状态栏左边那一堆图标是通知篇说的 Notification 的小图标，右边那一堆就是这篇要说的系统状态图标。虽然这篇的名字是状态栏图标，但是因为通知篇说过 Notification 的了，所以这里只说系统的状态图标。通知的图标是每一个通知一个，然后如果通知太多的话，后面会显示一个 “+” 的图标代表有更多的通知图标，所以说左边通知的图标是不确定的，是由运行不同的程序来决定的。而系统状态图标是固定的，在 framework 中代码写死一共有多少种系统状态，然后系统运行不同功能的时候显示某个状态的图标，完成后，图标消失。例如说，设置（关闭）闹钟、开启（关闭）飞行模式、开启（关闭）静音。这里稍微注意下，只有图上右边框出来的部分（只是一小部分而已）才是系统状态，wifi、电量信息和时间不属于系统状态图标的。</p>
 <h2 id="接口">接口</h2>
 <p>我们先来看系统状态图标的接口，接口依旧在 StatusBarManager（SBM） 中：</p>

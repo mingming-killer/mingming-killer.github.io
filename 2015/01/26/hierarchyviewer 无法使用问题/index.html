@@ -139,7 +139,7 @@ Result: Parcel(00000000 00000001 '........')"
 
 <p>说明 view server 处于开启状态。我在我的 eng 的机子试了下，发现输出是 00000000。奇怪了，之前还是能用的，怎么突然 view server 启不来啦？启动代码在上面有，我发现启动 view server 那里有 try catch，然后有句简单的打印。取出来 log 看了下，发现确实有打印： View server did not start。但是也看不出来哪里出错了。</p>
 <p>于是我在 try catch 那加了句： e.printStackTrace() 。然后发现了异常：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/hierarchyviewer-problem/1.png" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/hierarchyviewer-problem/1.png" alt=""></p>
 <p>唉，这咋是 unable to resolve “localhost” 咧？哦，我突然想起来，最近搞屏蔽应用内广告。然后借鉴了一种简单的方法：就是修改 hosts 文件。然后我在调试的时候把原来的 /system/etc/hosts 给删掉了。原来这个文件中就只有一条 host：</p>
 <pre>
 127.0.0.1 localhosts

@@ -105,7 +105,7 @@
 		<p>Material Design 是 google 大力推广的 android app 设计模式。我个人还是挺喜欢的，因为界面比较简洁，动画效果也不错。但是要从头实现这些效果也不是一件容易的事，所以为了拉拢开发者，google 推出了一系列 support library： support-v7-appcompat, support-v7-cardview, support-v7-recyclerview, support-v7-palette 已经今天要介绍的 support-design。开发者通过这些库能够很方便的构造出 Material Design 模式的界面。</p>
 <h2 id="简单使用">简单使用</h2>
 <p>其实我用 support design 的初衷是因为头要仿 ios 短信的一个效果，就是在列表上面有个搜索框，向下滑动的时候会消失，向上滑动又回出来，就像这样：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/support-design-use/design-scrolling.gif" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/support-design-use/design-scrolling.gif" alt=""></p>
 <p>于是我就发现用 support-design 库正好有这个效果（google 不要怪我拿你的库是仿 ios 哈）。首先要引用 support-design 可以直接在 build.gradle 中直接写：</p>
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">dependencies</span> {</div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.android.support:appcompat-v7:22.2.0'</span></div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.android.support:recyclerview-v7:22.2.0'</span></div><div class="line">	<span class="keyword">compile</span> <span class="string">'com.android.support:design:22.2.0'</span></div><div class="line">}</div></pre></td></tr></table></figure>
 

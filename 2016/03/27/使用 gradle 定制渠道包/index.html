@@ -308,7 +308,7 @@ android update project -p .
 <h2 id="附录：关于_Flavors_的问题">附录：关于 Flavors 的问题</h2>
 <p>gradle 是可以定义不同的 Flavors，app 和 module 都可以，但是我强烈建议只在 app 中定义。如果你在 module 里分了 Flavors，在编译 app 的时候敲 task 确实能看到多了几个 Flavors 的 task 出来，但是其实你如果 build module 的 Flavors 是无法打包 app 出来的，但是如果直接 build，module 又无法根据 Flavors 走不同的分支。当然有可能是我自己还没学会怎么整，但是我还是建议只在 app 使用 Flavors，如果由于某些特殊原因，代码的不同是在 module 里面的，其实也可以绕到 app 中去，在 app 定义 Flavors，然后 module 抽出大多数相同的一部分变成一个 module，然后根据不同的 Flavors 建几个分支 module，然后在 app 中不同的 Flavors 引用不同的分支 module 就行了（分支 module 都引用抽出来的那个大 module）。</p>
 <p>还有导入了 idea（IDE）后也是可以编译不同的 Flavors 的，在 idea 的左边的有一个 Build Variants 的选项，可以选择要编译的 Flavors 的：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/gradle-custom-flavors/ide_build_flavors.jpg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/gradle-custom-flavors/ide_build_flavors.jpg" alt=""></p>
   
 	</div>
 		<footer class="article-footer clearfix">

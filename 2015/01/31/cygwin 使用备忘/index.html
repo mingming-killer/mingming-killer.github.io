@@ -114,7 +114,7 @@ Permissions 0660 for '/home/***/.ssh/id_rsa' are too open. It is required that y
 </pre>
 
 <p>一般按照提示去把 <code>id_rsa</code> chmod 600 就行了。但是在 win8.1 下有个蛋疼的问题。就是你 chmod 600 会发现还是 660 ，就是 group 和 other 的权限怎么都收不回来。后来发现是因为 win8.1 的 cygwin 有个 None 的用户组，这个组很奇怪。<code>id_rsa</code> 被分到那个组去了。解决办法很简单，cat /etc/group 把 <code>id_rsa</code> 分配到不是 None 的组就行了，例如说我分配到 Users 组去了（<code>chgrp Users id_rsa</code> 就行了）。</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/window/cygwin-note/1.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/window/cygwin-note/1.jpeg" alt=""></p>
   
 	</div>
 		<footer class="article-footer clearfix">

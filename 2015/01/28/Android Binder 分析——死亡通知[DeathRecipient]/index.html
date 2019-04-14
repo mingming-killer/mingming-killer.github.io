@@ -186,7 +186,7 @@
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> BR_CLEAR_DEATH_NOTIFICATION_DONE:</div><div class="line">    {</div><div class="line">        <span class="comment">// 之前手动增加的引用计数，还是手动减少</span></div><div class="line">        BpBinder *proxy = (BpBinder*)mIn.readInt32();</div><div class="line">        proxy-&gt;getWeakRefs()-&gt;decWeak(proxy);</div><div class="line">    } <span class="keyword">break</span>;</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>到这里处理终于完了。上一张图吧：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/Binder-death/1.png" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/Binder-death/1.png" alt=""></p>
 <p>但是这里还有一个疑问。根据前面的分析，最后能触发调用注册的死亡通知回调，最开始是因为 Bn 的 binder 驱动关闭函数（<code>binder_release</code>）里面设置的延迟工作队列触发的。我们很清楚 ProcessState 的构造函数里有明确的 open 过 binder 驱动，但是好像没哪里 close 过。是的，没错，我 grep 了代码好久，确实没哪里 close 过。</p>
 <p>于是我就猜测是不是在程序结束后会自动关闭打开过的设备驱动。我询问我们那弄 kernel 的同事，他说应该不会的。然后我做了个小试验，我弄了 native 的服务，跑在命令行下面。不管我是 ctrl + C 发信号量退出，还是写个 client 发个命令让它正常退出，还是直接 kill -9 强制终止，<code>binder_release</code> 都会调用（我有在 kernel 的 binder 驱动里面加打印）。我刚开始怀疑是不是注册了一些信号量函数，然后在收到一个些信号量里面做写什么处理。但是又去翻了好久，没找到相关的代码。</p>
 <p>后来没办法，我就专门写了个小程序：</p>

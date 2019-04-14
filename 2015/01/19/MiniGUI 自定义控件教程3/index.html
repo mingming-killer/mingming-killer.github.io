@@ -112,17 +112,17 @@
 </ol>
 <h2 id="二、概要设计">二、概要设计</h2>
 <p>好，功能确定了，下面进行设计。首先我把这个控件取名为CTRL_BUTTONEX（”button_ex”）。然后先设计ButtonEx的最基本功能Button它有4种状态：正常（Normal），控件在没有焦点，使能情况下的状态；焦点（Focus），控件出处输入焦点的状态；点击、按下（Click），控件在焦点状态下被按下或者鼠标点击的状态；无效（Disable），控件被EnableWindow设置成无效时的状态。这4种状态的转化我在MiniGUI原来基础上新增鼠标移入客户区进入Focus状态。其他就是MiniGUI原来Button的状态转化了：Noraml就多说了。控件在tab（left、up、right、down）便利到的情况下下进入Focus状态；在Focus下，按下鼠标左键、space、enter键进入到Click状态；在Click下，鼠标左键在客户区弹起、space、enter键弹起，进入到Focus状态（并判定发送Click事件，向父窗口发送Click通知码）；如果鼠标左键在客户区之外弹起则进入Normal状态（并判定无Click事件发生，不向父窗口发送通知码）；Disable windows事件发生进入到Disable状态；Enable window事件发送进入到Normal状态。状态图转化详见下图：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/custom-control3/1.jpeg" alt="&quot;图 1 状态转化图&quot;"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/custom-control3/1.jpeg" alt="&quot;图 1 状态转化图&quot;"></p>
 <p>然后控件能在WS_TABSTOP风格下在Dialog中能被tab、left、up、right、down便利焦点。在焦点状态下按下space、enter键发送按下事件。这些靠处理MSG_KEYDOWN来实现。<br>最后我们来设计ButtonEx的外观表现形式。这里我经过了几个版本的升级，参考了MiniGUI原来Button的表现手法和网上一些扩展控件的表现方法，决定设计出几种不同的风格来供使用者选择。</p>
 <h3 id="1：BEXS_IMAGE">1：BEXS_IMAGE</h3>
 <p>我把这个叫做图片风格。分别用4张不同的图片来表现4种状态。图片支持bmp（支持透明色）、png（支持alpha通道）、gif、jpeg（支持透明色）。外观全部交由图片负责，因此这个风格不支持显示文本。好不好看全靠外部图片PS处理。这里说明下，现在一般使用MiniGUI的色深是16bit，但是载入24bit的bmp只要PS里颜色渐变不是特别BT，不会有太大的失真。32bit带alpha通道的png在2.0.4的API下也能保留alpha通道信息。因此这种可以做出外观上不规则的Button（它响应鼠标还是以矩形来算的）。bmp、jpg在设置了透明色后也能有这种效果，不过图层边缘的渐变造成透明时的锯齿问题（这里的透明平滑算法我至今还没弄出来，现在只能在图像处理软件里弄）。最终效果如下：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/custom-control3/2.jpeg" alt="&quot;图 2 BEXS_IMAGE效果&quot;"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/custom-control3/2.jpeg" alt="&quot;图 2 BEXS_IMAGE效果&quot;"></p>
 <h3 id="2：BEXS_BKIMAGE">2：BEXS_BKIMAGE</h3>
 <p>我把这个风格叫做背景图片风格。它用4张不同的图片来变现4种状态的背景。然后能在其基础上放置图标（icon），写文本，图标和文本能在Click中显示动态效果，图标能在Disable状态下表现alpha混合特效。它的背景图片模式与BEXS_IMAGE一致，支持bmp、png、gif、jpeg，也能透过alpha通道或是透明色变现出不规则形状。Icon支持的图片格式和背景图片一样。可以显示文本，在有icon的情况下显示文本。Icon和文本的动态点击效果其实只要在Focus和Click下稍微改动下Icon和文本位置形成一定的位置偏差就即可看到动态效果。至于Disable下Icon的alpha混合特效，是应用了2.0.4的newgal接口提供的高级图像处理API来完成的。方法是在Disable下把Icon以一定的alpha值，半透明的绘制在背景上，这样看上去就像背景透过了一部分Icon一样，从而达到表现Dsiable状态的效果。文本让用户设置2种不同的颜色，分别在Disable和非Disable下显示。这些其实就是.net，java里Button控件的功能。不过这个风格用好了，效果不低于.net，java的Button控件哦。不过折腾这些东西实现费了我不少时间。最终效果如下：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/custom-control3/3.jpeg" alt="&quot;图 3 BEXS_BKIMAGE效果&quot;"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/custom-control3/3.jpeg" alt="&quot;图 3 BEXS_BKIMAGE效果&quot;"></p>
 <h3 id="3：BEXS_DRAW">3：BEXS_DRAW</h3>
 <p>我把这个风格叫做编程绘制风格。顾名思意，4种状态的背景表现方式全部通过代码编程的方式绘制。其实这个风格是我学习之用的，基本上没什么实用价值，因为它的特效BEXS_BKIMAGE中都有，但是又没BEXS_BKIMAGE花哨。而且这个风格的核心颜色渐变算法我是照抄MiniGUI 2.0.4 fashion里Button的。但是在表现形式上有些不同。Normal状态基本一样，都是用2种颜色来混合渐变效果，由中间的基色调向上、下渐变至第2种颜色；不过ButtonEx里可以设置这2种颜色。Focus状态也基本一样，在外围画一圈虚线，ButtonEx也可是设置虚线的颜色。Click状态有所不同，ButtonEx里我强制用Click动态效果来表现这个状态，因为MiniGUI里用了另外2种颜色来渐变，我试了下在加Icon的情况下效果不怎么好，于是就采用动态效果来表现了。Disable状态我另外用一种颜色来进行单一填充，然后Icon alpha混合上这种颜色，类似于winXP上按钮Disable的效果。控件边框用实线画成一个带圆角的矩形，在Disable和非Disable下有2种不同颜色选择。文本和Icon同BEXS_BKIMAGE。不过这个风格还是有点好处的，就是使用者不用PS背景图片了，对于不会PS的人来说比较方便，之用去网上下一些Icon就可以了（一般网上下的Icon可以直接使用了，但是网上一般下不到Button背景图片）。其实这个风格最终效果也还是可以的：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/custom-control3/4.jpeg" alt="&quot;图 4 BEXS_DRAW效果&quot;"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/custom-control3/4.jpeg" alt="&quot;图 4 BEXS_DRAW效果&quot;"></p>
 <h2 id="三、详细设计">三、详细设计</h2>
 <h3 id="1：数据结构">1：数据结构</h3>
 <p>控件有3个风格，有些成员变量能够几个风格公用，有些是类变量（C++ Class中的static变量），有些则是实例变量（C++ Class中的普通变量）。我将BEXS_DRAW风格的一些变量设计成类变量，因为我觉得这种风格的背景基本上应该都是一样的，其它2个风格的设计成实例变量。实例变量数据结构我将其命名为BEXDATA：</p>

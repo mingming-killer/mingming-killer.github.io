@@ -109,13 +109,13 @@ EFI 安装 Win8（8.1）
 <h2 id="EFI_安装_Win8（8-1）">EFI 安装 Win8（8.1）</h2>
 <h3 id="制作启动安装U盘">制作启动安装U盘</h3>
 <p>在EFI下安装系统，是不能像以前那样分区滴，必须重新分区，需要GPT格式。找个大点的 U盘（至少4G以上），格成 fat32 格式的。用 <a href="http://pan.baidu.com/s/1c0ckax6" title="Universal-USB-Installer" target="_blank" rel="external">Universal-USB-Installer</a> 把 win8 iso 制作成启动安装U盘。然后把 <a href="http://pan.baidu.com/s/1dDILxJz" title="EFI(x64)" target="_blank" rel="external">EFI(x64)</a> 下的文件全部 copy 到U盘根目录下。</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/other/EFI-install/1.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/other/EFI-install/1.jpeg" alt=""></p>
 <h3 id="进入_EFI">进入 EFI</h3>
 <p>这个比较简单，只要进入bois设置一下即可。启动项里，将UEFI这一项放到第一个：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/other/EFI-install/2.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/other/EFI-install/2.jpeg" alt=""></p>
 <h3 id="创建启动分区">创建启动分区</h3>
 <p>进入EFI后，实际上就直接进入安装界面了，和正常安装相同，这里就不赘述了。</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/other/EFI-install/3.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/other/EFI-install/3.jpeg" alt=""></p>
 <p>到了选择分区的那一步停止（因为下一步是灰的）按shift+F10，打开命令提示行：</p>
 <h4 id="1、把MBR磁盘转换为GPT磁盘">1、把MBR磁盘转换为GPT磁盘</h4>
 <p>键入 diskpart ，打开 diskpart 工具，选择目标磁盘：</p>
@@ -123,26 +123,26 @@ EFI 安装 Win8（8.1）
 <li>list disk——————————列出系统拥有的磁盘</li>
 <li>select disk 0 ———————选择0号磁盘（请根据磁盘大小，自行判断你的目标磁盘</li>
 </ul>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/other/EFI-install/4.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/other/EFI-install/4.jpeg" alt=""></p>
 <h4 id="2、清空目标磁盘，并转换为GPT格式">2、清空目标磁盘，并转换为GPT格式</h4>
 <ul>
-<li>clean————————————-清除磁盘,该命令会抹去磁盘上所有数据（注意备份以前的重要数据）<br><img src="http://7u2hy4.com1.z0.glb.clouddn.com/other/EFI-install/5.jpeg" alt=""></li>
-<li>convert gpt—————————将磁盘转换为GPT格式<br><img src="http://7u2hy4.com1.z0.glb.clouddn.com/other/EFI-install/6.jpeg" alt=""></li>
-<li>list partition————————-列出磁盘上的分区，因为我们刚转换成GPT格式，因此，分区为空<br><img src="http://7u2hy4.com1.z0.glb.clouddn.com/other/EFI-install/7.jpeg" alt=""></li>
+<li>clean————————————-清除磁盘,该命令会抹去磁盘上所有数据（注意备份以前的重要数据）<br><img src="https://mingming-killer.github.io/img/pics/other/EFI-install/5.jpeg" alt=""></li>
+<li>convert gpt—————————将磁盘转换为GPT格式<br><img src="https://mingming-killer.github.io/img/pics/other/EFI-install/6.jpeg" alt=""></li>
+<li>list partition————————-列出磁盘上的分区，因为我们刚转换成GPT格式，因此，分区为空<br><img src="https://mingming-killer.github.io/img/pics/other/EFI-install/7.jpeg" alt=""></li>
 </ul>
 <h4 id="3、建立EFI分区及系统安装分区">3、建立EFI分区及系统安装分区</h4>
 <ul>
-<li>create partition efi size=200———————-建立EFI分区，大小为200M<br><img src="http://7u2hy4.com1.z0.glb.clouddn.com/other/EFI-install/8.jpeg" alt=""></li>
+<li>create partition efi size=200———————-建立EFI分区，大小为200M<br><img src="https://mingming-killer.github.io/img/pics/other/EFI-install/8.jpeg" alt=""></li>
 <li>create partition msr size=128———————建立MSR分区，微软默认建立的话，大小是128M</li>
 <li>create partition primary size=51200———-建立主分区，大小为50G，根据自己需求调整，该分区用来安装win8</li>
-<li>list partition————————————————-列出磁盘上的分区<br><img src="http://7u2hy4.com1.z0.glb.clouddn.com/other/EFI-install/9.jpeg" alt=""></li>
+<li>list partition————————————————-列出磁盘上的分区<br><img src="https://mingming-killer.github.io/img/pics/other/EFI-install/9.jpeg" alt=""></li>
 </ul>
 <p>PS：其实，一个diskpart工具，几乎可以代替其他的第三方磁盘工具了，大部分硬盘分区工具是无法更改GPT格式磁盘的分区ID的，但是diskpart可以。</p>
 <h3 id="安装win8：">安装win8：</h3>
 <p>关闭命令提示符，点刷新:</p>
-<p><img src="hhttp://7u2hy4.com1.z0.glb.clouddn.com/other/EFI-install/10.jpeg" alt=""></p>
+<p><img src="hhttps://mingming-killer.github.io/img/pics/other/EFI-install/10.jpeg" alt=""></p>
 <p>选择50G的主分区安装win8:</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/other/EFI-install/11.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/other/EFI-install/11.jpeg" alt=""></p>
 <p>然后等着安装完成就 OK 了。</p>
 <p><a href="http://benyouhui.it168.com/thread-2475714-1-1.html" title="原始出处" target="_blank" rel="external">原始出处</a></p>
 <h2 id="EFI_安装_ubuntu">EFI 安装 ubuntu</h2>

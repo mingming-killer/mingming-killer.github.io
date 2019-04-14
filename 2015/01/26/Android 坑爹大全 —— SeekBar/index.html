@@ -109,10 +109,10 @@ SeekBar 由一个进度条和上面的滑块构成。一般换图就换这2个�
 		<p>一般用 SeekBar 除了 google 自己那一票 app 以及系统，开发者几乎都不会直接用原来的 SeekBar 的图的，都要自己换图。这里就所说 SeekBar 换图的事。</p>
 <h2 id="结构">结构</h2>
 <p>首先来看看 SeekBar 的构成：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/suck-problem-seek-bar/1.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/suck-problem-seek-bar/1.jpeg" alt=""></p>
 <p>SeekBar 由一个进度条和上面的滑块构成。一般换图就换这2个东西就 OK 了。一般是要准备3张图片：进度条2张，一张背景（background）、一张滑动的进度（progress）、一张是滑块（thumb）。</p>
 <p>拿个例子说事， UI 说界面的亮度调节的视觉是这样的：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/suck-problem-seek-bar/2.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/suck-problem-seek-bar/2.jpeg" alt=""></p>
 <p>然后给了3张图，一般换图么， SeekBar 继承关系是： SeekBar —-&gt; AbsSeekBar —&gt; ProgressBar 。 换个 progressDrawable（ProgressBar的） 和 thumb（AbsSeekBar的） 就行了。</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">SeekBar</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:layout_width</span>=<span class="value">"300dp"</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:layout_centerInParent</span>=<span class="value">"true"</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:progressDrawable</span>=<span class="value">"@drawable/seek_drawable"</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:thumb</span>=<span class="value">"@drawable/seek_thumb"</span></span></div><div class="line"><span class="tag">    /&gt;</span></div><div class="line"></div></pre></td></tr></table></figure>
 
@@ -121,7 +121,7 @@ SeekBar 由一个进度条和上面的滑块构成。一般换图就换这2个�
 
 <p>progressDrawable 可以用 LayerDrawable 同时指定进度条的背景（background）和进度（progress），progress 的 clip 的意思是说：这个要用这个图片的一部门来表示进度，而不是用图片的全部来表示，想想看进度条的表示方式，就是这样的啦。这个 clip 还可以设置方向，进度条可以是水平的也可以是竖直的。</p>
 <p>然后坑就来了。一般 SeekBar 的滑块都会比进度条大，这里 UI 给的是 25x29 ，那个进度是 9-patch 的，20x6。我原来以为 SeekBar 的大小应该是 300 x 29，滑块是 25x29，然后那个进度条高度就是 6，居中显示。但是出来的结果确是滑块的大小确实 25x29，但是进度条却是 13 的高度（居中倒是居中），感觉肥了不少。</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/suck-problem-seek-bar/3.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/suck-problem-seek-bar/3.jpeg" alt=""></p>
 <p>刚开始以为 ProgressBar 可以设啥 padding 之类的东西，但是不找到，然后尝试把进度体的图改称和 thumb 的一样高（png 的用透明填充），但是发现还是达不到预期效果。无奈只好去翻代码了。 </p>
 <h2 id="坑爹的设计">坑爹的设计</h2>
 <p>先是在 ProgressBar.java 中发现 progressDrawable 设置的地方：</p>
@@ -157,7 +157,7 @@ int trackHeight = Math.min(mMaxHeight, h - mPaddingTop - mPaddingBottom);
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">SeekBar</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:layout_width</span>=<span class="value">"300dp"</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:layout_centerInParent</span>=<span class="value">"true"</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:progressDrawable</span>=<span class="value">"@drawable/seek_drawable"</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:thumb</span>=<span class="value">"@drawable/seek_thumb"</span></span></div><div class="line"><span class="tag">    <span class="attribute">android:maxHeight</span>=<span class="value">"6dp"</span></span></div><div class="line"><span class="tag">    /&gt;</span></div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>果然不肥了：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/suck-problem-seek-bar/4.jpeg" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/suck-problem-seek-bar/4.jpeg" alt=""></p>
   
 	</div>
 		<footer class="article-footer clearfix">

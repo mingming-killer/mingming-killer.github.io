@@ -118,7 +118,7 @@ GDIGDI（Graphics Device Interface）: 图形设备接口。这应该是一个�
 </li>
 <li><p><strong>Surface</strong><br>Surface：哎～～这个我还真不知道要怎么翻译好，干脆就直接用英文吧。surface 是 GAL 层的基本单位，包括最基本的像素数据（图像数据）、颜色格式、图形驱动回调函数等等。dc 中包含了这个基本单位。</p>
 </li>
-<li><p><strong>层次图如下：</strong><br><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/minigui-dc/1.png" alt="" title="层次图"></p>
+<li><p><strong>层次图如下：</strong><br><img src="https://mingming-killer.github.io/img/pics/minigui/minigui-dc/1.png" alt="" title="层次图"></p>
 </li>
 </ul>
 <h2 id="DC_的创建与销毁">DC 的创建与销毁</h2>
@@ -305,7 +305,7 @@ GDIGDI（Graphics Device Interface）: 图形设备接口。这应该是一个�
 <p>通过上面的 API 获取（或是创建）了 dc 后，再调用 GDI 层提供的一系列图形绘制函数就可以画出图像了。从上层应用程序调用一个图形绘制 API 到真正在屏幕上显示，这一个过程是怎么样的？我以前用 MiniGUI 的时候一直有这么一个疑问。现在把我自己的一些理解总结下：</p>
 <h3 id="基本流程">基本流程</h3>
 <p>现在以 FillBox (HDC hdc, int x, int y, int w, int h) 这样一个GDI 层的简单的 API 为例，走下 MiniGUI 的流程。首先这个 API 的作用是使用 dc 的画刷（可以使用 SetBrushColor 设置，默认为白色）颜色来填充 dc 中的指定矩形区域。它的基本流程是：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/minigui-dc/2.png" alt="" title="dc流程"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/minigui-dc/2.png" alt="" title="dc流程"></p>
 <ul>
 <li>通过上面的一些 API 中的一个取得 dc（这里以 on-screen 类的 dc 为例子）。</li>
 <li>设置你获取的 dc 的画刷颜色（不设置就是之前的颜色，默认为白色）。</li>
@@ -319,7 +319,7 @@ GDIGDI（Graphics Device Interface）: 图形设备接口。这应该是一个�
 <ul>
 <li><strong>dc 剪切域：</strong><br>上面提到的 MiniGUI 会根据 dc 中的剪切域来填充指定的矩形。剪切域上面也有提到过的，是 MiniGUI 窗口系统通过一系列窗口遮挡关系计算出来的，保证看不到的地方不绘制，用以提高绘制效率的机制。MiniGUI 会调用内部的填充函数分别填充剪切域。如果被遮挡过的（或是调用专门的接口设置过），那一般矩形会被分割成几个部分（需要绘制的部分，就是把不需要绘制的部分从原来矩形里剔除了）。所以你在上层传入的一个块区域信息，但是到了 MiniGUI 内部不一定一次就填充完成。很有可能这块区域被分成了几块小的区域，填充多次。MiniGUI 里绘制一些不规则的图形就是通过剪切域来实现的。</li>
 </ul>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/minigui-dc/3.png" alt="" title="剪切域示例"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/minigui-dc/3.png" alt="" title="剪切域示例"></p>
 <ul>
 <li><strong>surface 的类型：</strong><br>上面说的根据 surface 的类型选用填充函数。surface 分为软件的还硬件的。软件的意思是说这个 surface 的像素数据是使用系统内存来存储的，各项图形（像素）操作是通过 CPU 来实现的。而硬件 surface 则是像素数据使用显存存储，各项图形（像素）操作是通过 GPU 来实现。这里说 GPU 有点夸张，很多芯片或是平台上，都是只有一块简单的图形处理芯片而已，有些则是集成在了 CPU 里。这里很明显可以看得出硬件 surface 的好处。首先它的像素数据不占用系统内存，其次它的各种图形操作可以通过专用的图形芯片进行加速处理。通常图形芯片处理图像数据比处理通用数据的 CPU 要快得很多，特别是图像数据在显存中的时候。</li>
 </ul>

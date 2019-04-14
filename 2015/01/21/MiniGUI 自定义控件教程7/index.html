@@ -112,7 +112,7 @@
 <li>可以设置2套图片，分别用来表示进度条本身和背景。每套图片分为3个部分：头、身体、尾。头和尾可有，可无；背景也是可有，可无。图片格式支持bmp、gif、jpg、png（jpg、png依赖于MiniGUI的配置）。</li>
 </ol>
 <p>最终效果见下图：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/custom-control7/1.jpeg" alt="" title="图 1 CTRL_PROGRESSBAREX效果图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/custom-control7/1.jpeg" alt="" title="图 1 CTRL_PROGRESSBAREX效果图"></p>
 <h2 id="二、概要设计">二、概要设计</h2>
 <p>我把控件取名为CTRL_PROGRESSBAREX，自己重新写（继承顶层的DefaultContorl）。虽然ProgressBarEx需要MiniGUI原有控件的功能，但是我认为实现这些功能的代码量都不大；并且自己重新写能有更高的灵活性，权衡了一下我还是选择自己重新写。其实这里主要工作在于用图片表现控件的外观上了。</p>
 <h2 id="三、详细设计">三、详细设计</h2>
@@ -158,7 +158,7 @@
 <li><p>2: 进度条身体的拼凑。这个首先来看看没有头、尾的情况。没有头、尾，那进度条就只有身体的图片组成，这个主要就是计算当前进度的区域长度（垂直的是高度），然后这个长度，需要多少张当前的身体图片来拼凑。有头、尾的话，就把头和尾的图片贴上去，然后在计算剩下的部分需要多少身体图片。可以参照下面的图，应该就比较好理解了：</p>
 </li>
 </ul>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/custom-control7/2.jpeg" alt="" title="图 2 进度条身体拼凑"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/custom-control7/2.jpeg" alt="" title="图 2 进度条身体拼凑"></p>
 <ul>
 <li>3: 透明。这个问题其实在ButtonEx中已经讨论过了。我这里不提供非png格开启的透明颜色的选项。因为如果要用bmp或是jpg的话，请把图片背景弄成窗口背景颜色就行了。如果窗口背景是图片的话，您还是用png吧 -_-|| 。这里也顺带说说，为什么要把这些图片弄成3张。其实弄成一张也可以，而且这样还方便PS处理。但是这样做有个问题，就是集合在一张里的话，就要用MiniGUI的图像处理API去分割图片；这在16bit的运行环境下处理32bit的png的话，就造成透明颜色的失真。这个也是在ButtonEx中说过了的。</li>
 </ul>

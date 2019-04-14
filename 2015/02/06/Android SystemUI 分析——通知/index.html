@@ -134,9 +134,9 @@
 <p>发现优先匹配 id，然后才是 tag（最后包名那来个保险，确保你只能操作自己发的通知）。所以说要自己设计通知的 id 话，可以随意点，因为系统帮你确保你的 id 只在你的 pkg 中有效了，android 系统里面是直接拿图标的 R 资源的 id 来做 id 用的。也有一些用 tag，不过那个用得少。</p>
 <h2 id="Content">Content</h2>
 <p>接下来介绍下通知的显示内容。通知的 Content 一般来说是这样的：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/SystemUI-notification/normal_notification_callouts.png" alt="normal view 模式" title="normal view 模式"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/SystemUI-notification/normal_notification_callouts.png" alt="normal view 模式" title="normal view 模式"></p>
 <p>从 4.0 开始多了一个 big view 的模式，是这样的：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/SystemUI-notification/bigpicture_notification_callouts.png" alt="big view 模式" title="big view 模式"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/SystemUI-notification/bigpicture_notification_callouts.png" alt="big view 模式" title="big view 模式"></p>
 <p>前面看了通知的接口。应用需要构造出一个 Notification 对象出来。在 2.x 的时候是直接设置 Notification 的字段的（里面的字段都是 public 的），后面 android 本着封装的设计感觉原来的不太好，所以搞了一个 Notification.Builder 出来，之后建议开发者用这个 Builder 来构造 Notification。其实2个原理上基本上是一样的，但是某些地方有点点不一样。就算是新的 sdk，你仍然可以坚持直接设置 Notification。所以我们来分开说一下：</p>
 <h3 id="直接设置_Notification">直接设置 Notification</h3>
 <p>我们来列一下 Notification 中我们需要设置的一些数据。</p>
@@ -211,9 +211,9 @@
 <p>从代码中看，这些 Style 就是先调用 Builder 的无风格 build 函数，然后再重新把 bigContentView 自己生成一个，覆盖以前的而已。其他2个我就不贴代码了，套路基本上是一样的。通知栏智能机时代是 android 发明的（IOS 的在后面，android 在界面设计方面有领先 IOS 的地方了哟），加入了 big view 之后 UI 更加灵活了，好像 5.0 又多了一个新功能，以后有时间再看看。</p>
 <h2 id="系统处理流程">系统处理流程</h2>
 <p>上面说了一些 Notification 的基本用法，也稍微分析下源代码的一些实现。这些稍微说下，应用对 NM 发送一条通知，framework 中会对应生成什么数据，然后通知的 content view 是怎么加到 SystemUI 的状态栏和通知面板中的。先是上一张图先：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/SystemUI-notification/Send-notification.png" alt="流程图" title="流程图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/SystemUI-notification/Send-notification.png" alt="流程图" title="流程图"></p>
 <p>从图中可以看到一个通知从 app 自己构造通知然后调用 NotificationManager（NM）的接口发送，经过了 NotificationManagerService（NMS）到 StatusBarManagerService(SBMS) 最后到添加 Notification 的 UI 元素到 SystemUI 中。好像也有点麻烦的样子，然后图中蓝色的部分是每个模块（NMS、SBMS、SystemUI）保存通知的相关数据（前面说了每个模块都不一样，还真是不一样）。然后我们再贴下通知相关的 UI 元素最后在 SystemUI 中的表现：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/SystemUI-notification/notification-ui.jpeg" alt="UI 效果" title="UI 效果"><br>(PS: 这不是 android 原生的 SystemUI，是被我定制过的，通知没分组了)</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/SystemUI-notification/notification-ui.jpeg" alt="UI 效果" title="UI 效果"><br>(PS: 这不是 android 原生的 SystemUI，是被我定制过的，通知没分组了)</p>
 <p>上面我们稍微注意下每个模块对应的数据结构，和最后扔到 SystemUI 中的 view 就差不多能摸清系统处理通知的流程了。下面开始跟流程：</p>
 <ul>
 <li><strong>1.App</strong><br>首先是构造 Notification，前面分析过了，然后获取 NM 调用 notify 的接口，把 id 和 Notificaiton 传给 NM。这里代码前面贴过了，回去看看就行。</li>
