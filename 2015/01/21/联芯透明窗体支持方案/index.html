@@ -239,7 +239,7 @@
 <li>32 bit 颜色格式。</li>
 </ul>
 <p>更新下实现代码和示例。最开始写的代码有些地方不正确的。附近里的才是最新的。顺带上个效果图，show 一下，现在的 MiniGUI 也能做到这样的效果哦。 :-D</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/leadcore-trans-window/1.png" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/leadcore-trans-window/1.png" alt=""></p>
 <h2 id="2011-3-24：改动2——一些小修正">2011.3.24：改动2——一些小修正</h2>
 <h3 id="问题-2">问题</h3>
 <ul>
@@ -267,7 +267,7 @@
 <ul>
 <li>这个在联芯的实际使用情况中还是有点明显的。根据他们提出改进建议，在他们的使用情况中，有很大几率的情况会遇到在刷新链表中，某个普通窗体的更新区域（普通窗体与透明窗体相交的区域）正好是透明窗体的更新区域，这样就不需在更新后面的普通窗体的背景到透明窗体中来了。不过这样需要将保存的链表反序遍历，并且比较找到是否存在这样的普通窗体，还要记下这个链表位置（或者说记下这个窗体的句柄？？）。仔细分析下，这种思路，在某些情况下应该是能提高效率的。不过我暂时没有实现这个，据说联芯他们在自己改。</li>
 </ul>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/minigui/leadcore-trans-window/2.png" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/leadcore-trans-window/2.png" alt=""></p>
 <h3 id="代码路径">代码路径</h3>
 <p>最开始的代码已经有很多地方不对了。这里就不在上传代码在本文档里了。现在的代码已经在 svn 中（在 3rd-party/transparent 里，devsrv 就是 10.10.0.9）：</p>
 <pre>
@@ -506,7 +506,7 @@ URL: svn+ssh://devsrv/home/projects/svn/minigui/branches/rel-3-0-arena
 	</div>
 -->
 
-		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2017 
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2019 
 		
 		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
 		

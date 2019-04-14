@@ -117,7 +117,7 @@
 <p>同时由于有这一票 services 的 存在，那么又要有人来管它们，所以就有一个东西叫： ServiceManager 。这个东西本身也是基于 binder 通信的。</p>
 <h2 id="框架设计——native">框架设计——native</h2>
 <p>binder 主要的实现在 native 层。先来张图，整体对框架有个概括（图中我省略了 binder 进程 death 之后的通知机制，这个可以后面单独分析，这里只是画出了刚开始比较关键的通信的那部分）：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/Binder-base/1.png" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/Binder-base/1.png" alt=""></p>
 <p>这里先啰嗦下 binder native 层的代码位置（这个是个模块，相关的都里面，没几个文件，自己找吧）： </p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 头文件：</span></div><div class="line">frameworks/native/include/binder</div><div class="line"><span class="comment"># 实现：</span></div><div class="line">frameworks/native/libs/binder</div><div class="line"></div></pre></td></tr></table></figure>
 
@@ -184,7 +184,7 @@
 <p>这里 native 层的框架就说完了。接下来看下 java 层的。</p>
 <h2 id="框架设计——java">框架设计——java</h2>
 <p>照例来先张图先：</p>
-<p><img src="http://7u2hy4.com1.z0.glb.clouddn.com/android/Binder-base/2.png" alt=""></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/Binder-base/2.png" alt=""></p>
 <p>图中我把相关的 jni 里面类也画了出来，这样就能更加明显的看到 java 层和 native 层的对应关系。</p>
 <p>代码位置也先说下：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># java：</span></div><div class="line">frameworks/base/core/java/android/os/Binder.java</div><div class="line">frameworks/base/core/java/android/os/Parcel.java</div><div class="line">frameworks/base/core/java/com/android/internal/os/BinderInternal.java</div><div class="line"></div><div class="line"><span class="comment"># jni：</span></div><div class="line">frameworks/base/core/jni/android_util_Binder.h</div><div class="line">frameworks/base/core/jni/android_util_Binder.cpp</div><div class="line">frameworks/base/core/jni/android_os_Parcel.h</div><div class="line">frameworks/base/core/jni/android_os_Parcel.cpp</div><div class="line"></div></pre></td></tr></table></figure>
@@ -438,7 +438,7 @@
 	</div>
 -->
 
-		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2017 
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2019 
 		
 		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
 		
