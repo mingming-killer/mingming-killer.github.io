@@ -110,54 +110,49 @@ Sample Code
 		<h1 id="MediaPlayer">MediaPlayer</h1>
 <h2 id="Sample_Code">Sample Code</h2>
 <p>官方文档的状态机如下图：</p>
-<p><img src="https://mingming-killer.github.io/img/pics/android/media-framework/know_mediaflow_mp_state.png.png" alt="MediaPlayer状态机"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/media-framework/know_mediaflow_mp_state.png" alt="MediaPlayer状态机"></p>
 <p>按照官网状态机，一般 MediaPlayer 使用代码如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 1. new MediaPlayer 对象</span></div><div class="line">MediaPlayer mp = <span class="keyword">new</span> MediaPlayer();</div><div class="line"><span class="comment">// 2. setDataSource 设置视频源（真正初始化多媒体组件）</span></div><div class="line">mp.setDataSource(video_url);</div><div class="line"><span class="comment">// 3. 设置 surface（解码显示用）</span></div><div class="line">mp.setSurface(surface);</div><div class="line"><span class="comment">// 4. 多媒体组件 prepare（有异步接口，使用回调通知准备完成）</span></div><div class="line">mp.prepare();</div><div class="line"><span class="comment">// 5. 开始播放</span></div><div class="line">mp.start();</div><div class="line"></div></pre></td></tr></table></figure>
 
 <h2 id="数据通路">数据通路</h2>
 <p>官网的多媒体框架介绍（本文中的 android framework 代码基于 Android 10 其他版本可能会有一些差异）：</p>
-<p><img src="figures/know_mediaflow_ape_fwk_media.png" alt="Media框架"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/media-framework/know_mediaflow_ape_fwk_media.png" alt="Media框架"></p>
 <p>MediaPlayer 数据通路时序图如下：</p>
-<p><img src="figures/know_mediaflow_mp_flow.png" alt="MediaPlayer时序图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/media-framework/know_mediaflow_mp_flow.png" alt="MediaPlayer时序图"></p>
 <p>上面的数据通路可以分为6个部分：</p>
 <h3 id="应用层（App）">应用层（App）</h3>
 <p>这部分主要是上层 apk 自己的代码。</p>
 <h3 id="Application_Framework（Java）">Application Framework（Java）</h3>
 <ol>
-<li><p>这部分代码在：</p>
-<p>framework/base/media/java/android/media/MediaPlayer.java<br>/system/framework/framework.jar</p>
+<li><p>这部分代码在：<br>framework/base/media/java/android/media/MediaPlayer.java<br>/system/framework/framework.jar</p>
 </li>
 <li><p>framework.jar 中代码就是应用调用 sdk 里面的 android.jar。这部分的核心功能是调用 jni 实现的，jni 中有一个 native class 的 MediaPlayer 的。java 的 MediaPlayer 对象中有一个 long mNativeContext 的变量是保存 jni 中 native 对象 MediaPlayer 的指针的，用于 jni 调用；它会在 jni 的 native_init() 中初始化 java 层的 class 还有各种变量的引用，并且在 MediaPlayer.java 的 static 代码段中调用 System.loadLibrary(media_jni) 加载 jni so 和调用 native_init() 初始化。然后在 native_setup()  中将 new 出来的 native MediaPlayer 对象（指针）保存在 java 对象的 mNativeContext 字段中（这个变量是 long，指针本质就是一个地址）。基本上 Android 的多媒体的 api 框架都是这个套路，这个设计框架可以学习一下。</p>
 </li>
 </ol>
 <h3 id="Application_Framework（JNI）">Application Framework（JNI）</h3>
 <ol>
-<li><p>这部分代码在：</p>
-<p>framework/base/media/jni/android_media_MediaPlayer.cpp<br>/system/framework/lib/libmedia_jni.so</p>
+<li><p>这部分代码在：<br>framework/base/media/jni/android_media_MediaPlayer.cpp<br>/system/framework/lib/libmedia_jni.so</p>
 </li>
 <li><p>MediaPlayer framework jni 中也没什么实际工作，主要就是 new 了 native MediaPlayer 对象，调用 native MediaPlayer 接口。</p>
 </li>
 </ol>
 <h3 id="Binder_IPC_Proxy（Native）">Binder IPC Proxy（Native）</h3>
 <ol>
-<li><p>这部分代码在：</p>
-<p>frameworks/av/media/libmedia/mediaplayer.cpp<br>/system/framework/lib/libmedia.so</p>
+<li><p>这部分代码在：<br>frameworks/av/media/libmedia/mediaplayer.cpp<br>/system/framework/lib/libmedia.so</p>
 </li>
 <li><p>av 下面这个 libmedia.so 会去和 MediaPlayerService 连接（创维 MediaPlayerService 的 Client），主要都是通过 Binder 去调用 MediaPlayerService 的接口，功能都在 MediaPlayerService 里面实现。这个 native 的类里面会持有 MediaPlayerService Client 的 Bp 端。所以这个 so 还是属于 App 进程空间的。主要功能实现都是调用 MediaPlayerService Client 的接口，转发到 MediaPlayerService 中调用。sdk 文档中的状态机是在这个类里维护的，所以状态仅仅在 App 端维护，Service 端没有这些状态机的概念。</p>
 </li>
 </ol>
 <h3 id="MediaPlayerService（Native）">MediaPlayerService（Native）</h3>
 <ol>
-<li><p>这部分代码在：</p>
-<p>frameworks/av/media/libmediaplayerservice/MediaPlayerService.cpp<br>/system/framework/lib/libmediaplayerservice.so</p>
+<li><p>这部分代码在：<br>frameworks/av/media/libmediaplayerservice/MediaPlayerService.cpp<br>/system/framework/lib/libmediaplayerservice.so</p>
 </li>
 <li><p>MediaPlayerService 是一个 native 的系统服务。它的服务的 bin 在 frameworks/av/media/mediaserver，进程是 mediaserver，服务接口是：media.player: [android.media.IMediaPlayerService]。它主要是维护一个 mClients 的列表（SortedVector）。当有客户端（上面 libmedia.so）连接的时候会创建 Client（Bn 端）对象，然后保存到列表里面，当客户端销毁的时候就会清掉这个 Client。当 App 调用 setDataSource 的时候，MediaPlayerService 会通过 MediaPlayerFactory 创建方案商自己的 Player（方案商的解码器是硬解，要是 AOSP 原生的就是软解），我们这边就是 AwPlayer。每一个 Client 中都会有一个 AwPlayer。App MediaPlayer 各种接口调用最后都会调用到解码器的同名接口。</p>
 </li>
 </ol>
 <h3 id="AwPlayer（Native）">AwPlayer（Native）</h3>
 <ol>
-<li><p>这部分代码在：</p>
-<p>frameworks/av/media/libcedarx/android_adapter/awplayer/awplayer.cpp<br>/system/framework/lib/libawplayer.so</p>
+<li><p>这部分代码在：<br>frameworks/av/media/libcedarx/android_adapter/awplayer/awplayer.cpp<br>/system/framework/lib/libawplayer.so</p>
 </li>
 <li><p>其实这部分代码远不止这里列出来的这些。这部分就是方案商硬解的解码器的代码实现了。这里可以看到方案商的解码器需要适配 android 的 MediaPlayer 的接口。这里面有一堆解码器的库（例如上面列出来的 libcdx_ 开头的这些库），这部分就是多媒体那边负责了的，当然有兴趣的也可以看看代码，但是有一部分是不开源的。</p>
 </li>
@@ -188,30 +183,27 @@ Sample Code
 <li>上面能看到 OMX 的 Plugin 通过 so 的形式存在，通过定义好 函数接口，通过 dlopen、load、查找函数来实现 plugin 加载、交互。这个框架我们也可以学习一下。</li>
 </ol>
 <p>接下来看看 MediaCodec 应用端这边的时序图： </p>
-<p><img src="figures/know_mediaflow_mc_flow.png" alt="MediaCodec时序图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/media-framework/know_mediaflow_mc_flow.png" alt="MediaCodec时序图"></p>
 <p>可以看到 MediaCodec 比 MediaPlayer 要复杂很多（上面的时序已经简化过了）。</p>
 <h3 id="应用层（App）-1">应用层（App）</h3>
 <p>这部分主要是上层 apk 自己的代码。</p>
 <h3 id="Application_Framework（Java）-1">Application Framework（Java）</h3>
 <ol>
-<li><p>这部分代码在：</p>
-<p>framework/base/media/java/android/media/MediaCodec.java<br>/system/framework/framework.jar</p>
+<li><p>这部分代码在：<br>framework/base/media/java/android/media/MediaCodec.java<br>/system/framework/framework.jar</p>
 </li>
 <li><p>这部分代码套路和 MediaPlayer 一样，不过多说明。</p>
 </li>
 </ol>
 <h3 id="Application_Framework（JNI）-1">Application Framework（JNI）</h3>
 <ol>
-<li><p>这部分代码在：</p>
-<p>framework/base/media/jni/android_media_MediaCodec.cpp<br>/system/framework/lib/libmedia_jni.so</p>
+<li><p>这部分代码在：<br>framework/base/media/jni/android_media_MediaCodec.cpp<br>/system/framework/lib/libmedia_jni.so</p>
 </li>
 <li><p>这部分代码套路也和 MediaPlayer 一样，不过多说明。</p>
 </li>
 </ol>
 <h3 id="Stagefright_Engine（Client）">Stagefright Engine（Client）</h3>
 <ol>
-<li><p>这部分代码在：</p>
-<p>frameworks/av/media/libstagefright/MediaCodec.cpp<br>frameworks/av/media/libstagefright/ACodec.cpp<br>/system/framework/lib/libstagefright.so</p>
+<li><p>这部分代码在：<br>frameworks/av/media/libstagefright/MediaCodec.cpp<br>frameworks/av/media/libstagefright/ACodec.cpp<br>/system/framework/lib/libstagefright.so</p>
 </li>
 <li><p>这里主要是 media.codec 的 client 端，主要业务逻辑都是通过 media.codec 创建插件的解码器（node）的 instance，然后转由不同解码器的 instance 调用到解码器内部实现。MediaCodec 有2个静态创建 MediaCodec 的函数：一个 createByCodecName，一个 createDecoderByType。createByCodecName 传递的是解码器的名字，这个名字在 vendor 的 插件（我们这里就是前面说的那个 core[] 数组里面定义的）里面定义。当然 app 可以通过 MediaCodecList 罗列出所有支持指定类型的解码器的名字，例如说需要 “avc”（H264） 的解码器，一般返回的列表的第一个就是平台的硬解的解码器（例如说 SampleCode 里面 allwinner 开头的解码器）。当然你也可以根据平台自己写死解码器名字。第二个 createDecoderByType 传递的是需要解码器类型，例如说 “video/avc” ，内部也是通过 MediaCodecList 罗列出所有支持的解码器，然后取第一个。这个2个函数最终通路都是一样的，所以时序图只画了 createByCodecName，最后都是通过名字来创建解码器实例的。</p>
 </li>
@@ -230,8 +222,7 @@ Sample Code
 </ol>
 <h3 id="Stagefright_Engine（Service）">Stagefright Engine（Service）</h3>
 <ol>
-<li><p>这部分代码在：</p>
-<p>frameworks/av/media/libstagefright/omx/1.0/Omx.cpp<br>frameworks/av/media/libstagefright/omx/1.0/OMXMaster.cpp<br>frameworks/av/media/libstagefright/omx/1.0/OMXNodeInstance.cpp<br>/system/framework/lib/libstagefright_omx.so</p>
+<li><p>这部分代码在：<br>frameworks/av/media/libstagefright/omx/1.0/Omx.cpp<br>frameworks/av/media/libstagefright/omx/1.0/OMXMaster.cpp<br>frameworks/av/media/libstagefright/omx/1.0/OMXNodeInstance.cpp<br>/system/framework/lib/libstagefright_omx.so</p>
 </li>
 <li><p>这部前面介绍过服务初始的流程。 承接前面，当 app 要创建指定的解码器，client 那边会调用 allocateNode 让服务创建指定解码器的 instance。service 这边会先 new 一个 OMXNodeInstance， 然后在前面加载好的mPluginByComponetName 列表中找到对应的 vendor plugin（我们这里是 AwOMXPlugin），然后调用 plugin 的 OMX_GetHandle 函数（这里就是 AwOmxComponentCreate）。这个函数里面会查找前面说的 core[] 这个数组，这个数组里面定义了解码器对应实现的 so：</p>
 </li>
@@ -244,16 +235,14 @@ Sample Code
 </ol>
 <h3 id="OMX_Plugin">OMX Plugin</h3>
 <ol>
-<li><p>这部分代码在：</p>
-<p>frameworks/av/media/libcederc/openomx/libstagefrighthw/AwOMXPlugin.cpp<br>/vendor/lib/libstagefrighthw.so</p>
+<li><p>这部分代码在：<br>frameworks/av/media/libcederc/openomx/libstagefrighthw/AwOMXPlugin.cpp<br>/vendor/lib/libstagefrighthw.so</p>
 </li>
 <li><p>这部分前面已经介绍过了。这里可以发现一个规律，android 框架代码的 so，都是在 /system/lib/ 下面的，vnedor 自己实现的 so 都是 /vendor/lib/ 下面的。</p>
 </li>
 </ol>
 <h3 id="OMX_IL_Component">OMX IL Component</h3>
 <ol>
-<li><p>这部分代码在：</p>
-<p>frameworks/av/media/libcederc/openomx/omxcore/aw_omx_core.c<br>frameworks/av/media/libcederc/openomx/omxcore/aw_omx_component.c<br>frameworks/av/media/libcederc/openomx/vdec/omx_vdec.c<br>/vendor/lib/libOmxCore.so<br>/vendor/lib/libOmxVdec.so</p>
+<li><p>这部分代码在：<br>frameworks/av/media/libcederc/openomx/omxcore/aw_omx_core.c<br>frameworks/av/media/libcederc/openomx/omxcore/aw_omx_component.c<br>frameworks/av/media/libcederc/openomx/vdec/omx_vdec.c<br>/vendor/lib/libOmxCore.so<br>/vendor/lib/libOmxVdec.so</p>
 </li>
 <li><p>这里接着前面 plugin 创建 node 那里。H264 实现的 so 是 libOmxVdec 。在 OMX_GerHandle 函数里面，回去 libOmxVdec.so 里面查找加载 node 的初始化函数 AwOmxComponentCreate（对应实现函数 __AwOmxComponentCreate），这个函数里面会先 new 一个 AwOmxVdec 的对象（这个应该是对应解码器的对象了，也可以说是 node 的对象），然后初始化 AwOmxVdec，把接口的函数指针都赋值。这样后续就能通过接口调用到解码器内部的函数了。至于这个 so 里面的实现目前还没细看（应该和 AwPlayer 一样，后面关键的代码都是二进制的 so 里面的）。</p>
 </li>
