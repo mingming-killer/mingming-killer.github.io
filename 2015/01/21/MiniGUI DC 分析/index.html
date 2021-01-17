@@ -1,0 +1,669 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>MiniGUI DC 分析 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="相关术语
+这里先解释下相关术语吧（呃～～是按我的理解）：
+
+GDIGDI（Graphics Device Interface）: 图形设备接口。这应该是一个抽象层，在这一些为上层应用程序提供了一系列图形绘制相关的接口：例如画点、画线、矩形填充、块传送、加载图片文件等等。它衔接底层硬件层与上层应用层。">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/21/MiniGUI DC 分析/" title="MiniGUI DC 分析" itemprop="url">MiniGUI DC 分析</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-21T13:15:16.000Z" itemprop="datePublished">2015 1月 21</time>
+    更新日期:<time datetime="2015-01-21T13:15:16.000Z" itemprop="dateModified">2015 1月 21</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#相关术语"><span class="toc-number">1.</span> <span class="toc-text">相关术语</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DC_的创建与销毁"><span class="toc-number">2.</span> <span class="toc-text">DC 的创建与销毁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DC_工作原理"><span class="toc-number">3.</span> <span class="toc-text">DC 工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#基本流程"><span class="toc-number">3.1.</span> <span class="toc-text">基本流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#要点分析"><span class="toc-number">3.2.</span> <span class="toc-text">要点分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其它话题"><span class="toc-number">4.</span> <span class="toc-text">其它话题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#颜色运算"><span class="toc-number">4.1.</span> <span class="toc-text">颜色运算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#绘制图像导致屏幕闪烁"><span class="toc-number">4.2.</span> <span class="toc-text">绘制图像导致屏幕闪烁</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="相关术语">相关术语</h2>
+<p>这里先解释下相关术语吧（呃～～是按我的理解）：</p>
+<ul>
+<li><p><strong>GDI</strong><br>GDI（Graphics Device Interface）: 图形设备接口。这应该是一个抽象层，在这一些为上层应用程序提供了一系列图形绘制相关的接口：例如画点、画线、矩形填充、块传送、加载图片文件等等。它衔接底层硬件层与上层应用层。</p>
+</li>
+<li><p><strong>DC</strong><br>DC（Device Context）：设备上下文。这个是 gdi 层的基本单位。包含了像素颜色信息、填充函数、图像缩放函数等等，上层应用程序通过 gdi 接口操作封装在里面的底层图像数据。</p>
+</li>
+<li><p><strong>HDC</strong><br>HDC（Handle Device Context）： dc 的句柄。其实可以理解为 dc 的指针。MiniGUI 里本来也就是这么处理的。</p>
+</li>
+<li><p><strong>GAL</strong><br>GAL（Graphics Abstract Layer）：图形抽象层。这个层直接和硬件打交到，是 MiniGUI 的图形驱动。这个抽象了一些列的接口规范，供上层（GDI层）使用，不同的硬件平台使用自己硬件平台提供的接口（直接的 IO 操作或是封装过的库）完成这些接口就完成了 MiniGUI 的图形驱动。</p>
+</li>
+<li><p><strong>Surface</strong><br>Surface：哎～～这个我还真不知道要怎么翻译好，干脆就直接用英文吧。surface 是 GAL 层的基本单位，包括最基本的像素数据（图像数据）、颜色格式、图形驱动回调函数等等。dc 中包含了这个基本单位。</p>
+</li>
+<li><p><strong>层次图如下：</strong><br><img src="https://mingming-killer.github.io/img/pics/minigui/minigui-dc/1.png" alt="" title="层次图"></p>
+</li>
+</ul>
+<h2 id="DC_的创建与销毁">DC 的创建与销毁</h2>
+<p>从应用层来看，要绘制图形，首先要获取 dc。来看看总体情况吧，MiniGUI 3.0.x 现有的 dc 创建相关的 API 大致有以下几个：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">HDC GetDC (HWND hwnd);</div><div class="line">HDC GetClientDC (HWND hwnd);</div><div class="line">HDC GetSubDC (HDC hdc, <span class="keyword">int</span> off_x, <span class="keyword">int</span> off_y, <span class="keyword">int</span> width, <span class="keyword">int</span> height);</div><div class="line"></div><div class="line">HDC CreateCompatibleDCEx (HDC hdc, <span class="keyword">int</span> width, <span class="keyword">int</span> height);</div><div class="line">HDC CreateMemDCEx (<span class="keyword">int</span> width, <span class="keyword">int</span> height, <span class="keyword">int</span> depth, DWORD flags, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask, <span class="keyword">void</span>* bits, <span class="keyword">int</span> pitch);</div><div class="line">HDC CreateSubMemDC (HDC parent, <span class="keyword">int</span> off_x, <span class="keyword">int</span> off_y, <span class="keyword">int</span> width, <span class="keyword">int</span> height, BOOL comp_to_parent);</div><div class="line"></div><div class="line">HDC CreatePrivateDC (HWND hwnd);</div><div class="line">HDC CreatePrivateClientDC (HWND hwnd);</div><div class="line">HDC CreatePrivateSubDC(HDC hdc, <span class="keyword">int</span> off_x, <span class="keyword">int</span> off_y, <span class="keyword">int</span> width, <span class="keyword">int</span> height);</div><div class="line">HDC GetPrivateClientDC (HWND hwnd);</div><div class="line"></div><div class="line">HDC CreateSecondaryDC (HWND hwnd);</div><div class="line">HDC GetSecondaryDC (HWND hwnd);</div><div class="line">HDC GetSecondaryClientDC (HWND hwnd);</div><div class="line">HDC GetSecondarySubDC (HDC secondary_dc, HWND hwnd_child, BOOL client);</div><div class="line"></div><div class="line"><span class="keyword">void</span> ReleaseDC (HDC hdc);</div><div class="line"><span class="keyword">void</span> ReleaseSecondaryDC (HWND hwnd, HDC hdc);</div><div class="line"><span class="keyword">void</span> ReleaseSecondarySubDC (HWND hwnd, HDC hdc);</div><div class="line"><span class="keyword">void</span> DeleteMemDC (HDC mem_dc);</div><div class="line"><span class="keyword">void</span> DeletePrivateDC (HDC hdc);</div><div class="line"><span class="keyword">void</span> DeleteSecondaryDC (HWND hwnd);</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>以上一系列 API ，可以从几个方面分类：</p>
+<ul>
+<li><p><strong>存储位置：</strong><br>MiniGUI 内部有一个叫 dc 池的缓冲区，启动 MiniGUI 的时候就分配好了内存空间，是一系列静态变量，在 MiniGUI 周期中是常驻内存的。无需动态申请和释放。有部分 API 是从这个里面创建的，这类 API 通常使用频率较高，创建速度快（仅仅需要简单把 dc 池中的一些标志位设置一些即可，无需内存申请操作）。有部分则是自己申请内存创建的。</p>
+</li>
+<li><p><strong>像素数据类型：</strong><br>有些 API 是以屏幕的像素数据为内容来创建 dc 的。操作这类 API 创建的 dc ，立刻就能在屏幕上体现。有些则不是，需要手动调用位块传送 API 输出到屏幕才能体现来（BitBlt, StrechBlt 等）。</p>
+</li>
+<li><p><strong>API之间的对比：</strong> </p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">API</th>
+<th style="text-align:center">存储位置</th>
+<th style="text-align:center">像素数据类型</th>
+<th style="text-align:center">区域</th>
+<th style="text-align:center">特性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">GetDC</td>
+<td style="text-align:center">dc 池</td>
+<td style="text-align:center">on-screen</td>
+<td style="text-align:center">整个窗体</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:left">GetClientDC</td>
+<td style="text-align:center">dc 池</td>
+<td style="text-align:center">on-screen</td>
+<td style="text-align:center">窗体的非客户区</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:left">GetSubDC</td>
+<td style="text-align:center">dc 池</td>
+<td style="text-align:center">使用父 dc 的像素数据，但必须是 off-screen</td>
+<td style="text-align:center">参数指定大小，但无法超过父 dc 的大小</td>
+<td style="text-align:center">与父 dc 共用用一块像素地址，子 dc 的操作将会影响到父</td>
+</tr>
+<tr>
+<td style="text-align:left">CreateCompatibleDCEx</td>
+<td style="text-align:center">动态内存</td>
+<td style="text-align:center">off-screen</td>
+<td style="text-align:center">参数指定大小</td>
+<td style="text-align:center">创建的 dc，将会与传入的参考 dc 有相同的颜色格式。CreateCompatibleDC 是创建与参考 dc 同样大小的 dc，是对该 API 的简单封装</td>
+</tr>
+<tr>
+<td style="text-align:left">CreateMemDCEx</td>
+<td style="text-align:center">动态内存</td>
+<td style="text-align:center">off-screen</td>
+<td style="text-align:center">参数指定大小</td>
+<td style="text-align:center">能自己指定色深、颜色格式，以及初始的像素数据。CreateMemDC 创建的 dc 初始像素数据为0，是该 API 的简单封装</td>
+</tr>
+<tr>
+<td style="text-align:left">CreateSubMemDC</td>
+<td style="text-align:center">动态内存</td>
+<td style="text-align:center">使用父dc的像素数据，应该是 off-screen 的吧</td>
+<td style="text-align:center">参数指定大小，但无法超过父 dc 的大小</td>
+<td style="text-align:center">参数指定是否与父 dc 具有相同的剪切域</td>
+</tr>
+<tr>
+<td style="text-align:left">CreatePrivateDC</td>
+<td style="text-align:center">动态内存</td>
+<td style="text-align:center">on-screen</td>
+<td style="text-align:center">整个窗体</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:left">CreatePrivateClientDC</td>
+<td style="text-align:center">动态内存</td>
+<td style="text-align:center">on-screen</td>
+<td style="text-align:center">窗体的非客户区</td>
+<td style="text-align:center">好像是用于窗口或是控件的一个风格（WS_EX_USEPRIVATECDC、CS_OWNDC）</td>
+</tr>
+<tr>
+<td style="text-align:left">CreatePrivateSubDC</td>
+<td style="text-align:center">动态内存</td>
+<td style="text-align:center">使用父 dc 的像素数据</td>
+<td style="text-align:center">参数指定大小，但无法超过父 dc 的大小</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:left">GetPrivateClientDC</td>
+<td style="text-align:center">已经存在的变量</td>
+<td style="text-align:center">应该是 on-screen</td>
+<td style="text-align:center">未知</td>
+<td style="text-align:center">简单的返回 PMAINWIN 的 privCDC 变量</td>
+</tr>
+<tr>
+<td style="text-align:left">CreateSecondaryDC</td>
+<td style="text-align:center">动态内存</td>
+<td style="text-align:center">off-screen</td>
+<td style="text-align:center">整个窗体</td>
+<td style="text-align:center">最后调用 CreateCompatibleDCEx 创建通过 GetDC 获取兼容的 dc</td>
+</tr>
+<tr>
+<td style="text-align:left">GetSecondaryDC</td>
+<td style="text-align:center">不确定</td>
+<td style="text-align:center">应该是 on-screen</td>
+<td style="text-align:center">不确定</td>
+<td style="text-align:center">这个函数比较复杂，后面再分析</td>
+</tr>
+<tr>
+<td style="text-align:left">GetSecondaryClientDC</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">和 GetSecondaryDC 类似，只不过区域是非客户区而已</td>
+</tr>
+<tr>
+<td style="text-align:left">GetSecondarySubDC</td>
+<td style="text-align:center">dc 池</td>
+<td style="text-align:center">应该是 off-screen</td>
+<td style="text-align:center">参数指定大小，但无法超过父 dc 大小</td>
+<td style="text-align:center">这个 API 主要是 secondary dc 的获取 sub dc 版</td>
+</tr>
+<tr>
+<td style="text-align:left">ReleaseDC</td>
+<td style="text-align:center">释放 dc 池（只是简单设置标志位而已）</td>
+<td style="text-align:center">on-screen 数据不能销毁</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">从 dc 池创建的 dc，都应该由这个 API 释放</td>
+</tr>
+<tr>
+<td style="text-align:left">ReleaseSecondaryDC</td>
+<td style="text-align:center">释放 dc 池</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">根据不同的情况调用 ReleaseDC 或是 ReleaseSecondarySubDC</td>
+</tr>
+<tr>
+<td style="text-align:left">ReleaseSecondarySubDC</td>
+<td style="text-align:center">释放 dc 池</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">对 ReleaseDC 的简单封装</td>
+</tr>
+<tr>
+<td style="text-align:left">DeleteMemDC</td>
+<td style="text-align:center">释放内存</td>
+<td style="text-align:center">销毁 off-screen 数据</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">申请动态内存，使用 off-screen 像素数据的 dc 都应该由这个 API 销毁</td>
+</tr>
+<tr>
+<td style="text-align:left">DeletePrivateDC</td>
+<td style="text-align:center">释放内存</td>
+<td style="text-align:center">on-screen 数据不能销毁</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">由 CreatePrivateDC 创建的 dc 要使用该 API 销毁</td>
+</tr>
+<tr>
+<td style="text-align:left">DeleteSecondaryDC</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">对 DeleteMemDC 的简单封装</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p><strong>情况复杂的API：</strong><br>GetSecondaryDC：这个函数首先分为是主窗口还是控件，其实再看主窗口或是控件的风格：</p>
+<ul>
+<li><p>主窗口：如果有 <code>WS_EX_AUTOSECONARYDC</code> 风格，则返回 PMAINWIN 的 secondaryDC 变量（这个变量通过 SetSeconaryDC 设置，一般是 off-screen dc 来的）。否则则返回 <code>HDC_SCREEN</code> （屏幕dc）。</p>
+</li>
+<li><p>控件：如果父窗体有 <code>WS_EX_AUTOSECONARYDC</code> 风格，控件如果没有 <code>WS_EX_CTRLASMAINWIN</code> 风格，则返回父窗体 secondary dc 的子 dc （通过 GetSeconarySubDC 获取）；控件如果有 <code>WS_EX_CTRLASMAINWIN</code> 风格的话，则会通过 GetClientDC 获取；控件如果有 <code>WS_EX_USEPRIVATECDC</code> 则会返回控件的 privCDC 变量。如果父窗体没有 <code>WS_EX_AUTOSECONARYDC</code> 风格的话，则返回 <code>HDC_SCREEN</code>。</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>哎，说得头晕，还不如直接上代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">HDC GUIAPI GetSecondaryDC (HWND hwnd)</div><div class="line">{</div><div class="line">    PMAINWIN pWin;</div><div class="line">    pWin = MG_GET_WINDOW_PTR (hwnd);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (MG_IS_MAIN_WINDOW(hwnd) && pWin-&gt;secondaryDC) {</div><div class="line">        <span class="keyword">return</span> pWin-&gt;secondaryDC;</div><div class="line">    } </div><div class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (pWin-&gt;pMainWin-&gt;secondaryDC){</div><div class="line">        <span class="keyword">return</span> get_valid_dc (pWin, FALSE);</div><div class="line">    }</div><div class="line">    <span class="keyword">return</span> HDC_SCREEN;</div><div class="line">} </div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">inline</span> HDC get_valid_dc (PMAINWIN pWin, BOOL client)</div><div class="line">{</div><div class="line">    <span class="keyword">if</span> (!(pWin-&gt;dwExStyle & WS_EX_CTRLASMAINWIN) </div><div class="line">            && (pWin-&gt;pMainWin-&gt;secondaryDC)) {</div><div class="line">        <span class="keyword">if</span> (client && (pWin-&gt;dwExStyle & WS_EX_USEPRIVATECDC)) {</div><div class="line">            <span class="keyword">return</span> pWin-&gt;privCDC;</div><div class="line">        }</div><div class="line">        <span class="keyword">else</span></div><div class="line">            <span class="keyword">return</span> GetSecondarySubDC (pWin-&gt;pMainWin-&gt;secondaryDC, </div><div class="line">                    (HWND)pWin, client);</div><div class="line">    }</div><div class="line">    <span class="keyword">else</span> {</div><div class="line">        <span class="keyword">if</span> (client && (pWin-&gt;dwExStyle & WS_EX_USEPRIVATECDC)) {</div><div class="line">            <span class="keyword">return</span> pWin-&gt;privCDC;</div><div class="line">        }</div><div class="line">        <span class="keyword">if</span> (client) {</div><div class="line">            <span class="keyword">return</span> GetClientDC ((HWND)pWin);</div><div class="line">        }</div><div class="line">        <span class="keyword">else</span> {</div><div class="line">            <span class="keyword">return</span> GetDC ((HWND)pWin);</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>还有一对 API 用来获取和释放 dc 的：BeginPaint 和 EndPaint 。首先这一对 API 正常情况应该只用于 <code>MSG_PAINT</code> 消息处理里。BeginPaint 是通过内联函数 <code>get_valid_dc</code> 来获取。所以主窗体（或是控件）不同的风格获取到的 dc 是不同的。一般来说有双缓冲风格的获取到的一般是 off-screen 的 dc （之前设置的双缓冲 dc，控件得到的是父窗体缓冲的子 dc）；没有双缓冲的就是 on-screen dc 。并且这个 API 获取的 dc 是非客户区的区域的（这里是最大矩形区域），然后是经过剪切的（就是 MiniGUI 窗口系统通过窗口重叠、遮挡计算后，设置剪切好不需要绘制的区域了的）。然后由这个 API 获取到的 dc 一般要由  EndPaint 来释放，因此 EndPaint 不光光会释放 dc，如果有双缓冲风格的话，还会在这里调用双缓冲的更新函数（默认是将缓冲 dc 更新到屏幕）。</p>
+<h2 id="DC_工作原理">DC 工作原理</h2>
+<p>通过上面的 API 获取（或是创建）了 dc 后，再调用 GDI 层提供的一系列图形绘制函数就可以画出图像了。从上层应用程序调用一个图形绘制 API 到真正在屏幕上显示，这一个过程是怎么样的？我以前用 MiniGUI 的时候一直有这么一个疑问。现在把我自己的一些理解总结下：</p>
+<h3 id="基本流程">基本流程</h3>
+<p>现在以 FillBox (HDC hdc, int x, int y, int w, int h) 这样一个GDI 层的简单的 API 为例，走下 MiniGUI 的流程。首先这个 API 的作用是使用 dc 的画刷（可以使用 SetBrushColor 设置，默认为白色）颜色来填充 dc 中的指定矩形区域。它的基本流程是：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/minigui-dc/2.png" alt="" title="dc流程"></p>
+<ul>
+<li>通过上面的一些 API 中的一个取得 dc（这里以 on-screen 类的 dc 为例子）。</li>
+<li>设置你获取的 dc 的画刷颜色（不设置就是之前的颜色，默认为白色）。</li>
+<li>根据 dc 的剪切域来填充矩形。</li>
+<li>根据 dc 中 surface 的类型选用填充函数。</li>
+<li>填充函数完成图像数据填充。</li>
+<li>on-screen 数据被修改（填充）直接表现在屏幕上。</li>
+</ul>
+<h3 id="要点分析">要点分析</h3>
+<p>上面的步骤看似简单，但是其中有些步骤是包括很多事情的。下面来分析下上面步骤中一些需要注意的地方：</p>
+<ul>
+<li><strong>dc 剪切域：</strong><br>上面提到的 MiniGUI 会根据 dc 中的剪切域来填充指定的矩形。剪切域上面也有提到过的，是 MiniGUI 窗口系统通过一系列窗口遮挡关系计算出来的，保证看不到的地方不绘制，用以提高绘制效率的机制。MiniGUI 会调用内部的填充函数分别填充剪切域。如果被遮挡过的（或是调用专门的接口设置过），那一般矩形会被分割成几个部分（需要绘制的部分，就是把不需要绘制的部分从原来矩形里剔除了）。所以你在上层传入的一个块区域信息，但是到了 MiniGUI 内部不一定一次就填充完成。很有可能这块区域被分成了几块小的区域，填充多次。MiniGUI 里绘制一些不规则的图形就是通过剪切域来实现的。</li>
+</ul>
+<p><img src="https://mingming-killer.github.io/img/pics/minigui/minigui-dc/3.png" alt="" title="剪切域示例"></p>
+<ul>
+<li><strong>surface 的类型：</strong><br>上面说的根据 surface 的类型选用填充函数。surface 分为软件的还硬件的。软件的意思是说这个 surface 的像素数据是使用系统内存来存储的，各项图形（像素）操作是通过 CPU 来实现的。而硬件 surface 则是像素数据使用显存存储，各项图形（像素）操作是通过 GPU 来实现。这里说 GPU 有点夸张，很多芯片或是平台上，都是只有一块简单的图形处理芯片而已，有些则是集成在了 CPU 里。这里很明显可以看得出硬件 surface 的好处。首先它的像素数据不占用系统内存，其次它的各种图形操作可以通过专用的图形芯片进行加速处理。通常图形芯片处理图像数据比处理通用数据的 CPU 要快得很多，特别是图像数据在显存中的时候。</li>
+</ul>
+<p>那什么时候时候 dc 用的 surface 是硬件的，什么时候用的是软件的呢？要想使用硬件的 surface ，首先你运行 MiniGUI 的平台要有图形处理芯片（硬件支持）。其次 MiniGUI 有该图形芯片对应的 GAL （硬件驱动）。还要你 MiniGUI 的运行配置要使用该 GAL （MiniGUI.cfg 中的 gal_engine 设置）。最后你创建 dc 时，要告诉 MiniGUI 你要创建硬件 surface 的 dc （通过指定 <code>MEMDC_FLAG_HWSURFACE</code> 或是兼容硬件 dc 来创建）。还有一个关键因素，创建硬件 suraface 要满足底层硬件的条件，例如创建的时候显存要足够、必须是在硬件支持的颜色格式中等等。当你的 MiniGUI 不满足上面任意一个条件时，就会创建软件 surface 的 dc。</p>
+<ul>
+<li><p><strong>图像数据操作：</strong><br>这里要分开2种情况来讨论： </p>
+<ul>
+<li><p><strong>软件的 surface：</strong><br>软件的 surface 的图像数据处理，其实就是一些列的写点操作。MiniGUI 的软件 surface 图形操作函数，就是将 surface 里的图像数据写成指定的颜色（简单的赋值操作），只不过某些颜色格式（例如4字节对齐的32位）会用到一些优化的赋值算法。这里再说说图像数据吧。一般计算机用的是 RGB 颜色，这里以32位为例，RGB 每个分量从 0 ～ 255 （占用8位，1个字节），然后组合成各种不同的颜色。在 RGB 颜色方式中，一个像素点的数据就是一个 RGB 数值，所以一张图像就是一系列连续的这些像素点的集合，也就是一系列连续的 RGB 数值。这个就是图像数据，占用一片连续的存储空间（软件的就占用系统内存）。所以说软件的图像操作，都是操作这些 RGB 数值，可以简单的理解为 C 语言里的数组操作。</p>
+</li>
+<li><p><strong>硬件的 surface：</strong><br>硬件的 surface 图像处理，就调用不同的图形处理芯片的接口来进行的。一般的 2D 图形处理芯片对于色块的传送有比较明显的加速。一般表现为一次一片、一片的处理，比软件的一次一个点要快得多。同时有些硬件还支持一些像素混合的加速功能（alpha、colorkey 等）。</p>
+</li>
+<li><p><strong>屏幕显示：</strong><br>屏幕显示。不管是软件还是硬件的 surface ，操作它们的数据，是怎么影响到屏幕的呢？我们这个例子的 surface 数据是 on-screen 类型的。这个就比较直接了。软件的话，屏幕的图像数据就是内存中的那些 RGB数值（上面分析了的），所以你直接修改它们，就能马上显示到屏幕上。硬件的，虽然它们需要经过硬件图形芯片的处理，但是显存里面的数据还是屏幕的。所以图形芯片处理过后，屏幕上的图像也马上就更新了。但是 MiniGUI 硬件 surface 也是支持 off-screen 的，这又是怎么回事呢。没错，显存确实是屏幕的，但是一般来说显存都比屏幕大。这句话怎么理解呢。举个例子：假设屏幕是 640x480-16bpp 的，那么以 RGB 颜色格式来说一个屏幕说占用的显存大小就是 600kb，假设显存有10Mb，那么 off-screen 显存的大小就是 10Mb - 600kb = 9.4Mb 。这就说虽然这 9.4Mb 是屏幕的数据，但是由于屏幕只有 640x480 这么大，你操作了这些数据，理论上来说是应该马上在屏幕上显示的，但是由于用户其实是看不到这些内容的（前面说了，屏幕没这么大）。如果要想在屏幕上显示这部分显存的内容，需要色块传 API （也就是 MiniGUI 里的 BitBlt 接口）把这些显存的内容复制到能在屏幕上显示的显存的地址才行。所以硬件的 surface 也是能够有 off-screen dc 这种用法的。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="其它话题">其它话题</h2>
+<h3 id="颜色运算">颜色运算</h3>
+<p>不管是颜色填充（FillBox）还是色块传送（BitBlt），最终都是要做颜色运算。现在填充 MiniGUI 支持的颜色运算就是颜色覆盖和 alpha 混合。</p>
+<ul>
+<li><p>颜色覆盖就是直接拿源颜色的数值赋值给目标颜色。上面讲解中例子的用法的话，就是把屏幕图像数据中的某个一片数值改成了 dc 画刷的颜色（RGB值）。</p>
+</li>
+<li><p>alpha 混合就是通过一个指定颜色公式，使用颜色值中的 alpha 信息将源颜色和目的颜色进行混合，从而达到混合后的颜色信息带有目的颜色的目的。这个就是通常说的透明效果。一般来说 alpha 范围为 0 ～ 255，一般的混合公式为下面代码。从上面的公式可以看得出如果 alpha 值越小，那么目标颜色残留的就越多，源颜色的透明度也就越高（通俗的说就是源颜色很淡，而目标颜色很浓，透过源颜色能看到能多的目标颜色）。另外 alpha 混合的方式有很多种，例如是使用源颜色的 alpha 值做为混合标准（<code>MEMDC_FLAG_SRCALPHA</code>），还是使用目标颜色的 alpha 值做为混合标准；将不将源颜色的 alpha 值写入到目标颜色的 alpha 中去。目前 MiniGUI 的 alpha 混合只支持以源颜色的 alpha 为标准进行运算，并且不将源颜色的 alpha 值写入目标颜色的 alpha 中。经过上面的分析就能解释一个比较常见的问题：画透明图像的时候，在更新时透明图像会越叠越深，数次更新后，就不透明了。引起这个问题的主要原因就是，透明图像的背景没有被更新。这样的话透明图像（源颜色）第一次和透过的背景图像（目标颜色）进行 alpha 混合时，是正常的。随后，如果够过的背景图像没有被更新的话，那么透明图像就会和第一次混合后的图像进行混合。从上面的分析就可以看出，混合后的图像就像是把透明图像再次叠加到背景上一样（事实本来也是这样）。要想得到正确的效果，每次都必须更新背景图像，也就是说每次都要让透明图像和没有被混合后的图像进行混合。</p>
+</li>
+</ul>
+<p>代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// MiniGUI 32 位 alpha 混合代码</span></div><div class="line">DUFFS_LOOP4(</div><div class="line">{</div><div class="line">    Uint32 s;</div><div class="line">    Uint32 d;</div><div class="line">    Uint32 s1;</div><div class="line">    Uint32 d1;</div><div class="line">    Uint32 sA;</div><div class="line">    Uint32 dA;</div><div class="line">    s = *srcp;</div><div class="line">    d = *dstp;</div><div class="line">    sA = s &gt;&gt; <span class="number">24</span>;</div><div class="line">    dA = d &gt;&gt; <span class="number">24</span>;</div><div class="line">    dA = sA + dA - ((sA * dA) &gt;&gt; <span class="number">8</span>);</div><div class="line">    <span class="keyword">if</span>(dA &gt; <span class="number">255</span>) dA = <span class="number">255</span>; <span class="comment">//alpha may be greater than 255</span></div><div class="line">    alpha = s &gt;&gt; <span class="number">24</span>;</div><div class="line">    s1 = s & <span class="number">0xff00ff</span>;</div><div class="line">    d1 = d & <span class="number">0xff00ff</span>;</div><div class="line">    d1 = (d1 + (((s1 - d1) * alpha) &gt;&gt; <span class="number">8</span>)) & <span class="number">0xff00ff</span>;</div><div class="line">    s &= <span class="number">0xff00</span>;</div><div class="line">    d &= <span class="number">0xff00</span>;</div><div class="line">    d = (d + (((s - d) * alpha) &gt;&gt; <span class="number">8</span>)) & <span class="number">0xff00</span>;</div><div class="line">    *dstp = d1 | d | (dA &lt;&lt; <span class="number">24</span>);</div><div class="line">    ++srcp;</div><div class="line">    ++dstp;</div><div class="line">}, w);</div><div class="line"></div></pre></td></tr></table></figure>
+
+<ul>
+<li>colorkey：这个也有2种模式的，一种是以源颜色的 colorkey 颜色值做为标准（<code>MEMDC_FLAG_SRCCOLORKEY</code>），一种是以目标颜色的 colorkey 颜色值做为标准。这个在进行颜色填充或是色块传送的时候，如果遇到和 colorkey 颜色值一样的颜色，就会跳过这些颜色，不进行像素操作。这样就能形成一些不规则图形的填充（把背景颜色做为 colorkey 过滤掉）。目前 MiniGUI 只支持以源颜色 colorkey 颜色值做为标准。</li>
+</ul>
+<h3 id="绘制图像导致屏幕闪烁">绘制图像导致屏幕闪烁</h3>
+<p>导致这个问题的一般原因是，直接在屏幕上进行大规模的图像更新操作。这样绘制过程就会在屏幕上展现出来，这样就会感觉屏幕在闪烁（屏幕更新了多次）。在应用程序上导致这个问题的最常见的情况就是获取或是创建了 on-screen dc，然后绘制操作都在这个 dc 上进行。这样 dc 中的每个图像数据点的操作都会反映到屏幕上。短时间内颜色的频繁变化，在人的视觉上就会造成一种突变的感觉，就是通俗上说的闪烁。从上面分析可以看得出要避免这个问题，就是要避免在绘制过程中屏幕多次的改变。这里注意，即便是在应用程序中仅仅调用一次 FillBox 填充一块区域，如果是直接在 on-screen dc 上操作的话，屏幕的变化不仅仅是一次。如果是软件的 surface 应该说是这块区域有多少个像素点就有多少次，当然这个还和屏幕的刷新率有关。所以在应用程序中避免这样的问题，就需要在 off-screen dc 中把需要更新到屏幕的图像完全绘制好，然后使用色块传送 API 把这些绘制好的图像复制到屏幕上。在某些硬件上这个操作几乎可以说就是一次性完成的，计算是 MiniGUI 的软件 surface 操作的话，也在色块传送上也有专门的优化。这样能极大的减少短时间内屏幕的变化次数，从而缓解因为图像更新导致的屏幕闪烁问题。MiniGUI 3.0 的新特性双缓冲机制就是针对解决这个问题而提出的。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/minigui/">minigui</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/MiniGUI/">MiniGUI</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/21/MiniGUI DC 分析/" data-title="MiniGUI DC 分析 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/21/STi7167 GAL 开发笔记/" title="STi7167 GAL 开发笔记">
+  <strong>上一篇:</strong><br/>
+  <span>
+  STi7167 GAL 开发笔记</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/21/MiniGUI 源码分析笔记/"  title="MiniGUI 源码分析笔记">
+ <strong>下一篇:</strong><br/> 
+ <span>MiniGUI 源码分析笔记
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#相关术语"><span class="toc-number">1.</span> <span class="toc-text">相关术语</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DC_的创建与销毁"><span class="toc-number">2.</span> <span class="toc-text">DC 的创建与销毁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DC_工作原理"><span class="toc-number">3.</span> <span class="toc-text">DC 工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#基本流程"><span class="toc-number">3.1.</span> <span class="toc-text">基本流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#要点分析"><span class="toc-number">3.2.</span> <span class="toc-text">要点分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其它话题"><span class="toc-number">4.</span> <span class="toc-text">其它话题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#颜色运算"><span class="toc-number">4.1.</span> <span class="toc-text">颜色运算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#绘制图像导致屏幕闪烁"><span class="toc-number">4.2.</span> <span class="toc-text">绘制图像导致屏幕闪烁</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

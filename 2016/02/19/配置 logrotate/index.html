@@ -1,0 +1,487 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>配置 logrotate | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="对于服务器来说 log 是很重要的，通过 log 能够分析服务器运行是否正常，以及监控访问等。但是如果不加以限制的话，log 很容易就会爆满。例如说之前我们公司的 nginx 的访问 log 就把服务器的磁盘爆满了，导致磁盘没空间，然后访问各种异常。可能有人觉得 log 应该不会那么大，最开始我也是">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/19/配置 logrotate/" title="配置 logrotate" itemprop="url">配置 logrotate</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2016-02-19T15:39:16.000Z" itemprop="datePublished">2016 2月 19</time>
+    更新日期:<time datetime="2016-02-19T15:39:16.000Z" itemprop="dateModified">2016 2月 19</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置"><span class="toc-number">2.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#例子"><span class="toc-number">3.</span> <span class="toc-text">例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#注意问题"><span class="toc-number">4.</span> <span class="toc-text">注意问题</span></a></li></ol>
+		</div>
+		
+		<p>对于服务器来说 log 是很重要的，通过 log 能够分析服务器运行是否正常，以及监控访问等。但是如果不加以限制的话，log 很容易就会爆满。例如说之前我们公司的 nginx 的访问 log 就把服务器的磁盘爆满了，导致磁盘没空间，然后访问各种异常。可能有人觉得 log 应该不会那么大，最开始我也是这么认为了，但是我们公司的 nginx 一天也就几十万次的请求，然后 nginx 默认会把每次请求记录下来，然后几个星期后，几十G 的 log 就产生了，加上我挪用了下服务器用来下 android 源码（大概 2、30G这样），服务器 128G 的 ssd 就爆了（我们公司买的 Linode 比较便宜的服务器作为一个节点）。</p>
+<p>然后就会想能不能让 log 文件限制在一个可控的范围内。翻了下资料，就发现 linux 自带的工具 logrotate 就是干这个事情的。</p>
+<h2 id="简介">简介</h2>
+<p>logrotate 从名字看叫 log 轮转，其实它的作用是，可以定时的把 log 转储成备份文件，然后重新开始记录 log，然后还能限制转储文件的数量。这样既能将 log 大小控制在一定范围内，又保留的最近的 log 记录，便于查看，分析。</p>
+<h2 id="配置">配置</h2>
+<p>logrotate 的配置文件是 /etc/logrotate.conf:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># see "man logrotate" for details</span></div><div class="line"><span class="comment"># rotate log files weekly</span></div><div class="line">weekly</div><div class="line"></div><div class="line"><span class="comment"># use the syslog group by default, since this is the owning group</span></div><div class="line"><span class="comment"># of /var/log/syslog.</span></div><div class="line">su root syslog</div><div class="line"></div><div class="line"><span class="comment"># keep 4 weeks worth of backlogs</span></div><div class="line">rotate <span class="number">4</span></div><div class="line"></div><div class="line"><span class="comment"># create new (empty) log files after rotating old ones</span></div><div class="line">create</div><div class="line"></div><div class="line"><span class="comment"># uncomment this if you want your log files compressed</span></div><div class="line"><span class="comment">#compress</span></div><div class="line"></div><div class="line"><span class="comment"># packages drop log rotation information into this directory</span></div><div class="line">include /etc/logrotate.d</div><div class="line"></div><div class="line"><span class="comment"># no packages own wtmp, or btmp -- we'll rotate them here</span></div><div class="line">/var/log/wtmp {</div><div class="line">    missingok</div><div class="line">    monthly</div><div class="line">    create <span class="number">0664</span> root utmp</div><div class="line">    rotate <span class="number">1</span></div><div class="line">}</div><div class="line"></div><div class="line">/var/log/btmp {</div><div class="line">    missingok</div><div class="line">    monthly</div><div class="line">    create <span class="number">0660</span> root utmp</div><div class="line">    rotate <span class="number">1</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment"># system-specific logs may be configured here</span></div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>我们先来介绍一下 logrotate 一些主要参数的含义：</p>
+<ul>
+<li><p><strong>compress</strong><br>通过 gzip 压缩转储以后的日志，加了这个参数生成的归档文件就是个 gzip 压缩包</p>
+</li>
+<li><p><strong>nocompress</strong><br>不需要压缩时，用这个参数</p>
+</li>
+<li><p><strong>copytruncate</strong><br>用于还在打开中的日志文件，把当前日志备份并截断</p>
+</li>
+<li><p><strong>nocopytruncate</strong><br>备份日志文件但是不截断</p>
+</li>
+<li><p><strong>create mode owner group</strong><br>转储文件，使用指定的文件模式创建新的日志文件</p>
+</li>
+<li><p><strong>nocreate</strong><br>不建立新的日志文件</p>
+</li>
+<li><p><strong>delaycompress</strong><br>和 compress 一起使用时，转储的日志文件到下一次转储时才压缩</p>
+</li>
+<li><p><strong>nodelaycompress</strong><br>覆盖 delaycompress 选项，转储同时压缩。</p>
+</li>
+<li><p><strong>errors address</strong><br>专储时的错误信息发送到指定的Email 地址</p>
+</li>
+<li><p><strong>ifempty</strong><br>即使是空文件也转储，这个是 logrotate 的缺省选项。</p>
+</li>
+<li><p><strong>notifempty</strong><br>如果是空文件的话，不转储</p>
+</li>
+<li><p><strong>mail address</strong><br>把转储的日志文件发送到指定的E-mail 地址</p>
+</li>
+<li><p><strong>nomail</strong><br>转储时不发送日志文件</p>
+</li>
+<li><p><strong>olddir directory</strong><br>转储后的日志文件放入指定的目录，必须和当前日志文件在同一个文件系统</p>
+</li>
+<li><p><strong>noolddir</strong><br>转储后的日志文件和当前日志文件放在同一个目录下</p>
+</li>
+<li><p><strong>prerotate/endscript</strong><br>在转储以前需要执行的命令可以放入这个对，这两个关键字必须单独成行</p>
+</li>
+<li><p><strong>postrotate/endscript</strong><br>在转储以后需要执行的命令可以放入这个对，这两个关键字必须单独成行</p>
+</li>
+<li><p><strong>daily</strong><br>指定转储周期为每天</p>
+</li>
+<li><p><strong>weekly</strong><br>指定转储周期为每周</p>
+</li>
+<li><p><strong>monthly</strong><br>指定转储周期为每月</p>
+</li>
+<li><p><strong>rotate xx</strong><br>指定日志文件删除之前转储的次数，0 指没有备份，5 指保留5 个备份</p>
+</li>
+<li><p><strong>size xx</strong><br>当日志文件到达指定的大小时才转储，size 可以指定 bytes (缺省)以及KB (sizek)或者MB (sizem).</p>
+</li>
+</ul>
+<h2 id="例子">例子</h2>
+<p>我们先来看看上面 logrotate.conf 中的配置，默认写了一些，其中有一个 include /etc/logrotate.d 这就会引用 /etc/logrotate.d/ 下面的配置文件。其实应用都是把自己的配置文件写在 logrotate.d 下面的。像安装 nginx 的时候就会在 /etc/logrotate.d/ 下面生成一个默认的 nginx 文件的默认配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">/var/log/nginx/*.log {</div><div class="line">    weekly</div><div class="line">    missingok</div><div class="line">    rotate <span class="number">52</span></div><div class="line">    compress</div><div class="line">    delaycompress</div><div class="line">    notifempty</div><div class="line">    create <span class="number">0640</span> www-data adm </div><div class="line">    sharedscripts</div><div class="line">    prerotate</div><div class="line">        <span class="keyword">if</span> [ <span class="operator">-d</span> /etc/logrotate.d/httpd-prerotate ]; <span class="keyword">then</span> \</div><div class="line">            run-parts /etc/logrotate.d/httpd-prerotate; \</div><div class="line">        <span class="keyword">fi</span> \</div><div class="line">    endscript</div><div class="line">    postrotate</div><div class="line">        [ <span class="operator">-s</span> /run/nginx.pid ] && kill -USR1 `cat /run/nginx.pid`</div><div class="line">    endscript</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>logrotate 的配置，都是一个 log 的文件路径（这个路径就是你要配置的应用写 log 的路径，可以看到支持正则表达匹配的，同一个应用，不同类型的 log 可以用不同的配置），然后后面接一对 {} 做为一个配置。对照上面的参数含义，我们可以看到 nginx 默认是一个星期才转储一次，然后会保留 52 个转储文件，对于我们的服务器来说，一个星期的 nginx 的 log 就有十来G了，然后还保留将近2个月的，就算压缩过，我们那可怜的 128G ssd，也肯定撑不住。所以我决定给它改改。</p>
+<p>然后上面还注意一下， prerotate/endscript 和 postrotate/endscript 这个参数。这个2个参数分别是能够在转储前和转储后，执行指定的操作，操作由特定的脚本语言描述，相当于是一个简单脚本语言了，这里不详细说明这个语言。就稍微解释下为什么需要这2个参数，是因为要转储的话，就需要移动原来正在写的 log 文件，然后让程序写新的 log，那这个功能肯定不同的程序不一样了，logrotate 不可能完成的，所以就留了一个接口（可编程的脚本语言）让每个程序自己实现。这里解释下上面 nginx 做的，转储前的话，是看下 /etc/logrotate.d/httpd-prerotate 这个文件是否存在，存在的话就运行一下？（好像是这个意思吧）。转储后，就找到 nginx 当前运行的 pid，然后发送一个信号量给 nginx 的进程，让其重启，就会写新的 log 文件了。</p>
+<p>这里我把 nginx 的转储配置改为了每天转储一次，然后转储文件数量为3：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">/var/log/nginx/*.log {</div><div class="line">    daily</div><div class="line">    missingok</div><div class="line">    rotate <span class="number">3</span></div><div class="line">    compress</div><div class="line">    delaycompress</div><div class="line">    notifempty</div><div class="line">    create <span class="number">0640</span> www-data adm </div><div class="line">    sharedscripts</div><div class="line">    prerotate</div><div class="line">        <span class="keyword">if</span> [ <span class="operator">-d</span> /etc/logrotate.d/httpd-prerotate ]; <span class="keyword">then</span> \</div><div class="line">            run-parts /etc/logrotate.d/httpd-prerotate; \</div><div class="line">        <span class="keyword">fi</span> \</div><div class="line">    endscript</div><div class="line">    postrotate</div><div class="line">        [ <span class="operator">-s</span> /run/nginx.pid ] && kill -USR1 `cat /run/nginx.pid`</div><div class="line">    endscript</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<h2 id="注意问题">注意问题</h2>
+<p>最后要说下 logrotate 配置的一些问题。虽然 logrotate 可以配置成按天、周、月和文件大小进行日志转储。但是 logrotate 也是有一定限制的，这里稍微说下 logrotate 的实现原理。其实 logrotate 并不是一个守护进程，而是通过 linux 的定时任务机制 cron 来实现的（关于 cron 的用法，可以去网上找下资料）。在 /etc/cron.daily 有一个 logrotate 文件，是在 logrotate 安装的时候创建的，这个就是定时执行 logrotate 轮询脚本了 。 /etc/crontab 是 cron 的配置文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># /etc/crontab: system-wide crontab</span></div><div class="line"><span class="comment"># Unlike any other crontab you don't have to run the `crontab'</span></div><div class="line"><span class="comment"># command to install the new version when you edit this file</span></div><div class="line"><span class="comment"># and files in /etc/cron.d. These files also have username fields,</span></div><div class="line"><span class="comment"># that none of the other crontabs do.</span></div><div class="line"></div><div class="line">SHELL=/bin/sh</div><div class="line">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin</div><div class="line"></div><div class="line"><span class="comment"># m h dom mon dow user  command</span></div><div class="line"><span class="number">17</span> *    * * *   root    <span class="built_in">cd</span> / && run-parts --report /etc/cron.hourly</div><div class="line"><span class="number">25</span> <span class="number">6</span>    * * *   root    test -x /usr/sbin/anacron || ( <span class="built_in">cd</span> / && run-parts --report /etc/cron.daily )</div><div class="line"><span class="number">47</span> <span class="number">6</span>    * * <span class="number">7</span>   root    test -x /usr/sbin/anacron || ( <span class="built_in">cd</span> / && run-parts --report /etc/cron.weekly )</div><div class="line"><span class="number">52</span> <span class="number">6</span>    <span class="number">1</span> * *   root    test -x /usr/sbin/anacron || ( <span class="built_in">cd</span> / && run-parts --report /etc/cron.monthly )</div><div class="line"><span class="comment">#</span></div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>可以看到默认系统是在每天 6：25 的时候执行 logrotate 的轮询的。也就是说其实你配置了按文件大小进行转储，也要等到每天 logrotate 出发轮询才会生效。当然既然是通过 cron 来实现的，也可以自己修改配置文件，调高 logrotate 轮询的间隔（例如一天2次之类的）。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/server/">server</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Server/">Server</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2016/02/19/配置 logrotate/" data-title="配置 logrotate | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/03/27/Linux 实用工具总结/" title="Linux 实用工具总结">
+  <strong>上一篇:</strong><br/>
+  <span>
+  Linux 实用工具总结</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/31/工作小笔记——Android 自带的应用统计服务[UsageStatsService]/"  title="工作小笔记——Android 自带的应用统计服务（UsageStatsService）">
+ <strong>下一篇:</strong><br/> 
+ <span>工作小笔记——Android 自带的应用统计服务（UsageStatsService）
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置"><span class="toc-number">2.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#例子"><span class="toc-number">3.</span> <span class="toc-text">例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#注意问题"><span class="toc-number">4.</span> <span class="toc-text">注意问题</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

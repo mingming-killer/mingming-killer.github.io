@@ -1,0 +1,439 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>window 在 cygwin 中使用 repo ssh | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="其实在 cygwin 中弄 ssh 是为使用在 window 中使用 repo 。如果单纯为了在 window 上 ssh 登陆 linux 服务器的话，直接用 putty 就行了，简单方便，无需安装、配置。
+安装 cygwin
+从cygwin web 下载一个很小的 setup.exe ，然后第一">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/31/window 在 cygwin 中使用 repo ssh/" title="window 在 cygwin 中使用 repo ssh" itemprop="url">window 在 cygwin 中使用 repo ssh</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-31T03:42:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    更新日期:<time datetime="2015-01-31T03:42:16.000Z" itemprop="dateModified">2015 1月 31</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装_cygwin"><span class="toc-number">1.</span> <span class="toc-text">安装 cygwin</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置_cygwin"><span class="toc-number">2.</span> <span class="toc-text">配置 cygwin</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置_sshd"><span class="toc-number">3.</span> <span class="toc-text">配置 sshd</span></a></li></ol>
+		</div>
+		
+		<p>其实在 cygwin 中弄 ssh 是为使用在 window 中使用 repo 。如果单纯为了在 window 上 ssh 登陆 linux 服务器的话，直接用 putty 就行了，简单方便，无需安装、配置。</p>
+<h2 id="安装_cygwin">安装 cygwin</h2>
+<p>从<a href="http://cygwin.com/setup.exe" title="cygwin web" target="_blank" rel="external">cygwin web</a> 下载一个很小的 setup.exe ，然后第一选从网上安装（第一次装好后，会把安装文件缓存到你指定的目录，下次就可以选中从本地安装了）。如果选择从网上安装的话，之后会让你选择安装源（我选的163的那个，看上去就像是国内的源）。之后就会解析源信息（无论是在线的、还是本地的），如果出现说：提示你这个 setup.exe 有新版，然后出现解析失败的话，先要去它提示你的网址下载最新的 setup.exe，然后就会解析成功了。</p>
+<p>最后一步是让你选择要安装的包，如果你硬盘够大，又不在意安装时间的话，可以全部选择安装（在那些分类上点击出现  install 就行了）。默认是 default，default 的话，它会安装一些最基本的 linux 的包（例如 bash 这些），然后如果是之前安装过的，default 是会保留你之前安装的包。所以如果你要卸载的话 ，就把它点成 uninstall，还有一个 reinstall 是重新安装。</p>
+<p>这些我只是要用 repo 和 git （svn也算上吧）而已，所以把 Net 大类和 Python （repo要用 python）大类点上（点成 install 状态，然后点开看到具体的软件的版本号就算行了），然后在搜索栏上敲 ssh，把出来的也点上（一般就是  openssh），然后还可以点些自己需要的东西，例如 vim、unzip、sqlite 等。我为了省空间强制干掉了 X11、Gonme、KDE、Graphic、Audio 的东西，然后也没点啥编译的东西（gcc、make 之类的玩意，这些东西在 Devel 这个类下，想在 window 下要编 NDK 的要勾上这些了）。</p>
+<p>选好后，点下一步就等进度条就行了。</p>
+<h2 id="配置_cygwin">配置 cygwin</h2>
+<p>cygwin 是个在 window 上模拟的 linux 环境，很多和 linux 差不多。我们可以先配一下，以后用着顺手。一开桌面上的快捷方式，它会在你的安装目录下以你当前 window 用户创建一个用户目录，例如我的安装目录是 C:\cygwin ，我当前的 window 用户是 Administrator，那就会创建这么目录。然后在这个目录下会自动创建 .bashrc_histroy 等一些文件。顺带说一下，这个目录就是你的 home 目录了，然后在安装目录下就有 etc、usr、lib、dev、bin 等 linux 的目录。然后我们可以自己用得习惯的 bash 配置文件 .bashrc 放到自己的 home 目录（还可以放一些别的软件配置文件，例如 .srceenrc, .vimrc 等）。不过别以直接丢 .bashrc 到 home 就完事了，你再次打开 bash 发现是无效的。因为 cygwin bash 的配置文件不在这个 home 目录下，而是在 etc 下的 bash.bashrc 。当然你可以在 bash.bashrc  里改，但是我建议还是把你自定义的配置文件放到 home 目录下，然后在 bash.bashrc 的最后加上 source ~/.bashrc 就 OK 了。这样做的好处的能最大的兼容 cygwin ，因为你打开 bash.bashrc 会发现它其实设置了一些东西的，所以最好不要乱动别人的东西。</p>
+<h2 id="配置_sshd">配置 sshd</h2>
+<p>ssh 的客户端不需要配置什么东西，直接 ssh username@host 就可以用。不过一上来就这么用的话，会发现会报啥 connect to xx port  22: Conection  refused 之类的错误的。这个是因为你的 ssh 服务的守护进程没有启动（也就是 sshd）。我这里的配置大多数是网上的：</p>
+<p>如果之前有配置过，但是配错了，想重新配置，就直接敲 ssh-host-config 就行了。但是如果想重新安装，可以用 sc delete sshd 这个命令先把之前安装的 sshd 服务给卸掉。如果创建了一些不想用的window用户，可以去 window 的控制面板去闪除。如果是 cygwin 的用户的话，你直接把 /etc/passwd 和 /etc/group 给删掉就好了，然后再用 mkpasswd -l &gt; /etc/passwd 和 mkgroup -l &gt; /etc/group 重新恢复默认用户和用户组就行了。记得重新分组后，要 chmod +r /ect/passwd 和 chmod +r /ect/group 改下权限，然后 rm -rf /var ，把这些临时文件给删掉。</p>
+<p>其实就是直接敲 ssh-host-config ，只不过会一些选项让你选择而已：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">$ ssh-host-config</div><div class="line">*** Info: Generating /etc/ssh_host_key</div><div class="line">*** Info: Generating /etc/ssh_host_rsa_key</div><div class="line">*** Info: Generating /etc/ssh_host_dsa_key</div><div class="line">*** Info: Creating default /etc/ssh_config file（如果这里之前安装过，会问你是否覆盖，选 yes 覆盖）</div><div class="line">*** Info: Creating default /etc/sshd_config file （如果这里之前安装过，会问你是否覆盖，选 yes 覆盖）</div><div class="line"></div><div class="line">*** Info: Privilege separation is <span class="keyword">set</span> to yes by default since OpenSSH <span class="number">3.3</span>.</div><div class="line">*** Info: However, this requires a non-privileged account called <span class="string">'sshd'</span>.</div><div class="line">*** Info: For more info on privilege separation <span class="built_in">read</span> /usr/share/doc/openssh/REAME.privsep.</div><div class="line">*** Query: Should privilege separation be used? (yes/no) yes（这里的意思开启 sshd 需要一个有系统管理员权限的用户，说的是 window 的；问你是不是要单独创建一个这样的window用户，网上有说选no，有说选 yes 的，我是选 yes 的，可以启动 sshd）</div><div class="line"></div><div class="line">*** Info: Updating /etc/sshd_config file</div><div class="line">*** Info: Creating default /etc/inetd.d/sshd-inetd file</div><div class="line">*** Info: Updated /etc/inetd.d/sshd-inetd</div><div class="line">*** Warning: The following functions require administrator privileges!</div><div class="line">*** Query: Do you want to install sshd as a service?</div><div class="line">*** Query: (Say <span class="string">"no"</span> <span class="keyword">if</span> it is already installed as a service) (yes/no) yes（这里是问你是不是要安装 sshd 服务，肯定要选 yes，必须要装的）</div><div class="line">*** Info: Note that the CYGWIN variable must contain at least <span class="string">"ntsec"</span></div><div class="line">*** Info: <span class="keyword">for</span> sshd to be able to change user context without password.</div><div class="line"></div><div class="line">*** Query: Enter the value of CYGWIN <span class="keyword">for</span> the daemon: [] ntsec tty（这里好像问的你是使用的终端连接方式吧，照网上的说法填 ntsec tty）</div><div class="line">*** Info: On Windows Server <span class="number">2003</span>, Windows Vista, and above, the</div><div class="line">*** Info: SYSTEM account cannot setuid to other users -- a capability</div><div class="line">*** Info: sshd requires.  You need to have or to create a privileged</div><div class="line">*** Info: account.  This script will <span class="built_in">help</span> you <span class="keyword">do</span> so.</div><div class="line">*** Info: You appear to be running Windows <span class="number">2003</span> Server or later.  On <span class="number">2003</span></div><div class="line">*** Info: and later systems, it<span class="string">'s not possible to use the LocalSystem</span></div><div class="line"><span class="string">*** Info: account for services that can change the user id without an</span></div><div class="line"><span class="string">*** Info: explicit password (such as passwordless logins [e.g. public key</span></div><div class="line"><span class="string">*** Info: authentication] via sshd).</span></div><div class="line"><span class="string">*** Info: If you want to enable that functionality, it'</span>s required to create</div><div class="line">*** Info: a new account with special privileges (unless a similar account</div><div class="line">*** Info: already exists). This account is <span class="keyword">then</span> used to run these special</div><div class="line">*** Info: servers.</div><div class="line">*** Info: Note that creating a new user requires that the current account（这里第一次还会有个问题的，就是说如果你用的高于 window xp 的版本，就需要你重新创建一个有管理权限的用户，这个用户是 cygwin 的，这里选 yes，创建）</div><div class="line"></div><div class="line">*** Info: have Administrator privileges itself.</div><div class="line">*** Info: No privileged account could be found.</div><div class="line">*** Info: This script plans to use <span class="string">'cyg_server'</span>.</div><div class="line">*** Info: <span class="string">'cyg_server'</span> will only be used by registered services.</div><div class="line">*** Query: Do you want to use a different name? (yes/no) no（这里创建的用户默认名字是 cyg_server 问你是不是要改名字，一般不用改）</div><div class="line">*** Warning: Privileged account <span class="string">'cyg_server'</span> was specified,</div><div class="line">*** Warning: but it does not have the necessary privileges.</div><div class="line">*** Warning: Continuing, but will probably use a different account.</div><div class="line">*** Warning: The specified account <span class="string">'cyg_server'</span> does not have the</div><div class="line">*** Warning: required permissions or group memberships. This may</div><div class="line">*** Warning: cause problems <span class="keyword">if</span> not corrected; continuing...</div><div class="line"></div><div class="line">*** Query: Please enter the password <span class="keyword">for</span> user <span class="string">'cyg_server'</span>: ******（然后让你为刚刚创建的 cyg_server 设密码）</div><div class="line">*** Query: Reenter: ******</div><div class="line">*** Info: The sshd service has been installed under the <span class="string">'cyg_server'</span></div><div class="line">*** Info: account.  To start the service now, call `net start sshd<span class="string">' or</span></div><div class="line"><span class="string">*** Info: `cygrunsrv -S sshd'</span>.  Otherwise, it will start automatically</div><div class="line">*** Info: after the next reboot.</div><div class="line">*** Info: Host configuration finished. Have fun!</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>最后出现这个提示就表示配置成功了。因为新创建了2个用户（一个 window 的，一个 cygwin 的），再用 mkpasswd -l &gt; /etc/passwd 和 mkgroup -l &gt; /etc/group 重新设置下用户信息。如果配置的过程中，出现创建用户不成功的提示，就用最开始说的，把之前创建的用户给删掉；还有在重新配置前先要停掉正在运行的 sshd 服务（net stop sshd）。</p>
+<p>然后按提示的，使用 net start sshd 就可以启动 sshd 服务了。成功的话，会出成功的提示（cygwin bash 中文乱码的话，右键鼠标 —&gt; options —&gt; text 设置下编码可以解决）。然后在 window 的控制面板中的 系统安全 —&gt; 管理工具 —&gt; 服务 中可以看到一个叫 CYGWIN sshd 的服务，点开属性，登陆那里可以看到是使用刚刚创建的用户在启动的。</p>
+<p>然后就可以使用 ssh user@host 来登陆了。如果使用密码登陆，记得把服务器的 /etc/ssh/sshd_config 中的 PasswordAuthentication 设置成 yes，如果使用密钥进行登陆就把 RSAAuthentication 和 PubkeyAuthentication 设置成 yes （具体使用密钥的方式，可以参看我的另外一篇叫 Rsa 验证的笔记）。</p>
+<p>然后再记下，window 的 hosts 文件的位置在 C:\Windows\System32\drivers\etc 下，默认是隐藏、只读的系统文件。</p>
+<p>最后，搞好 ssh 后，终于可以在 window 下用 repo 和 git pull、push 或是 sync 代码了。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/window/">window</a><a href="/tags/install/">install</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Window/">Window</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/31/window 在 cygwin 中使用 repo ssh/" data-title="window 在 cygwin 中使用 repo ssh | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/31/cygwin screen Directory tmp uscreens S-UserName must have mode 700/" title="cygwin screen Directory tmp uscreens S-UserName must have mode 700">
+  <strong>上一篇:</strong><br/>
+  <span>
+  cygwin screen Directory tmp uscreens S-UserName must have mode 700</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/31/cygwin 使用备忘/"  title="cygwin 使用备忘">
+ <strong>下一篇:</strong><br/> 
+ <span>cygwin 使用备忘
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装_cygwin"><span class="toc-number">1.</span> <span class="toc-text">安装 cygwin</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置_cygwin"><span class="toc-number">2.</span> <span class="toc-text">配置 cygwin</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置_sshd"><span class="toc-number">3.</span> <span class="toc-text">配置 sshd</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

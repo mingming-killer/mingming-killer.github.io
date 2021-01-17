@@ -1,0 +1,519 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>(转) float 类型在内存中的表示 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="标准
+先说一下计算机中二进制的算法：
+整数
+整数的二进制算法大家应该很熟悉，就是不断的除以2取余数，然后将余数倒序排列。比如求9的二进制： 
+
+9/2=4 余 1 
+4/2=2 余 0 
+2/2=1 余 0 
+1/2=0 余 1
+ 
+
+一直计算到商为0为止，然后将得到的余数由下到上排列，就得到了9的">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/19/[转] float 类型在内存中的表示/" title="(转) float 类型在内存中的表示" itemprop="url">(转) float 类型在内存中的表示</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-19T12:22:16.000Z" itemprop="datePublished">2015 1月 19</time>
+    更新日期:<time datetime="2015-01-19T12:22:16.000Z" itemprop="dateModified">2015 1月 19</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#标准"><span class="toc-number">1.</span> <span class="toc-text">标准</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#整数"><span class="toc-number">1.1.</span> <span class="toc-text">整数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#小数"><span class="toc-number">1.2.</span> <span class="toc-text">小数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实例"><span class="toc-number">2.</span> <span class="toc-text">实例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#需要注意的东西"><span class="toc-number">3.</span> <span class="toc-text">需要注意的东西</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#23位尾数填充的问题"><span class="toc-number">3.1.</span> <span class="toc-text">23位尾数填充的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#运算时向右对阶操作的舍入问题"><span class="toc-number">3.2.</span> <span class="toc-text">运算时向右对阶操作的舍入问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#指数全零问题"><span class="toc-number">3.3.</span> <span class="toc-text">指数全零问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#指数全一问题"><span class="toc-number">3.4.</span> <span class="toc-text">指数全一问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#我的话"><span class="toc-number">4.</span> <span class="toc-text">我的话</span></a></li></ol>
+		</div>
+		
+		<h2 id="标准">标准</h2>
+<p>先说一下计算机中二进制的算法：</p>
+<h3 id="整数">整数</h3>
+<p>整数的二进制算法大家应该很熟悉，就是不断的除以2取余数，然后将余数倒序排列。比如求9的二进制： </p>
+<pre>
+9/2=4 余 1 
+4/2=2 余 0 
+2/2=1 余 0 
+1/2=0 余 1
+</pre> 
+
+<p>一直计算到商为0为止，然后将得到的余数由下到上排列，就得到了9的二进制：1001。 从上面的算法我们可以看到，用整数除以2，最终都能够到0。因此，整数是可以用二进制来精确表示的。</p>
+<h3 id="小数">小数</h3>
+<p>小数的二进制算法和整数的大致相反，就是不断的拿小数部分乘以2取积的整数部分，然后正序排列。比如求0.9的二进制：</p>
+<pre> 
+0.9*2=1.8 取 1 
+0.8*2=1.6 取 1 
+0.6*2=1.2 取 1 
+0.2*2=0.4 取 0 
+0.4*2=0.8 取 0 
+0.8*2=1.6 取 1 
+… … 
+</pre>
+
+<p>如此循环下去。因此我么得到的二进制小数也是无限循环的：0.11100110011… 从小数的二进制算法中我们可以知道，如果想让这种算法停止，只有在小数部分是0.5的时候才可以，但是很不幸，这类的小数很少。所以大部分小数是很难用二进制来精确表示的。</p>
+<p>OK，有了上面的知识，我们进入正题：看看float类型在内存中是如何表示的。float类型又称为单精度浮点类型，在 <a href="http://en.wikipedia.org/wiki/IEEE_754-2008" title="IEEE 754-2008" target="_blank" rel="external">IEEE 754-2008</a> 中是这样定义它的结构的：</p>
+<pre>
+S    EEEEEEEE  FFFFFFFFFFFFFFFFFFFFFFF
+31   30        23 22 21 ... ...      0
+</pre>
+
+<p>float类型总共4个字节——32位：</p>
+<ul>
+<li><p><strong>符号位</strong><br>其中最左边的为符号位，0为正，1为负。</p>
+</li>
+<li><p><strong>指数</strong><br>接下来的E是指数，一共8位，也用二进制来表示。</p>
+</li>
+<li><p><strong>尾数</strong><br>最后的F是小数部分，尾数正是由这23位的小数部分+1位组成的。（这个稍后解释）。</p>
+</li>
+</ul>
+<p>这里我们需要多说一下指数。虽然指数也是用8位二进制来表示的，但是IEEE在定义它的时候做了些手脚，使用了偏移来计算指数。IEEE规定，在float类型中，用来计算指数的偏移量为 <strong>127</strong> 。也就是说，如果你的指数实际是0，那么在内存中存的就是 <strong>0+127=127</strong> 的二进制。稍后我们来看这个到底如何使用。</p>
+<h2 id="实例">实例</h2>
+<p>好了，看了这么多，我们该演示一下计算机如何将一个十进制的实数转换为二进制的。就拿6.9这个数字来举例吧。-_-||!</p>
+<p>首先，我们按照上面说的方法，分别将整数和小数转换成对应的二进制。这样 6.9 的二进制表示就是 110.1110011001100…（整数的部分按整数转化为二进制，小数部分按小数部分转化）。这里就看出来 了，6.9 转换成二进制，小数部分是无限循环的，这在现在的计算机系统上是无法精确表示的。这是计算机在计算浮点数的时候常常不精确的原因之一。</p>
+<p>其次，将小数点左移（或右移）到第一个有效数字之后。说的通俗些，就是把小数点移到第一个1之后。这样的话，对于上面的 110.1110011001100… 我们就需要把小数点左移2位，得到 1.101110011001100… 。</p>
+<p>接下来的事情就有意思了。首先我们把得到的 1.101110011001100.. 这个数，从小数点后第一位开始，数出23个来，填充到上面float内存 结构的尾数部分（就是那一堆F的地方），我们这里数出来的就是 10111001100110011001100。这里又要发生一次不精确了，小数点后超出 23位的部分都将被舍弃，太惨了。</p>
+<p>不过，这里有一个可能让大家觉得特别坑爹的事情，就是小数点前面的1也不要了。仔细看看上面的内存结构，确实没有地方存放这个1。原因是这样的：IEEE觉得，既然我们大家都约定把小数点移动到第一个有效数字之后，那也就默认小数点前面一定有且只有一个1，所以把这个1存起来也浪费，干脆就不要了，以后大家都这么默契的来就好。这也是为什么我上面说尾数是 <strong>23位+1位</strong> 的原因。</p>
+<p>填充完尾数，该填充指数了。这个指数就是刚才我们把小数点移动的位数，左移为正，右移为负，再按照上面所说的偏移量算法，我们填充的指数应该是 2+127=129 。转换成8位二进制就是 10000001。</p>
+<p>最后，根据这个数的正负来填充符号位。我们这里是正数，所以填0。这样6.9的在内存中的存储结果就出来了：</p>
+<pre>
+0  10000001  10111001100110011001100
+</pre>
+
+<p>总结一下，实数转二进制float类型的方法：</p>
+<ol>
+<li>分别将实数的整数和小数转换为二进制</li>
+<li>左移或者右移小数点到第一个有效数字之后</li>
+<li>从小数点后第一位开始数出23位填充到尾数部分 </li>
+<li>把小数点移动的位数，左移为正，右移为负，加上偏移量127，将所得的和转换为二进制填充到指数部分</li>
+<li>根据实数的正负来填充符号位，0为正，1为负</li>
+</ol>
+<p>如果需要把float的二进制转换回十进制的实数，只要将上面的步骤倒着来一边就行了。</p>
+<h2 id="需要注意的东西">需要注意的东西</h2>
+<h3 id="23位尾数填充的问题">23位尾数填充的问题</h3>
+<p>虽然在IEEE754标准中我没有找到相应的描述，但是在实际处理的时候，截取23位尾数需要对第24位进行零舍一入的操作，至少在Java虚拟机中是这么做的。有兴趣的可以试试0.7f-0.6f。</p>
+<h3 id="运算时向右对阶操作的舍入问题">运算时向右对阶操作的舍入问题</h3>
+<p>这个也是在实际操作时遇到的问题。到目前为止我还无法确定向右对阶操作是否也进行了零舍一入的操作。有兴趣的可以试试9.6f-6.9f。</p>
+<h3 id="指数全零问题">指数全零问题</h3>
+<p>全部为零的指数说明当前所表示的是一个特殊的float数字。全零的float类型分为两种情况：</p>
+<ul>
+<li><p><strong>尾数全零</strong><br>此时代表当前float数为0。根据符号位，分为+0和-0。这两个在JVM上相等的。这里需要解释一下。因为IEEE的默认1的问题，所以float类型没有办法表示0，因此只能在已有的规定上做一些强制性的规则来表示0，也就有了上面的这个全零的说法。 </p>
+</li>
+<li><p><strong>尾数不全为零</strong><br>此时说明当前的float数是一个非规格化的数。</p>
+</li>
+</ul>
+<h3 id="指数全一问题">指数全一问题</h3>
+<p>指数全部为一也说明这个float数是一个不寻常的数字。它也分为两种情况：</p>
+<ul>
+<li><p><strong>尾数全零</strong><br>此时根据符号位的不同，分为正无穷（+infinity）和负无穷（-infinity）。注意，这两个东西在JVM中是不相等的。</p>
+</li>
+<li><p><strong>尾数不全为零</strong><br>此时表示此float数纯粹不是一个数（NaN，Not a Number）。这个NaN也分QNaN（Quiet NaN）和SNaN（Signalling NaN）。至于这两个NaN有什么区别，下面这段话倒是说明了，但是我没有这方面的知识，所以不敢妄加翻译，只好把原文放在这里：</p>
+</li>
+</ul>
+<p>A QNaN is a NaN with the most significant fraction bit set. QNaN’s propagate freely through most arithmetic operations. These values pop out of an operation when the result is not mathematically defined.<br>An SNaN is a NaN with the most significant fraction bit clear. It is used to signal an exception when used in operations. SNaN’s can be handy to assign to uninitialized variables to trap premature usage.<br>Semantically, QNaN’s denote indeterminate operations, while SNaN’s denote invalid operations.</p>
+<p>最后一句话说的明白，QNaN就是一个不确定操作的结果，而SNaN纯粹就是一个非法的操作结果。</p>
+<p>OK，废话了这么多，我觉得对float类型也大致有个了解了。float明白了以后，double类型也就好说了，基本和上面一样，只是指数和尾数的位数不一样而已。</p>
+<p><a href="http://blog.csdn.net/nethibernate/article/details/6120382" title="原始出处" target="_blank" rel="external">原始出处</a></p>
+<h2 id="我的话">我的话</h2>
+<p>这个作者写的很好，很好的说明了 float 在内存中是怎么存放的。从这里可以看得出，为什么 float 运算比 int 要慢很多（多了太多的运算）。所以以前嵌入式 Soc 不给力的时候嵌入式的 app 一般不使用 float。现在我能理解以前 MiniGUI 用定点数代替 float 的做法了：</p>
+<p>就是把一个 int 类型拆成2部分：例如 32bit 的，高 16bit 当作整数部分，低 16bit 当作小数部分来表示和运算。这样的话，因为整数和小数的位数都是固定的，所以叫定点数。这样表示 float 的方法比正统的 float 要快很多，虽然精度比 float 差，但是在一些不太要紧的场合很实用。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/basics/">basics</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Basics-Knowledge/">Basics Knowledge</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/19/[转] float 类型在内存中的表示/" data-title="(转) float 类型在内存中的表示 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/19/MiniGUI 自定义控件教程1/" title="MiniGUI 自定义控件教程1">
+  <strong>上一篇:</strong><br/>
+  <span>
+  MiniGUI 自定义控件教程1</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/19/Endianness/"  title="Endianness">
+ <strong>下一篇:</strong><br/> 
+ <span>Endianness
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#标准"><span class="toc-number">1.</span> <span class="toc-text">标准</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#整数"><span class="toc-number">1.1.</span> <span class="toc-text">整数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#小数"><span class="toc-number">1.2.</span> <span class="toc-text">小数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实例"><span class="toc-number">2.</span> <span class="toc-text">实例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#需要注意的东西"><span class="toc-number">3.</span> <span class="toc-text">需要注意的东西</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#23位尾数填充的问题"><span class="toc-number">3.1.</span> <span class="toc-text">23位尾数填充的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#运算时向右对阶操作的舍入问题"><span class="toc-number">3.2.</span> <span class="toc-text">运算时向右对阶操作的舍入问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#指数全零问题"><span class="toc-number">3.3.</span> <span class="toc-text">指数全零问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#指数全一问题"><span class="toc-number">3.4.</span> <span class="toc-text">指数全一问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#我的话"><span class="toc-number">4.</span> <span class="toc-text">我的话</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

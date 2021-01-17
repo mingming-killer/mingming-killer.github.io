@@ -1,0 +1,494 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>Android 开机启动画面分析 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="android 开机启动画面一共有3种：
+framebuffer logo
+在 linux kernel framebuffer 驱动中的 logo（代码在 kernel/drivers/video/fbmem.c）。是一个 ppm 文件。可以通过工具制作（下面这些工具在 ubuntu 上自己安装相">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/28/Android 开机启动画面分析/" title="Android 开机启动画面分析" itemprop="url">Android 开机启动画面分析</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-28T11:46:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    更新日期:<time datetime="2015-01-28T11:46:16.000Z" itemprop="dateModified">2015 1月 28</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#framebuffer_logo"><span class="toc-number">1.</span> <span class="toc-text">framebuffer logo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#init_启动画面"><span class="toc-number">2.</span> <span class="toc-text">init 启动画面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bootanimtion"><span class="toc-number">3.</span> <span class="toc-text">bootanimtion</span></a></li></ol>
+		</div>
+		
+		<p>android 开机启动画面一共有3种：</p>
+<h2 id="framebuffer_logo">framebuffer logo</h2>
+<p>在 linux kernel framebuffer 驱动中的 logo（代码在 kernel/drivers/video/fbmem.c）。是一个 ppm 文件。可以通过工具制作（下面这些工具在 ubuntu 上自己安装相应的工具就可以）：</p>
+<ol>
+<li>pngtopnm logo.png &gt; logo_linux.pnm</li>
+<li>pnmquant 224 logo_linux.pnm &gt; logo_linux_clut224.pnm</li>
+<li>pnmtoplainpnm logo_linux_clut224.pnm &gt; logo_linux_clut224.ppm</li>
+<li>替换 kernel/drivers/video/logo 下的文件即可。</li>
+</ol>
+<p>这是最早的静态启动画面。一般产品发布的时候会把这个 logo 去掉的，一般是一个小企鹅，比较丑的说。这里不做过多分析。</p>
+<h2 id="init_启动画面">init 启动画面</h2>
+<p>开机的 init (代码在 system/core/init 下面)进程的启动 logo，是一张静态图片（init 的分析可以参考《深入理解 Android 卷I》的第3章）。在其中一个 action 中会调用 load 去加载 565 rle 格式的一张图片，然后写入 framebuffer 中显示出来：</p>
+<p>init.c:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">int</span> console_init_action(<span class="keyword">int</span> nargs, <span class="keyword">char</span> **args)</div><div class="line">{</div><div class="line">    <span class="keyword">int</span> fd;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (console[<span class="number">0</span>]) {</div><div class="line">        <span class="built_in">snprintf</span>(console_name, <span class="keyword">sizeof</span>(console_name), <span class="string">"/dev/%s"</span>, console);</div><div class="line">    }</div><div class="line"></div><div class="line">    fd = open(console_name, O_RDWR);</div><div class="line">    <span class="keyword">if</span> (fd &gt;= <span class="number">0</span>)</div><div class="line">        have_console = <span class="number">1</span>;     </div><div class="line">    close(fd);</div><div class="line">    </div><div class="line">    <span class="comment">// 加载 565 rle 图片并且显示</span></div><div class="line">    <span class="comment">// INIT_IMAGE_FILE 定义是 /initlogo.rle，最终打包在 ramdisk.img 里面的</span></div><div class="line">    <span class="comment">// 一般 OEM 定制可以把自己制作好的 rle 放到 devices 下面</span></div><div class="line">    <span class="keyword">if</span>( load_565rle_image(INIT_IMAGE_FILE) ) {</div><div class="line">        <span class="comment">// 如果没有图片或是加载失败，者直接往 fb 中写入 ANDROID 这几个字符</span></div><div class="line">        fd = open(<span class="string">"/dev/tty0"</span>, O_WRONLY); </div><div class="line">        <span class="keyword">if</span> (fd &gt;= <span class="number">0</span>) {</div><div class="line">            <span class="keyword">const</span> <span class="keyword">char</span> *msg;  </div><div class="line">                msg = <span class="string">"\n"</span>    </div><div class="line">            <span class="string">"\n"</span></div><div class="line">            <span class="string">"\n"</span></div><div class="line">            <span class="string">"\n"</span></div><div class="line">            <span class="string">"\n"</span></div><div class="line">            <span class="string">"\n"</span>              </div><div class="line">            <span class="string">"\n"</span>  <span class="comment">// console is 40 cols x 30 lines</span></div><div class="line">            <span class="string">"\n"</span></div><div class="line">            <span class="string">"\n"</span></div><div class="line">            <span class="string">"\n"</span></div><div class="line">            <span class="string">"\n"</span></div><div class="line">            <span class="string">"\n"</span></div><div class="line">            <span class="string">"\n"</span></div><div class="line">            <span class="string">"\n"</span></div><div class="line">            <span class="string">"             A N D R O I D "</span>; </div><div class="line">            write(fd, msg, <span class="built_in">strlen</span>(msg));   </div><div class="line">            close(fd);</div><div class="line">        }</div><div class="line">    }</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>logo.c:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> load_565rle_image(<span class="keyword">char</span> *fn)</div><div class="line">{</div><div class="line">    <span class="keyword">struct</span> FB fb;</div><div class="line">    <span class="keyword">struct</span> stat s;</div><div class="line">    <span class="keyword">unsigned</span> <span class="keyword">short</span> *data, *bits, *ptr;</div><div class="line">    <span class="keyword">unsigned</span> count, max;</div><div class="line">    <span class="keyword">int</span> fd;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (vt_set_mode(<span class="number">1</span>)) </div><div class="line">        <span class="keyword">return</span> -<span class="number">1</span>; </div><div class="line"></div><div class="line">    <span class="comment">// 打开 rle 文件</span></div><div class="line">    fd = open(fn, O_RDONLY);</div><div class="line">    <span class="keyword">if</span> (fd &lt; <span class="number">0</span>) {</div><div class="line">        ERROR(<span class="string">"cannot open '%s'\n"</span>, fn);</div><div class="line">        <span class="keyword">goto</span> fail_restore_text;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (fstat(fd, &s) &lt; <span class="number">0</span>) {</div><div class="line">        <span class="keyword">goto</span> fail_close_file;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="comment">// 将 rle 文件读入内存</span></div><div class="line">    data = mmap(<span class="number">0</span>, s.st_size, PROT_READ, MAP_SHARED, fd, <span class="number">0</span>); </div><div class="line">    <span class="keyword">if</span> (data == MAP_FAILED)</div><div class="line">        <span class="keyword">goto</span> fail_close_file;</div><div class="line"></div><div class="line">    <span class="comment">// 打开 fb，并 mmap 映射到程序内存（这个函数的实现在 logo.c 里面）</span></div><div class="line">    <span class="keyword">if</span> (fb_open(&fb))</div><div class="line">        <span class="keyword">goto</span> fail_unmap_data;</div><div class="line"></div><div class="line">    max = fb_width(&fb) * fb_height(&fb);</div><div class="line">    ptr = data;</div><div class="line">    count = s.st_size;</div><div class="line">    bits = fb.bits;</div><div class="line">    <span class="comment">// 把 rle 数据写入 fb，这个写法要参看 rle 的格式</span></div><div class="line">    <span class="keyword">while</span> (count &gt; <span class="number">3</span>) {</div><div class="line">        <span class="keyword">unsigned</span> n = ptr[<span class="number">0</span>];</div><div class="line">        <span class="keyword">if</span> (n &gt; max)</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        android_memset16(bits, ptr[<span class="number">1</span>], n &lt;&lt; <span class="number">1</span>); </div><div class="line">        bits += n;</div><div class="line">        max -= n;</div><div class="line">        ptr += <span class="number">2</span>;</div><div class="line">        count -= <span class="number">4</span>;</div><div class="line">    }</div><div class="line"></div><div class="line">    munmap(data, s.st_size);</div><div class="line">    fb_update(&fb);</div><div class="line">    fb_close(&fb);</div><div class="line">    close(fd);</div><div class="line">    unlink(fn);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line"></div><div class="line">fail_unmap_data:</div><div class="line">    munmap(data, s.st_size);</div><div class="line">fail_close_file:</div><div class="line">    close(fd);</div><div class="line">fail_restore_text:</div><div class="line">    vt_set_mode(<span class="number">0</span>);</div><div class="line">    <span class="keyword">return</span> -<span class="number">1</span>;</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p><code>load_565rle_image</code> 函数的输入参数是一个 rle 文件，该函数会把这个文件内容转换为rgb565，写入 framebuffer。以下百度百科来的 rle 简介 <a href="http://baike.baidu.com/view/18819.htm?fromTaglist" title="rle简介" target="_blank" rel="external">rle简介</a> ：</p>
+<p>RLE全称（run-length encoding），翻译为游程编码，又译行程长度编码，又称变动长度编码法（run coding），在控制论中对于二值图像而言是一种编码方法，对连续的黑、白像素数(游程)以不同的码字进行编码。游程编码是一种简单的非破坏性资料压缩法，其好处是加压缩和解压缩都非常快。其方法是计算连续出现的资料长度压缩之。</p>
+<p>RLE 文件格式为 [count(2 bytes), color(2 bytes)], count最大为 65535； color 为 RGB565, 当然也可以是 YUV422 ，我觉得只要是 2bytes 以下的都可以，但是由于最终我们写入到 framebuffer 中的都是 RGB565，从效率的角度，rle 文件的 color 值为RGB565最好。</p>
+<p><code>load_565rel_image</code> 源码第141行：写入n个像素点，像素点的 color 值是 rle 中的原始数据，这对于 rgb565 的 framebuffer 没有问题，但是如果 framebuffer 是RGB32（ARGB），就无法工作了。解决办法是做个转换，把 2bytes 的 RGB565 转换为 4bytes 的 ARGB 即可:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#<span class="keyword">define</span> rgb32_r(rle) (((rle & 0xf800) &gt;&gt; 11) &lt;&lt; 3)</span></div><div class="line"><span class="preprocessor">#<span class="keyword">define</span> rgb32_g(rle) (((rle & 0x07e0) &gt;&gt; 5 &lt;&lt; 2))</span></div><div class="line"><span class="preprocessor">#<span class="keyword">define</span> rgb32_b(rle) (((rle & 0x001f) &lt;&lt; 3))</span></div><div class="line"><span class="preprocessor">#<span class="keyword">define</span> rgb32(rle) (rgb32_r(rle) &lt;&lt; 16 | rgb32_g(rle) &lt;&lt; 8 | rgb32_b(rle) &lt;&lt; 0) </span></div><div class="line"></div><div class="line"></div><div class="line">        <span class="keyword">unsigned</span> <span class="keyword">int</span> *bits;</div><div class="line">        bits = (<span class="keyword">unsigned</span> <span class="keyword">int</span> *)fb.bits;</div><div class="line">        <span class="keyword">while</span> (count &gt; <span class="number">3</span>) {</div><div class="line">            <span class="keyword">unsigned</span> n = ptr[<span class="number">0</span>];</div><div class="line">            <span class="keyword">if</span> (n &gt; max)</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            out = rgb32(ptr[<span class="number">1</span>]);</div><div class="line">            android_memset32(bits, out, n &lt;&lt; <span class="number">2</span>);</div><div class="line">            bits += n;</div><div class="line">            max -= n;</div><div class="line">            ptr += <span class="number">2</span>;</div><div class="line">            count -= <span class="number">4</span>;</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>现在再回去，看看怎么得到 rle 格式的文件，一般来说分两步走，先把原始图片转为RGB565，然后再把 RGB565 转为 rle（当然不是必需的，如果有个能把 png 直接转为 rle 的工具）。</p>
+<ol>
+<li>先用 GMIP 生成一个 800X480 的 png 文件，为什么是 800x480，图片大小必须和屏大小一致，至于是不是 png 无所谓，只要有工具能转为 RGB565 即可</li>
+<li>convert 命令 png 为 RGB565: <code>convert -depth 8 android_logo.png rgb:android_logo.raw</code></li>
+<li>转换 RGB565 为 rle 文件（这个工具是源码编译出来的，在 out/host/linux-x86/bin 下面）：<code>rgb2565 -rle &lt; android_logo.raw &gt; initlogo.rle</code> </li>
+<li>替换 ramdisk 中的 initlogo.rle，重新启动即可看到新的启动画面（这个是标准的，不同的平台这个东西在的地方可能不一样）。</li>
+</ol>
+<p>注意 <code>load_565rle_image</code> 152行 unlink(fn) 会删除 initlogo.rle 文件，进入系统后，会发现 /initlogo.rle 文件已经被删除了，这样可以节约一点 ramdisk 文件系统的内存空间，对于 ramdisk 做 rootfs，这没有问题，因为 ramdisk 镜像本身并没有被修改。但是如果根文件系统是其他文件系统，就需要把 unlink(fn) 注释掉，以防止 initlog.rle 被永久删除。</p>
+<p>其实 rle 在一段是我抄别人的： <a href="http://blog.csdn.net/kickxxx/article/details/7548670" title="参考" target="_blank" rel="external">参考</a></p>
+<h2 id="bootanimtion">bootanimtion</h2>
+<p>bootanimtion 是 system/bin 下的一个本地程序（代码在 framework/base/cmds/bootanimation 下面），在 inin.rc 中会有以下的定义：</p>
+<pre config="brush:bash;toolbar:false;">
+service bootanim /system/bin/bootanimation
+    user graphics
+    group graphics
+    disabled
+    oneshot
+</pre>
+
+<p>会在 surfaceflinger 刚启动的时候启动（surfaceflinger 中的 startBootAnim 通过 property_set(“ctl.start”, “bootanim”) 通过 property 服务启动 bootanimation， 在 init.rc 中定义的 service）。 这个程序会一直循环的贴图（这里的动画就是通过不停的贴图来实现的），然后每个循环检测一个 property 值，如果这个值被设置了，就会退出循环。这个值由 surfaceflinger 写入， surfaceflinger 初始化好之后， framework 显示可以正工作了，就让 bootanimation 退出了（bootFinished 中 写入这个值）。当然上层在这里有超时设置的，如果在一段时间这个 property 值没有被设置的话， bootanimation 也会被强制终止掉。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> BootAnimation::checkExit() {</div><div class="line">    <span class="comment">// Allow surface flinger to gracefully request shutdown</span></div><div class="line">    <span class="keyword">if</span>(mShutdown)<span class="comment">//shutdown animation</span></div><div class="line">        {   </div><div class="line">        <span class="keyword">return</span>;</div><div class="line">        }   </div><div class="line"></div><div class="line">    <span class="keyword">char</span> value[PROPERTY_VALUE_MAX];</div><div class="line">    property_get(EXIT_PROP_NAME, value, <span class="string">"0"</span>);</div><div class="line">    <span class="keyword">int</span> exitnow = atoi(value);</div><div class="line">    <span class="keyword">if</span> (exitnow) {</div><div class="line">        requestExit();</div><div class="line">    }</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>上面配置可以看得到 bootanimation 被配置到了 graphics 组，这个组可以绘制图像，但是没有写 property 的权限（可以自己去看提供 property 的服务代码），不过有读的权限。所以 bootanimation 是不能靠写入 property 来和上层的 services 进行通信的（我之前曾经想这么做 -_-||）。</p>
+<p>bootanimation 是通过 GL 来进行绘制的（简单、粗暴、有效哈），通过 OES 扩展能比较轻松的进行 2D 贴图。 bootaniamtion 会去找 /system/media/bootanimation.zip 这个动画包，如果没有的话，就会显示 android 一排闪亮的字（用 native 的 AssetManager 去加载 framework/base/core/res/assets/image 下面的 android-logo-mask.png 和 android-logo-shine.png 这2张图片的），如果有的会则会解析这个 zip 包。然后读取里面 desc.txt 这个配置文件，设置一些动画属性，然后循环绑定纹理开始贴图。</p>
+<p>动画分为2个部分：配置文件（固定为  desc.txt）、资源图片（仅支持 png 格式）。 desc.txt 和 ini 文件类似，一行、一行解析的，分为2种格式：</p>
+<p>xx xx xx： 3个参数的，前2个是图像的宽、高，后面一个动画的 fps。例如：768 324 10，表示图像是 768x324，动画以 10fps 播放。这种一般就写一行就行了，写多了后面的会覆盖前面的配置的。如果这个分辨率比屏幕分辨率低的话，就会居中显示。这个分辨率最好和图片一样，否则会缩放的（GL 的纹理贴图，默认代码 GL 纹理选项没开最好的过滤方式，所以最好不要缩放）。</p>
+<p>xx xx xx xx： 4个参数的，是用来描述动画组成部分的（part），android 的开机动画 part 分为2种类型，一种是循环有限次数播放的，播放完指定次数这个 part 就结束了，进入到下一个 part；一种是无限循环播放的，直到开机初始化完成，bootanimation 进程结束（一般就2个 part，第一个不循环的，第二个循环的，应该可以写多与3个的 part，但是一般都不这么做）。第一个参数表示 part 是否必需要等到播放完成才能结束（就是说这个 part 能不能被中断，例如说开机初始化很快，动画还没播放就初始化好了，这个时候 bootanimation 进程会接收到上层 framework 请求终止的消息）， 填 ‘c’ 表示必需要等到这个 part 不能被终止（就是要必需被播放完，不能被提前终止）。填其它的表示可以被提前终止（一般填写 ‘p’）。第二参数表示这个 part 的循环次数。如果填 0 就表示是无限循环的，大于 0 就是循环次数。注意一下，不要第一个参数填 ‘c’，这个参数填 0，这样填写开机动画就真*无限循环了。第三个参数表示循环之间的等待时间（单位是以 fps 帧数来算的，例如10就是表示等待10帧），就是播放一次循环后，等多长时间开始下一次循环。第四个参数表示这个 part 使用的图片资源的路径。在 zip 包中不同的 part 要建立不同的文件夹（例如 part1/, part2/），图片以 frame 动画的编号命名放好，例如 f0000、f0001、f0002。例如：</p>
+<pre config="brush:bash;toolbar:false;">
+p 1 0 part1
+p 0 10 part2
+</pre>
+
+<p>表示开机动画有 2个 part， 2个part 都可以被提前终止，第一个 part 循环一次（只播放一次），由于只播放一次所以循环等待时间填0，图片路径为 part1；第二个 part 无限循环，每个 part 之间等待时间为 10，图片路径为 part2 。</p>
+<p>这个命名上面要注意一下，代码里面使用了一个以名字来排序的 Vector 来存储动画帧图片。所以名字可以是 <code>xx_0001</code>, <code>xx_0002</code>， 也可以是 x0001, x0002，只要是名字的字符能够正确的排序就行了，不要作死的搞一些奇怪的名字就行。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">struct</span> Animation {</div><div class="line">    <span class="keyword">struct</span> Frame {</div><div class="line">        String8 name;</div><div class="line">        FileMap* <span class="built_in">map</span>;   </div><div class="line">        <span class="keyword">mutable</span> GLuint tid;</div><div class="line">        <span class="comment">// 以名字来排序</span></div><div class="line">        <span class="keyword">bool</span> <span class="keyword">operator</span> &lt; (<span class="keyword">const</span> Frame& rhs) <span class="keyword">const</span> {</div><div class="line">            <span class="keyword">return</span> name &lt; rhs.name;</div><div class="line">        }</div><div class="line">    };</div><div class="line">    <span class="keyword">struct</span> Part {</div><div class="line">        <span class="keyword">int</span> count;</div><div class="line">        <span class="keyword">int</span> pause;</div><div class="line">        String8 path;</div><div class="line">        <span class="comment">// 排序的 vector </span></div><div class="line">        SortedVector&lt;Frame&gt; frames;</div><div class="line">        <span class="keyword">bool</span> playUntilComplete;</div><div class="line">    };</div><div class="line">    <span class="keyword">int</span> fps;</div><div class="line">    <span class="keyword">int</span> width;</div><div class="line">    <span class="keyword">int</span> height;</div><div class="line">    Vector&lt;Part&gt; parts;</div><div class="line">};</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>当然，可以自己弄一些其他格式的，例如说只有一个参数的，代表背景颜色。这个主要是我弄的一个芯片 GPU 性能不行， 但是产品偏要用非黑色背景的 bootanimation，要用非黑色背景的只能把图片做成全屏的，但是 GPU 不行，绑纹理速度太慢了，贴全屏的图片卡得和幻灯片一样。所以我就多搞了一个配置，用来指定背景颜色（默认 GL clear color 是黑色的）。这里 GL 调用是很原始的，要自己手动调用 eglSwapBuffers(mDisplay, mSurface); 才会刷新。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (;;) {</div><div class="line">    <span class="keyword">const</span> <span class="keyword">char</span>* endl = <span class="built_in">strstr</span>(s, <span class="string">"\n"</span>);</div><div class="line">    <span class="keyword">if</span> (!endl) <span class="keyword">break</span>;</div><div class="line">    String8 line(s, endl - s);     </div><div class="line">    <span class="keyword">const</span> <span class="keyword">char</span>* l = line.<span class="built_in">string</span>(); </div><div class="line">    <span class="keyword">int</span> fps, width, height, count, pause;</div><div class="line">    <span class="keyword">char</span> path[<span class="number">256</span>];       </div><div class="line">    <span class="keyword">char</span> pathType;</div><div class="line">    <span class="comment">// 3个参数的</span></div><div class="line">    <span class="keyword">if</span> (<span class="built_in">sscanf</span>(l, <span class="string">"%d %d %d"</span>, &width, &height, &fps) == <span class="number">3</span>) { </div><div class="line">        <span class="comment">//ALOGD("&gt; w=%d, h=%d, fps=%d", width, height, fps);</span></div><div class="line">        <span class="keyword">if</span> (mReverseAxis) {            </div><div class="line">            animation.width = height;      </div><div class="line">            animation.height = width;      </div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            animation.width = width;       </div><div class="line">            animation.height = height;     </div><div class="line">        }</div><div class="line">        animation.fps = fps;           </div><div class="line">    }</div><div class="line">    <span class="comment">// 4个参数的</span></div><div class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">sscanf</span>(l, <span class="string">" %c %d %d %s"</span>, &pathType, &count, &pause, path) == <span class="number">4</span>) {</div><div class="line">        <span class="comment">//ALOGD("&gt; type=%c, count=%d, pause=%d, path=%s", pathType, count, pause, path);</span></div><div class="line">        Animation::Part part;          </div><div class="line">        part.playUntilComplete = pathType == <span class="string">'c'</span>;</div><div class="line">        part.count = count;            </div><div class="line">        part.pause = pause;            </div><div class="line">        part.path = path;</div><div class="line">        animation.parts.add(part);     </div><div class="line">    }</div><div class="line">    <span class="comment">// 我自己加得一个参数的，指定背景颜色的</span></div><div class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">sscanf</span>(l, <span class="string">"%d"</span>, &bkColor) == <span class="number">1</span>) {</div><div class="line">        <span class="comment">// add by hmm@dw.gdbb.com      </span></div><div class="line">        <span class="comment">// for support specific bootanimtion background color.</span></div><div class="line">        <span class="comment">// due our GPU is pool, it's can't use full screen(1280x800 or 1920x1080) bitmap as</span></div><div class="line">        <span class="comment">// bootanimtion frame, so we can set background color to reduce the bitmap size.</span></div><div class="line">        <span class="comment">// the background is 10 hex base on RGB(e.g: 0x028cd6 ==&gt; 167162).</span></div><div class="line">        bkR = (<span class="keyword">float</span>)((bkColor & <span class="number">0x00ff0000</span>) &gt;&gt; <span class="number">16</span>) / <span class="number">255.0f</span>; </div><div class="line">        bkG = (<span class="keyword">float</span>)((bkColor & <span class="number">0x0000ff00</span>) &gt;&gt;  <span class="number">8</span>) / <span class="number">255.0f</span>; </div><div class="line">        bkB = (<span class="keyword">float</span>)(bkColor & <span class="number">0x000000ff</span>)         / <span class="number">255.0f</span>;</div><div class="line">        ALOGD(<span class="string">"read bkColor=0x%x, r=%f, g=%f, b=%f"</span>, bkColor, bkR, bkG, bkB);</div><div class="line">    }</div><div class="line"></div><div class="line">    s = ++endl;</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>特别注意一点，关于 bootanimation .zip 这个包打 zip 包的时候，里面的资源文件只能选择 store 模式（即存储模式），因为在代码里面， bootanimation 里面只认 zip 的 store 模式的文件（即不支持压缩）。打包的时候不要选择压缩文件，否则开机动画播不出来的。用 zip -r -0 bootanimation.zip part0/ part1/ desc.txt 就可以指定以存储方式打包，不压缩。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// read all the data structures</span></div><div class="line"><span class="keyword">const</span> size_t pcount = animation.parts.size();</div><div class="line"><span class="keyword">for</span> (size_t i=<span class="number">0</span> ; i&lt;numEntries ; i++) {</div><div class="line">    <span class="keyword">char</span> name[<span class="number">256</span>];</div><div class="line">    ZipEntryRO entry = zip.findEntryByIndex(i);</div><div class="line">    <span class="keyword">if</span> (zip.getEntryFileName(entry, name, <span class="number">256</span>) == <span class="number">0</span>) {</div><div class="line">        <span class="keyword">const</span> String8 entryName(name);</div><div class="line">        <span class="keyword">const</span> String8 path(entryName.getPathDir());</div><div class="line">        <span class="keyword">const</span> String8 leaf(entryName.getPathLeaf());</div><div class="line">        <span class="keyword">if</span> (leaf.size() &gt; <span class="number">0</span>) {</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j=<span class="number">0</span> ; j&lt;pcount ; j++) {</div><div class="line">                <span class="keyword">if</span> (path == animation.parts[j].path) {</div><div class="line">                    <span class="keyword">int</span> method;</div><div class="line">                    <span class="comment">// 只支持存储格式的 png 文件</span></div><div class="line">                    <span class="comment">// supports only stored png files</span></div><div class="line">                    <span class="keyword">if</span> (zip.getEntryInfo(entry, &method, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)) {</div><div class="line">                        <span class="keyword">if</span> (method == ZipFileRO::kCompressStored) {</div><div class="line">                            FileMap* <span class="built_in">map</span> = zip.createEntryFileMap(entry);</div><div class="line">                            <span class="keyword">if</span> (<span class="built_in">map</span>) {</div><div class="line">                                Animation::Frame frame;</div><div class="line">                                frame.name = leaf;</div><div class="line">                                frame.<span class="built_in">map</span> = <span class="built_in">map</span>;</div><div class="line">                                Animation::Part& part(animation.parts.editItemAt(j));</div><div class="line">                                part.frames.add(frame);</div><div class="line">                            }</div><div class="line">                        }</div><div class="line">                    }</div><div class="line">                }</div><div class="line">            }</div><div class="line">        }</div><div class="line">    } </div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>rk 的修改的 bootanimation 支持的开机音效 ogg 文件固定为/system/media/audio/boot.ogg ，打包 system 的时候放自己的 boot.ogg 到这个路径下面就有开机音效了，不放就没有（放的方法参照定制系统音效那里）。</p>
+<p>制作好了 bootanimation.zip  在打包 system 的时候 copy 到system/media 下面。修改 device/rockchip/Hx/Hx.mk 添加<br>PRODUCT_COPY_FILES += \<br>    $(LOCAL_PATH)/bootanimation.zip:system/media/bootanimation.zip</p>
+<p>当然上面这些框框条条可以自行修改 bootaniamtion 这个模块，增加新的参数，实现新的功能（以前君正的开机音效就是增加了一个参数，把音效 ogg 文件一起打包进 bootanimation.zip 里面去了）。</p>
+<p>这里贴一下 rk 播音效的代码，可以参考一下， native 层调用 MediaPlayer 播放音频文件：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> BootAnimation::playMusic()</div><div class="line">{</div><div class="line">    <span class="keyword">char</span> property[PROPERTY_VALUE_MAX];</div><div class="line">    <span class="keyword">bool</span> enable = <span class="keyword">true</span>;</div><div class="line">    <span class="keyword">if</span> ( property_get( BOOT_MUSIC_PROPERTY, property, <span class="string">"true"</span> ) &gt; <span class="number">0</span> ){</div><div class="line">        enable = !<span class="built_in">strcmp</span>(property, <span class="string">"true"</span>);</div><div class="line">    }</div><div class="line"></div><div class="line">    ALOGD( <span class="string">"BootAnimation::playMusic...enable:%s"</span>, enable ? <span class="string">"true"</span> : <span class="string">"false"</span> );</div><div class="line"></div><div class="line">    <span class="keyword">if</span>( enable ){</div><div class="line">        sp&lt;MediaPlayer&gt; mp = <span class="keyword">new</span> MediaPlayer();</div><div class="line">        <span class="comment">// 这里好像是检测能否正常访问音频文件</span></div><div class="line">        <span class="keyword">if</span> ((<span class="number">0</span> == access(BOOTMUSIC_FILE, F_OK)) && mp != NULL) {</div><div class="line">            mp-&gt;setDataSource(BOOTMUSIC_FILE, NULL);</div><div class="line">            mp-&gt;prepare();</div><div class="line">            mp-&gt;start();</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Framework/">Android Framework</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/28/Android 开机启动画面分析/" data-title="Android 开机启动画面分析 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/28/Android Surface flinger 颜色格式分析/" title="Android Surface flinger 颜色格式分析">
+  <strong>上一篇:</strong><br/>
+  <span>
+  Android Surface flinger 颜色格式分析</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/28/vold share 操作清理正在使用磁盘的进程分析/"  title="vold share 操作清理正在使用磁盘的进程分析">
+ <strong>下一篇:</strong><br/> 
+ <span>vold share 操作清理正在使用磁盘的进程分析
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#framebuffer_logo"><span class="toc-number">1.</span> <span class="toc-text">framebuffer logo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#init_启动画面"><span class="toc-number">2.</span> <span class="toc-text">init 启动画面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bootanimtion"><span class="toc-number">3.</span> <span class="toc-text">bootanimtion</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

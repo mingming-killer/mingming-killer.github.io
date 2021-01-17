@@ -1,0 +1,457 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>工作小笔记——拦截应用内置广告.拦截篇 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="上一篇说到怎么检测一个应用是否带有广告。那么现在就来说说怎么拦截广告。在开始之前首先感谢看雪论坛的牛人的分享，后面的方法基本是借鉴别人的想法的。
+拦截思路
+修改 hosts
+以前在 PC 通过修改 hosts 来访问 google 的哥们对这个东西应该不陌生吧。同样在 android 也有这个东西。">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/31/工作小笔记——拦截应用内置广告.拦截篇/" title="工作小笔记——拦截应用内置广告.拦截篇" itemprop="url">工作小笔记——拦截应用内置广告.拦截篇</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-31T02:46:16.000Z" itemprop="datePublished">2015 1月 31</time>
+    更新日期:<time datetime="2015-01-31T02:46:16.000Z" itemprop="dateModified">2015 1月 31</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#拦截思路"><span class="toc-number">1.</span> <span class="toc-text">拦截思路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#修改_hosts"><span class="toc-number">1.1.</span> <span class="toc-text">修改 hosts</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#注入系统服务，屏蔽广告_view"><span class="toc-number">1.2.</span> <span class="toc-text">注入系统服务，屏蔽广告 view</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">2.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#root"><span class="toc-number">2.1.</span> <span class="toc-text">root</span></a></li></ol></li></ol>
+		</div>
+		
+		<p>上一篇说到怎么检测一个应用是否带有广告。那么现在就来说说怎么拦截广告。在开始之前首先感谢看雪论坛的牛人的<a href="http://bbs.pediy.com/showthread.php?p=1158941" title="分享" target="_blank" rel="external">分享</a>，后面的方法基本是借鉴别人的想法的。</p>
+<h2 id="拦截思路">拦截思路</h2>
+<h3 id="修改_hosts">修改 hosts</h3>
+<p>以前在 PC 通过修改 hosts 来访问 google 的哥们对这个东西应该不陌生吧。同样在 android 也有这个东西。在 /system/etc/hosts 然后整个 /system/etc 链接到了根目录的 /etc 。</p>
+<p>有了这个文件，网络请求就优先去读这个文件中的配置，如果 hosts 中有要访问的域名，就不会去请求 DNS 解析，所以如果把那些广告的域名写到这个文件里面，然后设置成 127.0.0.1 的话，那些广告 sdk 就无法从广告服务器获取广告数据了，就无法展现出来了。例如这样（下面这2个是 google ad 的）：</p>
+<pre>
+127.0.0.1 adwords.google.com
+127.0.0.1 adwords.google.sk
+</pre>
+
+<p>然后这样设置的话，一般那些广告 sdk 访问网络都会报一个 xx hosts 无法解析的网络异常错误。</p>
+<p>前面看雪论坛的哥们分析了乐安全是用这种方式的，我研究了下腾讯的手机管家，也是用这种方式。腾讯管家，是你勾选了那些应用，那就对应把这几个应用使用的广告 sdk 的广告域名写道 /system/etc/hosts 中。每次设置完后，去看 hosts 文件的更新日期就发现被改变了。</p>
+<p>这种方法需要 root 权限，因为 system 分区是只读的，写 hosts 之前得先 remount 成读写的，而且 remount 成读写的之后，写也需要 root 权限。</p>
+<p>这种方法比较简单。能够阻止广告 sdk 去服务器取数据，不仅省去广告的骚扰，而且能够节省广告的流量开销（当然在 wifi only 的平板上可以忽略这点）。但是同时广告 sdk 方也很容易应对。 hosts 文件只能记录对应一个域名，广告 sdk 只要定期随机更换域名去取广告数据就能够避免被屏蔽了（好像多盟广告就已经这么干了）。</p>
+<h3 id="注入系统服务，屏蔽广告_view">注入系统服务，屏蔽广告 view</h3>
+<p>这个属于比较高级（麻烦）的做法。具体的去看前面贴出那个看雪论坛的哥们分析的金山手机毒霸的帖子吧。简单来说就是向 system server 注入自己的代码，然后在 view 处理流程中检测出 activity 中的广告 view （一般的广告都有一个 view 作为载体的），然后把这个 view 屏蔽掉（设置为 GONE）。</p>
+<p>这个也是需要 root 的（进程注入的 api 正常是用来调试用的，只允许注入子进程，但是 root 没有这个限制）。然后实现起来很麻烦。而且会影响正常的程序的效率。在 view 布局的流程加了一道这种工序。而且可能会影响某些程序的运行。因为是把广告 view 设置为 GONE 了。有些比较二的程序（不排除是故意）布局是以广告 view 为基准点的，你把它设置为 GONE 了，界面就全乱了（你把哥的广告屏蔽了，哥就不让你用了）。而且这种方法，广告还是把流量给跑了，只是没展现出来而已（就是说最终只是便宜了运营商而已）。</p>
+<h2 id="实现">实现</h2>
+<p>这里我选择了比较简单的修改 hosts 方法来实现。后一种方法实现太麻烦了。这里要改 hosts，我从网上找了一个网友收集的，还是挺多的，可以先暂时用着。然后你的程序可以写成 hosts 定时从服务器上更新，这样有新广告的时候也可以更新 hosts。但是最主要的问题是 root。腾讯手机管家，要使用这个功能，需要用户已经 root 了设备。这里我们就有想办法在手机上 root 了（俗称手机上一键 root）。</p>
+<h3 id="root">root</h3>
+<p>非 fastboot 刷机模式的 root 都是通过漏洞来提升自己的进程的权限来实现的（刷机的不说了，直接刷机工具把 su, busybox, superuser.apk 弄到 system 分区去了）。这里我直接贴出几个地址吧，我也不是研究这些漏洞的。一堆老外有事没事倒腾这些东西。</p>
+<p><a href="http://www.exploit-db.com/" title="Exploit Database" target="_blank" rel="external">Exploit Database</a><br><a href="http://www.cvedetails.com/" title="CVE security vulnerability datasource" target="_blank" rel="external">CVE security vulnerability datasource</a></p>
+<p>上面2个都是专门收集一些 linux 的漏洞的（kernel 的比较多，不能访问的时候请自备翻墙）。漏洞都以 CEV-xxxx-xxxx 的格式编号入库例如：CVE-2009-1234（后面那个一般是提交的时间）。然后有漏洞曝光提交后，如果这些漏洞有 linux kernel 的本地（local）漏洞，就可以用来提升进程的权限，来达到临时 root 的目的。然后这些漏洞曝光后，相关厂商会修复这些漏洞，同时会有修复补丁发出来，利用之前可以看看补丁的相关内容，确定下 kernel 还能否利用这个漏洞。</p>
+<p>然后有个老外收集了一些 android 上 kernel 的漏洞，整了一个开源的工具出来：</p>
+<p><a href="https://github.com/android-rooting-tools/android_run_root_shell" title="android_run_root_shell" target="_blank" rel="external">android_run_root_shell</a></p>
+<p>下载的时候注意看上面的 READE.md 的说明，这是一个 recursive 的 git 库，附带其它别的一堆库的。代码写得还不错，能够比较方便的添加新的漏洞。我用 ndk 编译的时候（READE.md 有编译说明），报了几个错误，好像有一些漏洞的 api ndk 不支持，注释掉就好。</p>
+<p>然后我在 rk（rockchip） 的 4.2.2 上试了下，这个漏洞有效：</p>
+<p><a href="http://blog.csdn.net/hu3167343/article/details/34454381" title="Missing access checks in put_user/get_user kernel API (CVE-2013-6282)" target="_blank" rel="external">Missing access checks in put_user/get_user kernel API (CVE-2013-6282)</a></p>
+<p>然后就是这个工具需要获取一些 kernel 中的函数地址。记录在 sqlite 的数据中。如果没有记录的话，就会尝试从 /proc/kallsyms 中去读。这个东西是 kernel 调试用的，在编译中，关闭一个选项这个文件中就没有地址了（一般发放出去的 kernel 这个文件都中的函数地址都是 0 来的）。所以好像指望这个东西来做坏事好像不行（我很好奇它自带的数据库里面那一堆地址从哪来的）。</p>
+<p>不过我们 kernel 是自己编译的。在编译完 kernel 后，在 kernel 根目录生成一个 System.map 的文件，这个文件里面就有 kernel 所有函数以及 static 变量的地址（十六进制的）。只要确定 kernel <strong>版本</strong>，用<strong>相同的编译器</strong>编译一次就能得到地址了。</p>
+<p>单个工具验证 OK，就要集成到 apk 中使用（要开始干坏事了）。首先上面那个小工具编译出来是一个 bin 文件，然后要改 hosts 文件的话，我决定把原来的 /system/etc/hosts 文件做一个软链接，指向一个普通应用可以读写的地方（例如 sdcard 的某个地方），所以需要一个 shell 脚本（在 root 的进程下调用）。然后做软件链接需要 busybox（编一个出来就好）。</p>
+<p>东西准备好，思路就是：这些脚本、bin 文件全部放到 assert 目录下，程序安装好后，通过 AssertManager copy 到程序的 data 目录下，然后再 copy 到 /data/local/tmp 下面执行。注意，android 中 bin 文件要在 shell 下执行只有在这个目录和 system/bin, /system/xbin 下可以，所以要执行 root 工具需要 copy 到 /data/local/tmp 下，system 现在还没 root 权限咧，无法 remount 的。copy 完成后，就可以在目录下执行命令了。java 层执行命令可以用下面的代码（不用 jni 了还麻烦）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">execlCommand</span>(String path, String command) {</div><div class="line">	Process proc = <span class="keyword">null</span>;</div><div class="line">	DataOutputStream os = <span class="keyword">null</span>;</div><div class="line">	BufferedReader in = <span class="keyword">null</span>;</div><div class="line">	<span class="keyword">try</span> {</div><div class="line">		Log.d(TAG, <span class="string">"execl path: "</span> + path + <span class="string">", command: "</span> + command);</div><div class="line">		</div><div class="line">		<span class="comment">// new a shell process for run out root kit</span></div><div class="line">		proc = Runtime.getRuntime().exec(<span class="string">"/system/bin/sh"</span>);</div><div class="line">		</div><div class="line">		<span class="comment">// send shell command</span></div><div class="line">		os = <span class="keyword">new</span> DataOutputStream(proc.getOutputStream());</div><div class="line">		os.writeBytes(<span class="string">"echo new a shell, now execl the command ... \n"</span>);</div><div class="line">		os.writeBytes(<span class="string">"cd "</span> + path + <span class="string">" \n"</span>);</div><div class="line">		<span class="comment">// change the file permission, java api copy file can't provider the file have execute permission</span></div><div class="line">		os.writeBytes(<span class="string">"chmod 777 "</span> + RootKit.ROOT_BIN + <span class="string">" \n"</span>);</div><div class="line">		os.writeBytes(<span class="string">"chmod 777 "</span> + RootKit.ROOT_DB + <span class="string">" \n"</span>);</div><div class="line">		os.writeBytes(<span class="string">"chmod 777 "</span> + RootKit.SHELL_TOOL + <span class="string">" \n"</span>);</div><div class="line">		os.writeBytes(<span class="string">"chmod 777 "</span> + RootKit.SHELL_COMMAND + <span class="string">" \n"</span>);</div><div class="line">		<span class="comment">// and then execute the root kit</span></div><div class="line">           os.writeBytes(<span class="string">"./"</span> + RootKit.ROOT_BIN + <span class="string">" -c "</span> + command + <span class="string">" \n"</span>);</div><div class="line">           os.writeBytes(<span class="string">"exit \n"</span>);</div><div class="line">           os.flush();</div><div class="line">           </div><div class="line">           <span class="comment">// wait for shell execute</span></div><div class="line">		proc.waitFor();</div><div class="line">           </div><div class="line">           <span class="comment">// get result of execute command</span></div><div class="line">           Log.d(TAG, <span class="string">"command execl: "</span>);</div><div class="line">           in = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(proc.getInputStream())); </div><div class="line">           String line = <span class="keyword">null</span>;    </div><div class="line">           <span class="keyword">while</span> ((line = in.readLine()) != <span class="keyword">null</span>) {    </div><div class="line">           	Log.d(TAG, line);</div><div class="line">           }</div><div class="line">           </div><div class="line">		<span class="comment">// release resources</span></div><div class="line">		proc.destroy();</div><div class="line">		os.close();</div><div class="line">		in.close();</div><div class="line">	} <span class="keyword">catch</span> (Exception e) {</div><div class="line">		e.printStackTrace();</div><div class="line">	}</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>从 AssertManager copy 的代码我就不贴了，网上一大堆（就是 java io 的相关函数）。</p>
+<p>其实，如果你收集的漏洞多（多去 google 一下老外，总会有新发现的，请自带翻墙），而且没有上面的那些函数地址的限制（或是你有办法可以在机器上获取到地址），自己就可以做所谓的一键 root 工具。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Framework/">Android Framework</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/31/工作小笔记——拦截应用内置广告.拦截篇/" data-title="工作小笔记——拦截应用内置广告.拦截篇 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/31/Google android source code build 问题总结/" title="Google android source code build 问题总结">
+  <strong>上一篇:</strong><br/>
+  <span>
+  Google android source code build 问题总结</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/31/工作小笔记——拦截应用内置广告.检测篇/"  title="工作小笔记——拦截应用内置广告.检测篇">
+ <strong>下一篇:</strong><br/> 
+ <span>工作小笔记——拦截应用内置广告.检测篇
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#拦截思路"><span class="toc-number">1.</span> <span class="toc-text">拦截思路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#修改_hosts"><span class="toc-number">1.1.</span> <span class="toc-text">修改 hosts</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#注入系统服务，屏蔽广告_view"><span class="toc-number">1.2.</span> <span class="toc-text">注入系统服务，屏蔽广告 view</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">2.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#root"><span class="toc-number">2.1.</span> <span class="toc-text">root</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

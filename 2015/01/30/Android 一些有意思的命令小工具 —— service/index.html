@@ -1,0 +1,599 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>Android 一些有意思的命令小工具 —— service | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="android 自带了很多 cmds 的小工具，都挺用有的，也有些比较有意思。这里介绍的是 service 这个工具。说之前先把相关源码位置说下（4.4 的）：
+123# service 命令模块frameworks/native/cmds/service
+
+作用
+这个工具的作用是让你能够在 she">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/30/Android 一些有意思的命令小工具 —— service/" title="Android 一些有意思的命令小工具 —— service" itemprop="url">Android 一些有意思的命令小工具 —— service</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-30T08:32:16.000Z" itemprop="datePublished">2015 1月 30</time>
+    更新日期:<time datetime="2015-01-30T08:32:16.000Z" itemprop="dateModified">2015 1月 30</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#作用"><span class="toc-number">1.</span> <span class="toc-text">作用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#list"><span class="toc-number">1.1.</span> <span class="toc-text">list</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#call"><span class="toc-number">1.2.</span> <span class="toc-text">call</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分析"><span class="toc-number">2.</span> <span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#check"><span class="toc-number">2.1.</span> <span class="toc-text">check</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#list-1"><span class="toc-number">2.2.</span> <span class="toc-text">list</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#call-1"><span class="toc-number">2.3.</span> <span class="toc-text">call</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#限制"><span class="toc-number">3.</span> <span class="toc-text">限制</span></a></li></ol>
+		</div>
+		
+		<p>android 自带了很多 cmds 的小工具，都挺用有的，也有些比较有意思。这里介绍的是 service 这个工具。说之前先把相关源码位置说下（4.4 的）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># service 命令模块</span></div><div class="line">frameworks/native/cmds/service</div><div class="line"></div></pre></td></tr></table></figure>
+
+<h2 id="作用">作用</h2>
+<p>这个工具的作用是让你能够在 shell 中调用 android system services 的一部分接口。至于怎么调用，看它的 usage 就清除了：</p>
+<pre>
+Usage: service [-h|-?]
+       service list
+       service check SERVICE
+       service call SERVICE CODE [i32 INT | s16 STR] ...
+Options:
+   i32: Write the integer INT into the send parcel.
+   s16: Write the UTF-16 string STR into the send parcel.
+</pre>
+
+<p>它的用法就是 service 命令 + 参数。service 的命令很少一般有用的就2个：</p>
+<h3 id="list">list</h3>
+<p>列出当前系统有所有的 system service :</p>
+<pre>
+ming ~ $ adb shell service list
+Found 73 services:
+0       media_router: [android.media.IMediaRouterService]
+1       print: [android.print.IPrintManager]
+2       assetatlas: [android.view.IAssetAtlas]
+3       dreams: [android.service.dreams.IDreamManager]
+4       commontime_management: []
+5       samplingprofiler: []
+6       diskstats: []
+7       appwidget: [com.android.internal.appwidget.IAppWidgetService]
+8       backup: [android.app.backup.IBackupManager]
+9       uimode: [android.app.IUiModeManager]
+10      serial: [android.hardware.ISerialManager]
+11      usb: [android.hardware.usb.IUsbManager]
+12      audio: [android.media.IAudioService]
+13      wallpaper: [android.app.IWallpaperManager]
+14      dropbox: [com.android.internal.os.IDropBoxManagerService]
+15      search: [android.app.ISearchManager]
+16      country_detector: [android.location.ICountryDetector]
+17      location: [android.location.ILocationManager]
+18      devicestoragemonitor: []
+19      notification: [android.app.INotificationManager]
+20      updatelock: [android.os.IUpdateLock]
+21      servicediscovery: [android.net.nsd.INsdManager]
+22      ethernet: [android.net.ethernet.IEthernetManager]
+23      connectivity: [android.net.IConnectivityManager]
+24      wifi: [android.net.wifi.IWifiManager]
+25      wifip2p: [android.net.wifi.p2p.IWifiP2pManager]
+26      netpolicy: [android.net.INetworkPolicyManager]
+27      netstats: [android.net.INetworkStatsService]
+28      textservices: [com.android.internal.textservice.ITextServicesManager]
+29      network_management: [android.os.INetworkManagementService]
+30      clipboard: [android.content.IClipboard]
+31      statusbar: [com.android.internal.statusbar.IStatusBarService]
+32      device_policy: [android.app.admin.IDevicePolicyManager]
+33      lock_settings: [com.android.internal.widget.ILockSettings]
+34      mount: [IMountService]
+35      accessibility: [android.view.accessibility.IAccessibilityManager]
+36      input_method: [com.android.internal.view.IInputMethodManager]
+37      bluetooth_manager: [android.bluetooth.IBluetoothManager]
+38      input: [android.hardware.input.IInputManager]
+39      window: [android.view.IWindowManager]
+40      alarm: [android.app.IAlarmManager]
+41      consumer_ir: [android.hardware.IConsumerIrService]
+42      vibrator: [android.os.IVibratorService]
+43      battery: []
+44      hardware: [android.os.IHardwareService]
+45      content: [android.content.IContentService]
+46      account: [android.accounts.IAccountManager]
+47      user: [android.os.IUserManager]
+48      entropy: []
+49      permission: [android.os.IPermissionController]
+50      cpuinfo: []
+51      dbinfo: []
+52      gfxinfo: []
+
+... ...
+</pre>
+
+<h3 id="call">call</h3>
+<p>这个是主要功能，就是调用指定 service 的接口。具体的在下面的源码分析说一边分析一边说。</p>
+<h2 id="分析">分析</h2>
+<p>这个工具的代码其实很少，只有一个 service.cpp 文件，而且只有 300 行不到。我们慢慢看，首先 mian 函数开头：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">char</span>* <span class="keyword">const</span> argv[])</div><div class="line">{</div><div class="line">    <span class="comment">// 取 SM </span></div><div class="line">    sp&lt;IServiceManager&gt; sm = defaultServiceManager();</div><div class="line">    fflush(stdout);</div><div class="line">    <span class="keyword">if</span> (sm == NULL) {</div><div class="line">        aerr &lt;&lt; <span class="string">"service: Unable to get default service manager!"</span> &lt;&lt; endl;</div><div class="line">        <span class="keyword">return</span> <span class="number">20</span>; </div><div class="line">    }</div><div class="line">        </div><div class="line">    <span class="keyword">bool</span> wantsUsage = <span class="keyword">false</span>;</div><div class="line">    <span class="keyword">int</span> result = <span class="number">0</span>;</div><div class="line">    </div><div class="line">    <span class="comment">// 敲 service -h 或是 service -? 是出前面的 usage 提示</span></div><div class="line">    <span class="keyword">while</span> (<span class="number">1</span>) {</div><div class="line">        <span class="keyword">int</span> ic = getopt(argc, argv, <span class="string">"h?"</span>);</div><div class="line">        <span class="keyword">if</span> (ic &lt; <span class="number">0</span>)</div><div class="line">            <span class="keyword">break</span>;</div><div class="line"></div><div class="line">        <span class="keyword">switch</span> (ic) {</div><div class="line">        <span class="keyword">case</span> <span class="string">'h'</span>:</div><div class="line">        <span class="keyword">case</span> <span class="string">'?'</span>:</div><div class="line">            wantsUsage = <span class="keyword">true</span>;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        <span class="keyword">default</span>:</div><div class="line">            aerr &lt;&lt; <span class="string">"service: Unknown option -"</span> &lt;&lt; ic &lt;&lt; endl;</div><div class="line">            wantsUsage = <span class="keyword">true</span>;</div><div class="line">            result = <span class="number">10</span>; </div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        }   </div><div class="line">    } </div><div class="line"></div><div class="line">... ...</div><div class="line"></div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<h3 id="check">check</h3>
+<p>接下来就有一个 check 的命令：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">... ...</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (optind &gt;= argc) {</div><div class="line">        wantsUsage = <span class="keyword">true</span>;</div><div class="line">    } <span class="keyword">else</span> <span class="keyword">if</span> (!wantsUsage) {</div><div class="line">        <span class="keyword">if</span> (<span class="built_in">strcmp</span>(argv[optind], <span class="string">"check"</span>) == <span class="number">0</span>) {</div><div class="line">            optind++;</div><div class="line">            <span class="keyword">if</span> (optind &lt; argc) {</div><div class="line">                <span class="comment">// 是调 SM 的 checkService 接口</span></div><div class="line">                sp&lt;IBinder&gt; service = sm-&gt;checkService(String16(argv[optind]));</div><div class="line">                aout &lt;&lt; <span class="string">"Service "</span> &lt;&lt; argv[optind] &lt;&lt;</div><div class="line">                    (service == NULL ? <span class="string">": not found"</span> : <span class="string">": found"</span>) &lt;&lt; endl;</div><div class="line">            } <span class="keyword">else</span> {</div><div class="line">                aerr &lt;&lt; <span class="string">"service: No service specified for check"</span> &lt;&lt; endl;</div><div class="line">                wantsUsage = <span class="keyword">true</span>;</div><div class="line">                result = <span class="number">10</span>;</div><div class="line">            }</div><div class="line">        }</div><div class="line"></div><div class="line">... ...</div><div class="line">            </div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            aerr &lt;&lt; <span class="string">"service: Unknown command "</span> &lt;&lt; argv[optind] &lt;&lt; endl;</div><div class="line">            wantsUsage = <span class="keyword">true</span>;</div><div class="line">            result = <span class="number">10</span>;</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div><div class="line">... ...</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>这个 check 命名就是调用 SM 的 checkService 接口。至于这个接口是干啥的，<a href="http://light3moon.com/2015/01/28/Android Binder 分析——系统服务 Binder 对象的传递" title="看这里" target="_blank" rel="external">看这里</a>。不过不知道是不是权限原因，这里从 SM 返回好像都是 NULL，然后老是打印 Service xx not found 。我没去深究，因为这个命令好像也没啥用。</p>
+<h3 id="list-1">list</h3>
+<p>下面继续：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">... ...</div><div class="line"></div><div class="line">        }</div><div class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(argv[optind], <span class="string">"list"</span>) == <span class="number">0</span>) {</div><div class="line">            Vector&lt;String16&gt; services = sm-&gt;listServices();</div><div class="line">            aout &lt;&lt; <span class="string">"Found "</span> &lt;&lt; services.size() &lt;&lt; <span class="string">" services:"</span> &lt;&lt; endl;</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">unsigned</span> i = <span class="number">0</span>; i &lt; services.size(); i++) {</div><div class="line">                String16 name = services[i];</div><div class="line">                sp&lt;IBinder&gt; service = sm-&gt;checkService(name);</div><div class="line">                aout &lt;&lt; i</div><div class="line">                     &lt;&lt; <span class="string">"\t"</span> &lt;&lt; good_old_string(name)</div><div class="line">                     &lt;&lt; <span class="string">": ["</span> &lt;&lt; good_old_string(get_interface_name(service)) &lt;&lt; <span class="string">"]"</span></div><div class="line">                     &lt;&lt; endl;</div><div class="line">            }</div><div class="line">        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(argv[optind], <span class="string">"call"</span>) == <span class="number">0</span>) {</div><div class="line"></div><div class="line">... ...</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>这个 list 好像也是 SM 的命令来的。SM 会返回一个当前注册的 system service 的列表过来，然后这边一个 for 循环打印这些服务的信息。哎，这里的 checkService 又 OK 了。可能是字符串传递的问题吧。我们来看下另外2个小函数：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 这个好像是字符串转化相关的，String8 和 String16 都是 android 在 native </span></div><div class="line"><span class="comment">// 对 char 串的封装</span></div><div class="line"><span class="keyword">static</span> String8 good_old_string(<span class="keyword">const</span> String16& src)</div><div class="line">{</div><div class="line">    String8 name8;</div><div class="line">    <span class="keyword">char</span> ch8[<span class="number">2</span>];</div><div class="line">    ch8[<span class="number">1</span>] = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">unsigned</span> j = <span class="number">0</span>; j &lt; src.size(); j++) { </div><div class="line">        <span class="keyword">char16_t</span> ch = src[j];</div><div class="line">        <span class="keyword">if</span> (ch &lt; <span class="number">128</span>) ch8[<span class="number">0</span>] = (<span class="keyword">char</span>)ch;</div><div class="line">        name8.append(ch8);</div><div class="line">    }</div><div class="line">    <span class="keyword">return</span> name8;</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>然后这个 <code>get_interface_name</code> 就是上面后面 [] 打印的东西，这个是每个 service 的标示，之前 binder 几篇的文章有说到每次 binder 通信，首先会检测这个标示的。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// get the name of the generic interface we hold a reference to</span></div><div class="line"><span class="keyword">static</span> String16 get_interface_name(sp&lt;IBinder&gt; service)</div><div class="line">{</div><div class="line">    <span class="keyword">if</span> (service != NULL) {</div><div class="line">        Parcel data, reply;</div><div class="line">        status_t err = service-&gt;transact(IBinder::INTERFACE_TRANSACTION, data, &reply);              </div><div class="line">        <span class="keyword">if</span> (err == NO_ERROR) {</div><div class="line">            <span class="keyword">return</span> reply.readString16();                                                                                  </div><div class="line">        }</div><div class="line">    }</div><div class="line">    <span class="keyword">return</span> String16();</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>然后在 Binder.cpp 中，就是 binder Bn 的父类中默认处理中：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">status_t BBinder::onTransact(</div><div class="line">    uint32_t code, <span class="keyword">const</span> Parcel& data, Parcel* reply, uint32_t flags)</div><div class="line">{</div><div class="line">    <span class="keyword">switch</span> (code) {</div><div class="line">        <span class="keyword">case</span> INTERFACE_TRANSACTION:</div><div class="line">            reply-&gt;writeString16(getInterfaceDescriptor());</div><div class="line">            <span class="keyword">return</span> NO_ERROR;</div><div class="line"></div><div class="line">... ...</div><div class="line"></div><div class="line">        <span class="keyword">default</span>:</div><div class="line">            <span class="keyword">return</span> UNKNOWN_TRANSACTION;</div><div class="line">    }</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>这就获取每个 system service 的标示。</p>
+<h3 id="call-1">call</h3>
+<p>接下来这个才是最有用的命令：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div></pre></td><td class="code"><pre><div class="line">... ...</div><div class="line">        </div><div class="line">        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(argv[optind], <span class="string">"call"</span>) == <span class="number">0</span>) {</div><div class="line">            optind++;</div><div class="line">            <span class="keyword">if</span> (optind+<span class="number">1</span> &lt; argc) {</div><div class="line">                <span class="keyword">int</span> serviceArg = optind;</div><div class="line">                <span class="comment">// 从 sm 那获取指定的 service 接口（Bp）</span></div><div class="line">                sp&lt;IBinder&gt; service = sm-&gt;checkService(String16(argv[optind++]));</div><div class="line">                <span class="comment">// 获取服务的标示</span></div><div class="line">                String16 ifName = get_interface_name(service);</div><div class="line">                int32_t code = atoi(argv[optind++]);</div><div class="line">                <span class="keyword">if</span> (service != NULL && ifName.size() &gt; <span class="number">0</span>) {</div><div class="line">                    Parcel data, reply;</div><div class="line"></div><div class="line">                    <span class="comment">// 呵呵，先写服务的标示</span></div><div class="line">                    <span class="comment">// the interface name is first</span></div><div class="line">                    data.writeInterfaceToken(ifName);</div><div class="line"></div><div class="line">                    <span class="comment">// 支持的参数有3种类型：i32、s16 和 intent</span></div><div class="line">                    <span class="comment">// then the rest of the call arguments</span></div><div class="line">                    <span class="keyword">while</span> (optind &lt; argc) {</div><div class="line">                        <span class="comment">// i32 就是 int32，非常简单的类型，</span></div><div class="line">                        <span class="comment">// 直接使用 parcel 的 writeInt32 </span></div><div class="line">                        <span class="keyword">if</span> (<span class="built_in">strcmp</span>(argv[optind], <span class="string">"i32"</span>) == <span class="number">0</span>) {</div><div class="line">                            optind++;</div><div class="line">                            <span class="keyword">if</span> (optind &gt;= argc) {</div><div class="line">                                aerr &lt;&lt; <span class="string">"service: no integer supplied for 'i32'"</span> &lt;&lt; endl;</div><div class="line">                                wantsUsage = <span class="keyword">true</span>;</div><div class="line">                                result = <span class="number">10</span>;</div><div class="line">                                <span class="keyword">break</span>;</div><div class="line">                            }</div><div class="line">                            data.writeInt32(atoi(argv[optind++]));</div><div class="line">                        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(argv[optind], <span class="string">"s16"</span>) == <span class="number">0</span>) {</div><div class="line">                            <span class="comment">// s16 就是 String16，也是比较简单的类型</span></div><div class="line">                            <span class="comment">// parcel 都有现成的接口可用</span></div><div class="line">                            optind++;</div><div class="line">                            <span class="keyword">if</span> (optind &gt;= argc) {</div><div class="line">                                aerr &lt;&lt; <span class="string">"service: no string supplied for 's16'"</span> &lt;&lt; endl;</div><div class="line">                                wantsUsage = <span class="keyword">true</span>;</div><div class="line">                                result = <span class="number">10</span>;</div><div class="line">                                <span class="keyword">break</span>;</div><div class="line">                            }</div><div class="line">                            data.writeString16(String16(argv[optind++]));</div><div class="line">                        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(argv[optind], <span class="string">"null"</span>) == <span class="number">0</span>) {</div><div class="line">                            optind++;</div><div class="line">                            data.writeStrongBinder(NULL);</div><div class="line">                        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strcmp</span>(argv[optind], <span class="string">"intent"</span>) == <span class="number">0</span>) {</div><div class="line">       </div><div class="line"><span class="comment">// 下面这个 intent 类型，就有点麻烦了，我暂时没去管它 ... ...</span></div><div class="line">... ...</div><div class="line"></div><div class="line">                        } <span class="keyword">else</span> {</div><div class="line">                            aerr &lt;&lt; <span class="string">"service: unknown option "</span> &lt;&lt; argv[optind] &lt;&lt; endl;</div><div class="line">                            wantsUsage = <span class="keyword">true</span>;</div><div class="line">                            result = <span class="number">10</span>;</div><div class="line">                            <span class="keyword">break</span>;</div><div class="line">                        }</div><div class="line">                    }</div><div class="line"></div><div class="line">                    <span class="comment">// parcel 打好包好，调用 service 的 transact 函数</span></div><div class="line">                    service-&gt;transact(code, data, &reply);</div><div class="line">                    <span class="comment">// 打印 parcel 打包的返回值</span></div><div class="line">                    aout &lt;&lt; <span class="string">"Result: "</span> &lt;&lt; reply &lt;&lt; endl;</div><div class="line">                } <span class="keyword">else</span> {</div><div class="line">                    aerr &lt;&lt; <span class="string">"service: Service "</span> &lt;&lt; argv[serviceArg]</div><div class="line">                        &lt;&lt; <span class="string">" does not exist"</span> &lt;&lt; endl;</div><div class="line">                    result = <span class="number">10</span>;</div><div class="line">                }</div><div class="line">            } <span class="keyword">else</span> {</div><div class="line"></div><div class="line">... ...</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>从上面的代码来看，call 的格式是：</p>
+<pre>
+service call service code i32 xx
+</pre>
+
+<p>service 就是当初 SM addService 的那串字符，就是 list 中第一个名字。例如 WindowManagerService 的就是 window。code 的话就是定义 service 接口的时候那从 <code>android.os.IBinder.FIRST_CALL_TRANSACTION</code> 开始累加的数字。然后后面就是参数了，开始要把参数类型写上，然后才是参数。上面说了一共支持3种类型：i32（int32）、s16（String16）和 intent（复合类型）。</p>
+<p>来点例子，例如我那篇 <a href="http://light3moon.com/2015/01/26/hierarchyviewer 无法使用问题" title="hierarchyviewer 无法使用问题" target="_blank" rel="external">hierarchyviewer 无法使用问题</a> 调用 wm 开启 view server 就是这么敲：</p>
+<pre>
+service call window 1 i32 4939
+</pre>
+
+<p>这个 <code>TRANSACTION_CODE</code> 怎么确定咧。这个就要去翻源码啦。例如上面 wm 的那个接口，我在 IWindwManager.java（wm 是用 aidl 的，要去 out 下面去翻 aidl 自动生成的 java 文件） 中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TRANSACTION_startViewServer = (android.os.IBinder.FIRST_CALL_TRANSACTION + <span class="number">0</span>);</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TRANSACTION_stopViewServer = (android.os.IBinder.FIRST_CALL_TRANSACTION + <span class="number">1</span>);</div><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TRANSACTION_isViewServerRunning = (android.os.IBinder.FIRST_CALL_TRANSACTION + <span class="number">2</span>);</div><div class="line"></div><div class="line"><span class="comment">// 然后去翻下 IBinder 发现是从 1 开始的 </span></div><div class="line">    <span class="keyword">enum</span> {</div><div class="line">        FIRST_CALL_TRANSACTION  = <span class="number">0x00000001</span>,</div><div class="line">        LAST_CALL_TRANSACTION   = <span class="number">0x00ffffff</span>,</div><div class="line">... ...</div><div class="line">    };</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>所以要调用 wm 的 startViewServer 接口，code 就要填 1 啦。然后我们再去看下 startViewServer 的接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*</span></div><div class="line"><span class="comment"> * Starts the view server on the specified port.</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment"> * @param port The port to listener to.</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment"> * @return True if the server was successfully started, false otherwise.</span></div><div class="line"><span class="comment"> *</span></div><div class="line"><span class="comment"> * @see com.android.server.wm.ViewServer</span></div><div class="line"><span class="comment"> * @see com.android.server.wm.ViewServer#VIEW_SERVER_DEFAULT_PORT</span></div><div class="line"><span class="comment"> */</span></div><div class="line"><span class="annotation">@Override</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">startViewServer</span>(<span class="keyword">int</span> port)</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>接口参数就一个 int 的 port（socket 的端口吧），所以后面那个参数就要填 i32 4939 （话说网上怎么知道端口要用 4939 的）。</p>
+<p>然后我们来看下 IWindowManager.aidl 中一段有意思的注释：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"><span class="comment"> * ===== NOTICE =====</span></div><div class="line"><span class="comment"> * The first three methods must remain the first three methods. Scripts</span></div><div class="line"><span class="comment"> * and tools rely on their transaction number to work properly.</span></div><div class="line"><span class="comment"> */</span> </div><div class="line"><span class="comment">// This is used for debugging</span></div><div class="line">boolean startViewServer(<span class="keyword">int</span> port);   <span class="comment">// Transaction #1</span></div><div class="line">boolean stopViewServer();            <span class="comment">// Transaction #2</span></div><div class="line">boolean isViewServerRunning();       <span class="comment">// Transaction #3</span></div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>大致意思是说：请把这2个接口放在最前面声明，因为 aidl 是按顺序生成 code 号的，这样就能保证这3个接口的 code 固定是 1、2、3。这个明显是 android 故意留给这个 shell 命令的小工具的。所以你要自己要加一些 service 的接口，尽量从 <code>LAST_CALL_TRANSACTION</code> 从后往前面加，避免影响一些系统工具的使用。</p>
+<p>然后如果是没有参数的话，后面那个参数可以不填，例如查询 wm view server 是否开启的接口：</p>
+<pre>
+service call window 3
+</pre>
+
+<p>然后就是返回值了。binder 的返回值都是通过 parcel 打包的，前面 binder 分析过了，每个服务的 Bp 都会自己解析返回值的 parcel 包，然后里面的返回值拆出来，转化成接口具体的返回值返回给调用者。但是这里就直接打印 parcel 了。前面 binder 也分析过，parcel 就是简单的把数据塞到内存里面而已（当然有一些类型有一点点格式）。这里也只是把 parcel 内存中的东西打印出来而已。</p>
+<p>我们来看上面那个查询 wm view server 是否开启的结果：</p>
+<pre>
+root@H9:/ # service call window 3
+Result: Parcel(00000000 00000001   '........')
+</pre>
+
+<p>返回值，第一个 int32 是错误值，0 表示没有错误。然后从第二开始才是真正的返回值。这个 startViewServer 的返回值看代码就是一个 int（那个接口是 boolean，在 Bp 那是根据 0、1 来判断的）。所以那个 00000001 就代表 view server 已经启动咯。如果是 00000000 就是没启动。</p>
+<p>好，我们再来个稍微复杂点的例子。wm 中有一个这个接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Override</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">float</span> <span class="title">getAnimationScale</span>(<span class="keyword">int</span> which) { </div><div class="line">    <span class="keyword">switch</span> (which) {</div><div class="line">        <span class="keyword">case</span> <span class="number">0</span>: <span class="keyword">return</span> mWindowAnimationScale;</div><div class="line">        <span class="keyword">case</span> <span class="number">1</span>: <span class="keyword">return</span> mTransitionAnimationScale;</div><div class="line">        <span class="keyword">case</span> <span class="number">2</span>: <span class="keyword">return</span> mAnimatorDurationScale; </div><div class="line">    }</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>而且这个正好在 Settings 中的开发这选项有可以设置（可以拿来测试用）。开发者选项—&gt;绘图：</p>
+<pre>
+窗口动画缩放    --> mWindowAnimationScale
+过渡动画缩放    --> mTransitionAnimationScale
+动画程序时长缩放 --> mAnimatorDurationScale
+</pre>
+
+<p>我们拿第一个玩一下，因为第一个窗口动画缩放，只要设置成 10x 窗口的缩放动画就会变得很慢。去翻下 IWindowManager.java 4.4 的是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TRANSACTION_getAnimationScale = (android.os.IBinder.FIRST_CALL_TRANSACTION + <span class="number">48</span>);</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>所以要获取 mWindowAnimationScale 的值的话就应该这么敲：</p>
+<pre>
+service call window 49 i32 0
+</pre>
+
+<p>得到的结果如下：</p>
+<pre>
+root@H9:/ # service call window 49 i32 0
+Result: Parcel(00000000 3f800000   '.......?')
+</pre>
+
+<p>嘿嘿，返回的是 float，顺带学习下 float 在内存中的表示：<a href="http://light3moon.com/2015/01/19/[转] float 类型在内存中的表示" title="看这里啦" target="_blank" rel="external">看这里啦</a>。</p>
+<p>0x3f800000 就是 1.0 的 float。然后去 Settings 的调试选项，把这个调成 动画缩放 10x，再敲一下，结果是：</p>
+<pre>
+root@H9:/ # service call window 49 i32 0
+Result: Parcel(00000000 41200000   '...... A')
+</pre>
+
+<p>0x41200000 是 10.0 的 float。</p>
+<h2 id="限制">限制</h2>
+<p>从上面来看，这个小工具其实挺有用的。可以很方便的自己留个小后门或是加一些调试小接口。这个东西，需要知道接口的 <code>TRANSACTION_CODE</code> 和参数才能正常调用，很符合留后门给自己用的风范 ^_^。</p>
+<p>还有从上面的分析来看，这个工具只能调用一些参数是 void、int、String 或是 intent 相关的接口。还有返回值如果是比较复杂的 class（结构体）要分析也比较困难，简单的 int、float、String 还好看懂。不过虽然有局限性，还是一个不错的小工具了。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Framework/">Android Framework</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/30/Android 一些有意思的命令小工具 —— service/" data-title="Android 一些有意思的命令小工具 —— service | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/30/工作小笔记——扩展字库乱码排查/" title="工作小笔记——扩展字库乱码排查">
+  <strong>上一篇:</strong><br/>
+  <span>
+  工作小笔记——扩展字库乱码排查</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/30/Android 一些有意思的命令小工具 —— dumpsys/"  title="Android 一些有意思的命令小工具 —— dumpsys">
+ <strong>下一篇:</strong><br/> 
+ <span>Android 一些有意思的命令小工具 —— dumpsys
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#作用"><span class="toc-number">1.</span> <span class="toc-text">作用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#list"><span class="toc-number">1.1.</span> <span class="toc-text">list</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#call"><span class="toc-number">1.2.</span> <span class="toc-text">call</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分析"><span class="toc-number">2.</span> <span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#check"><span class="toc-number">2.1.</span> <span class="toc-text">check</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#list-1"><span class="toc-number">2.2.</span> <span class="toc-text">list</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#call-1"><span class="toc-number">2.3.</span> <span class="toc-text">call</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#限制"><span class="toc-number">3.</span> <span class="toc-text">限制</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

@@ -1,0 +1,460 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>vold share 操作清理正在使用磁盘的进程分析 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="vold 是 android system/bin 下的一个本地程序（代码在 system/vold 下）。用于处理 framework 中各种和 mount、unmount 相关的命令。 vold 的框架结构分析，推荐去看一本叫《深入理解 Android 卷I》的第九章，很详细。不过这本书在最后留">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/28/vold share 操作清理正在使用磁盘的进程分析/" title="vold share 操作清理正在使用磁盘的进程分析" itemprop="url">vold share 操作清理正在使用磁盘的进程分析</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-28T11:42:16.000Z" itemprop="datePublished">2015 1月 28</time>
+    更新日期:<time datetime="2015-01-28T11:42:16.000Z" itemprop="dateModified">2015 1月 28</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#2种_usb_模式"><span class="toc-number">1.</span> <span class="toc-text">2种 usb 模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#访问磁盘的进程检测"><span class="toc-number">2.</span> <span class="toc-text">访问磁盘的进程检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#杀死访问磁盘的进程"><span class="toc-number">3.</span> <span class="toc-text">杀死访问磁盘的进程</span></a></li></ol>
+		</div>
+		
+		<p>vold 是 android system/bin 下的一个本地程序（代码在 system/vold 下）。用于处理 framework 中各种和 mount、unmount 相关的命令。 vold 的框架结构分析，推荐去看一本叫《深入理解 Android 卷I》的第九章，很详细。不过这本书在最后留了个问题，就是当把磁盘挂在到 PC 上（这个就是 vold 的 share 操作）的时候会导致一些进程被杀掉。正好UP主的这段时间的工作也和这个有关，这里在主要是解答下这个小问题。不过首先废话下 android 的2种 usb 模式：</p>
+<h2 id="2种_usb_模式">2种 usb 模式</h2>
+<p>首先说下 android 上目前支持的2种 usb 连接模式：</p>
+<ul>
+<li><p><strong>UMS(USB Mass Storage)</strong><br>这种模式下，会将 android 的磁盘从系统中 umount 出去，然后 mount 到 PC 上，就和 PC 上插上U盘类似。使用这种模式，由于需要把 umount 磁盘，所以在使用过程中，android 系统无法使用磁盘。 vold 就是这种模式下用的。</p>
+</li>
+<li><p><strong>MTP(Media Transfer Protocol)</strong><br>媒体传输协议（具体的百度、google 去吧）。和 UMS 最大的不同，就是不需要 umount 磁盘，插上 PC 后，就和插入数码相机类似，可以查看、copy 多媒体文件到磁盘中。所以这种模式下，android 系统是能够继续使用磁盘的。但是也存在缺点：只能管理多媒体文件，文件IO 速度和稳定性比 UMS 稍差。原生 android 从 4.0 之后默认使用这种模式。</p>
+</li>
+</ul>
+<h2 id="访问磁盘的进程检测">访问磁盘的进程检测</h2>
+<p>在 UMS 下，连接 usb ， 打开 SystemUI 的 UsbStorageActivity，点击 mount 按钮，会在 checkStorageUsersAsync() 会调用 MountService 的 getStorageUsers() 去检测有哪些进程还在访问磁盘：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">checkStorageUsersAsync</span>() {</div><div class="line">    IMountService ims = getMountService();</div><div class="line">    <span class="keyword">if</span> (ims == <span class="keyword">null</span>) {</div><div class="line">        <span class="comment">// Display error dialog</span></div><div class="line">        scheduleShowDialog(DLG_ERROR_SHARING);</div><div class="line">    }   </div><div class="line">    <span class="comment">// 这个路径就是让 vold 去对比的 sdcard 的 mount 路径</span></div><div class="line">    String extStoragePath = Environment.getExternalStorageDirectory().toString();</div><div class="line">    <span class="keyword">boolean</span> showDialog = <span class="keyword">false</span>;</div><div class="line">    <span class="keyword">try</span> {</div><div class="line">        <span class="keyword">int</span>[] stUsers = ims.getStorageUsers(extStoragePath);</div><div class="line">        <span class="keyword">if</span> (stUsers != <span class="keyword">null</span> && stUsers.length &gt; <span class="number">0</span>) {</div><div class="line">            showDialog = <span class="keyword">true</span>;</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            <span class="comment">// List of applications on sdcard.</span></div><div class="line">            ActivityManager am = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);</div><div class="line">            List&lt;ApplicationInfo&gt; infoList = am.getRunningExternalApplications();</div><div class="line">            <span class="keyword">if</span> (infoList != <span class="keyword">null</span> && infoList.size() &gt; <span class="number">0</span>) {</div><div class="line">                showDialog = <span class="keyword">true</span>;</div><div class="line">            }   </div><div class="line">        }   </div><div class="line">    } <span class="keyword">catch</span> (RemoteException e) {</div><div class="line">        <span class="comment">// Display error dialog</span></div><div class="line">        scheduleShowDialog(DLG_ERROR_SHARING);</div><div class="line">    }   </div><div class="line">    <span class="keyword">if</span> (showDialog) {</div><div class="line">        <span class="comment">// Display dialog to user</span></div><div class="line">        scheduleShowDialog(DLG_CONFIRM_KILL_STORAGE_USERS);</div><div class="line">    } <span class="keyword">else</span> {</div><div class="line">        <span class="keyword">if</span> (localLOGV) Log.i(TAG, <span class="string">"Enabling UMS"</span>);</div><div class="line">        switchUsbMassStorage(<span class="keyword">true</span>);</div><div class="line">    }   </div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>MountService 里面的 getStorageUsers() 会调用 NativeDaemonConnector 的 executeForList() 方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">int</span>[] <span class="title">getStorageUsers</span>(String path) {</div><div class="line">    validatePermission(android.Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS);</div><div class="line">    waitForReady();</div><div class="line">    <span class="keyword">try</span> {</div><div class="line">        <span class="keyword">final</span> String[] r = NativeDaemonEvent.filterMessageList(</div><div class="line">                mConnector.executeForList(<span class="string">"storage"</span>, <span class="string">"users"</span>, path),</div><div class="line">                VoldResponseCode.StorageUsersListResult);</div><div class="line"></div><div class="line">        <span class="comment">// FMT: &lt;pid&gt; &lt;process name&gt;</span></div><div class="line">        <span class="keyword">int</span>[] data = <span class="keyword">new</span> <span class="keyword">int</span>[r.length];</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; r.length; i++) {</div><div class="line">            String[] tok = r[i].split(<span class="string">" "</span>);</div><div class="line">            <span class="keyword">try</span> {</div><div class="line">                data[i] = Integer.parseInt(tok[<span class="number">0</span>]);</div><div class="line">            } <span class="keyword">catch</span> (NumberFormatException nfe) {</div><div class="line">                Slog.e(TAG, String.format(<span class="string">"Error parsing pid %s"</span>, tok[<span class="number">0</span>]));</div><div class="line">                <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">0</span>];</div><div class="line">            }    </div><div class="line">        }    </div><div class="line">        <span class="keyword">return</span> data;</div><div class="line">    } <span class="keyword">catch</span> (NativeDaemonConnectorException e) { </div><div class="line">        Slog.e(TAG, <span class="string">"Failed to retrieve storage users list"</span>, e);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">0</span>];</div><div class="line">    }    </div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>NativeDaemonConnector 是 MountService 用来和 Vold 通讯用的。java 层通过 Unix socket 和 native vold 进行通讯（遵守 android 自己定义的通讯协议，暂时不清楚为声明不用 binder）。exectueForList() 最后调用自己内部的 exectue() 把一个 “storage” 命令 + 检测路径（path）打包转化为协议数据包二进制流，然后通过写到 socket 里面：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> NativeDaemonEvent[] <span class="title">execute</span>(<span class="keyword">int</span> timeout, String cmd, Object... args)</div><div class="line">        <span class="keyword">throws</span> NativeDaemonConnectorException {</div><div class="line">    <span class="keyword">final</span> <span class="keyword">long</span> startTime = SystemClock.elapsedRealtime();</div><div class="line"></div><div class="line">    <span class="keyword">final</span> ArrayList&lt;NativeDaemonEvent&gt; events = Lists.newArrayList();</div><div class="line"></div><div class="line">    <span class="keyword">final</span> StringBuilder rawBuilder = <span class="keyword">new</span> StringBuilder();</div><div class="line">    <span class="keyword">final</span> StringBuilder logBuilder = <span class="keyword">new</span> StringBuilder();</div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> sequenceNumber = mSequenceNumber.incrementAndGet();</div><div class="line">    </div><div class="line">    <span class="comment">// 命令+路径 打包</span></div><div class="line">    makeCommand(rawBuilder, logBuilder, sequenceNumber, cmd, args);</div><div class="line"></div><div class="line">    <span class="keyword">final</span> String rawCmd = rawBuilder.toString();</div><div class="line">    <span class="keyword">final</span> String logCmd = logBuilder.toString();</div><div class="line"></div><div class="line">    log(<span class="string">"SND -&gt; {"</span> + logCmd + <span class="string">"}"</span>);</div><div class="line"></div><div class="line">    <span class="keyword">synchronized</span> (mDaemonLock) {</div><div class="line">        <span class="keyword">if</span> (mOutputStream == <span class="keyword">null</span>) {</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NativeDaemonConnectorException(<span class="string">"missing output stream"</span>);</div><div class="line">        } <span class="keyword">else</span> {</div><div class="line">            <span class="keyword">try</span> {</div><div class="line">            <span class="comment">// 协议数据包二进制流写入 stokect   </span></div><div class="line">            mOutputStream.write(rawCmd.getBytes(StandardCharsets.UTF_8));</div><div class="line">            } <span class="keyword">catch</span> (IOException e) {</div><div class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> NativeDaemonConnectorException(<span class="string">"problem sending command"</span>, e); </div><div class="line">            }   </div><div class="line">        }   </div><div class="line">    }   </div><div class="line">    NativeDaemonEvent event = <span class="keyword">null</span>;</div><div class="line">    do {</div><div class="line">        event = mResponseQueue.remove(sequenceNumber, timeout, logCmd);</div><div class="line">        <span class="keyword">if</span> (event == <span class="keyword">null</span>) {</div><div class="line">            loge(<span class="string">"timed-out waiting for response to "</span> + logCmd);</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NativeDaemonFailureException(logCmd, event);</div><div class="line">        }   </div><div class="line">        log(<span class="string">"RMV &lt;- {"</span> + event + <span class="string">"}"</span>);</div><div class="line">        events.add(event);</div><div class="line">    } <span class="keyword">while</span> (event.isClassContinue());</div><div class="line"></div><div class="line">    <span class="keyword">final</span> <span class="keyword">long</span> endTime = SystemClock.elapsedRealtime();</div><div class="line">    <span class="keyword">if</span> (endTime - startTime &gt; WARN_EXECUTE_DELAY_MS) {</div><div class="line">        loge(<span class="string">"NDC Command {"</span> + logCmd + <span class="string">"} took too long ("</span> + (endTime - startTime) + <span class="string">"ms)"</span>);</div><div class="line">    }   </div><div class="line"></div><div class="line">    <span class="keyword">if</span> (event.isClassClientError()) {</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NativeDaemonArgumentException(logCmd, event);</div><div class="line">    }   </div><div class="line">    <span class="keyword">if</span> (event.isClassServerError()) {</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NativeDaemonFailureException(logCmd, event);</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">return</span> events.toArray(<span class="keyword">new</span> NativeDaemonEvent[events.size()]);</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>在 vold 这边， CommandListener 有一个对应 “storage” 命令的处理实现 StorageCmd 。这个实现会用 Process 的 checkFileDescriptorSymLinks() 去检测是否用进程在访问磁盘。检测的方法是：去 /proc/xx/ 下（xx 是进程号 pid，每个打开了 fd 的进程会在系统的 /proc 下有记录的）检测3种东西：</p>
+<ul>
+<li><p><strong>checkFileDescriptorSymLinks</strong><br>这个是检测进程打开的 fd 的链接路径（Process 通过 linux 系统函数 readlink 去获取一个 fd 的真实文件物理路径，例如 /proc/2100/40 可能的真实 link 是 /mnt/sdcard/text.txt）是否和传入的 mountPoint 一致（一般这就是 sdcard 的挂载点路径，由 java 层传入。不过偶尔也会有坑，例如某些 rom sdcard 挂载点，为了兼容性，弄了一个文件链接给应用用，导致应用打开的 fd 路径和 mount 的时候检测的路径字符串不一样，注意是字符串不一样，导致检测不到进程在访问 sdcard），如果一致就表示该进程正在访问磁盘。</p>
+</li>
+<li><p><strong>checkFileMaps</strong><br>这个是检测 /proc/xx/maps ，这个我暂时不知道声明情况下会有记录。</p>
+</li>
+<li><p><strong>checkSymLink</strong><br>这个是检测 /proc/xx/cwd、/proc/xx/root、/proc/xx/exe ，这个目的应该是判断应用时候安装在 sdcard 上，或是有使用的数据在 sdcard 上（例如一些大型游戏的 data 数据）。如果是安装在 sdcard 上的应用，mount 出去的时候肯定要停止才行。</p>
+</li>
+</ul>
+<p>如果上面3种检测任何一种检测到了（返回值为 1），就给 stocket 写该进程的 pid 号，这样 java 层就知道有哪些进程在访问磁盘了。UsbStorageActivity 那里的表现就是弹出一个确定对话框告诉用户现在还有程序在访问磁盘，如果挂载 usb 设备则这些应用可能会出现异常（其实就是要强制杀死它们而已）。如果用户点确定，MountService 在开启 UMS 之前会让 ActivityManager 把那些还在访问磁盘的进程杀掉。先上剩余坚持代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line">CommandListener::StorageCmd::StorageCmd() :</div><div class="line">                 VoldCommand(<span class="string">"storage"</span>) {</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">int</span> CommandListener::StorageCmd::runCommand(SocketClient *cli,</div><div class="line">                                                      <span class="keyword">int</span> argc, <span class="keyword">char</span> **argv) {</div><div class="line">    dumpArgs(argc, argv, -<span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (argc &lt; <span class="number">2</span>) {</div><div class="line">        cli-&gt;sendMsg(ResponseCode::CommandSyntaxError, <span class="string">"Missing Argument"</span>, <span class="keyword">false</span>);</div><div class="line">        <span class="keyword">return</span> <span class="number">0</span>; </div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (!<span class="built_in">strcmp</span>(argv[<span class="number">1</span>], <span class="string">"users"</span>)) {</div><div class="line">        DIR *dir;</div><div class="line">        <span class="keyword">struct</span> dirent *de;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (!(dir = opendir(<span class="string">"/proc"</span>))) { </div><div class="line">            cli-&gt;sendMsg(ResponseCode::OperationFailed, <span class="string">"Failed to open /proc"</span>, <span class="keyword">true</span>);</div><div class="line">            <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">        }   </div><div class="line"></div><div class="line">        <span class="keyword">while</span> ((de = readdir(dir))) {</div><div class="line">            <span class="keyword">int</span> pid = Process::getPid(de-&gt;d_name);</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (pid &lt; <span class="number">0</span>) {</div><div class="line">                <span class="keyword">continue</span>;</div><div class="line">            }       </div><div class="line"></div><div class="line">            <span class="keyword">char</span> processName[<span class="number">255</span>];</div><div class="line">            Process::getProcessName(pid, processName, <span class="keyword">sizeof</span>(processName));</div><div class="line">            </div><div class="line">            <span class="comment">// Process 里面的代码不上了，具体的看源代码去吧</span></div><div class="line">            <span class="keyword">if</span> (Process::checkFileDescriptorSymLinks(pid, argv[<span class="number">2</span>]) ||</div><div class="line">                Process::checkFileMaps(pid, argv[<span class="number">2</span>]) ||</div><div class="line">                Process::checkSymLink(pid, argv[<span class="number">2</span>], <span class="string">"cwd"</span>) ||</div><div class="line">                Process::checkSymLink(pid, argv[<span class="number">2</span>], <span class="string">"root"</span>) ||</div><div class="line">                Process::checkSymLink(pid, argv[<span class="number">2</span>], <span class="string">"exe"</span>)) {</div><div class="line"></div><div class="line">                <span class="keyword">char</span> msg[<span class="number">1024</span>];</div><div class="line">                <span class="built_in">snprintf</span>(msg, <span class="keyword">sizeof</span>(msg), <span class="string">"%d %s"</span>, pid, processName);</div><div class="line">                cli-&gt;sendMsg(ResponseCode::StorageUsersListResult, msg, <span class="keyword">false</span>);</div><div class="line">            }</div><div class="line">        }</div><div class="line">        closedir(dir);</div><div class="line">        cli-&gt;sendMsg(ResponseCode::CommandOkay, <span class="string">"Storage user list complete"</span>, <span class="keyword">false</span>);</div><div class="line">    } <span class="keyword">else</span> {</div><div class="line">        cli-&gt;sendMsg(ResponseCode::CommandSyntaxError, <span class="string">"Unknown storage cmd"</span>, <span class="keyword">false</span>);</div><div class="line">    }</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>说那么多，上个图先：<br><img src="https://mingming-killer.github.io/img/pics/android/vold-share-clean/1.png" alt=""></p>
+<h2 id="杀死访问磁盘的进程">杀死访问磁盘的进程</h2>
+<p>上面分析在点击挂载到 PC 的时候，如果检测到有进程在访问磁盘，则会弹个询问框出来，告诉用户现在有程序在访问磁盘，如果还是要挂载磁盘则这些程序可能会出现异常。如果点击确定就会先调用 StroageManager 的 enableUsbMassStorage()，这个最后会调用 MountService 的 setUsbMassStorageEnabled(true) 去向 vold 发 shared 命令去把磁盘从 android 中 unmounted，然后再 shared 到 PC 上。</p>
+<p>（具体过程以后再分析）</p>
+<p>其中 package manager 会收一些广播，然后干一些磁盘 umount 相关的事情，干完后，pm 会调用 MountService 的 finishMediaUpdate() 通知 MountService，然后在 MountService 自己的 Handler 中处理这个消息时候就会调用 ActivityManager 的 killPids 去杀死这些还在访问的磁盘的进程，让挂载能够顺利的进行下去。</p>
+<p>Package Manager 中的 Handler 处理：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> UPDATED_MEDIA_STATUS: {</div><div class="line">    <span class="keyword">if</span> (DEBUG_SD_INSTALL) Log.i(TAG, <span class="string">"Got message UPDATED_MEDIA_STATUS"</span>);</div><div class="line">    <span class="keyword">boolean</span> reportStatus = msg.arg1 == <span class="number">1</span>;</div><div class="line">    <span class="keyword">boolean</span> doGc = msg.arg2 == <span class="number">1</span>;</div><div class="line">    <span class="keyword">if</span> (DEBUG_SD_INSTALL) Log.i(TAG, <span class="string">"reportStatus="</span> + reportStatus + <span class="string">", doGc = "</span> + doGc);</div><div class="line">    <span class="keyword">if</span> (doGc) {</div><div class="line">        <span class="comment">// Force a gc to clear up stale containers.</span></div><div class="line">        Runtime.getRuntime().gc();</div><div class="line">    }</div><div class="line">    <span class="keyword">if</span> (msg.obj != <span class="keyword">null</span>) {</div><div class="line">        <span class="annotation">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</div><div class="line">        Set&lt;AsecInstallArgs&gt; args = (Set&lt;AsecInstallArgs&gt;) msg.obj;</div><div class="line">        <span class="keyword">if</span> (DEBUG_SD_INSTALL) Log.i(TAG, <span class="string">"Unloading all containers"</span>);</div><div class="line">        <span class="comment">// Unload containers</span></div><div class="line">        unloadAllContainers(args);</div><div class="line">    }</div><div class="line">    <span class="keyword">if</span> (reportStatus) {</div><div class="line">        <span class="keyword">try</span> {</div><div class="line">            <span class="keyword">if</span> (DEBUG_SD_INSTALL) Log.i(TAG, <span class="string">"Invoking MountService call back"</span>);</div><div class="line">            <span class="comment">// 通知 MountService            </span></div><div class="line">            PackageHelper.getMountService().finishMediaUpdate();</div><div class="line">        } <span class="keyword">catch</span> (RemoteException e) {</div><div class="line">            Log.e(TAG, <span class="string">"MountService not running?"</span>);</div><div class="line">        }</div><div class="line">    }</div><div class="line">} <span class="keyword">break</span>;</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>MountService 中的处理：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div></pre></td><td class="code"><pre><div class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">finishMediaUpdate</span>() {</div><div class="line">        mHandler.sendEmptyMessage(H_UNMOUNT_PM_DONE);</div><div class="line">    }</div><div class="line"></div><div class="line">    class MountServiceHandler extends Handler {</div><div class="line">        ArrayList&lt;UnmountCallBack&gt; mForceUnmounts = <span class="keyword">new</span> ArrayList&lt;UnmountCallBack&gt;();</div><div class="line">        <span class="keyword">boolean</span> mUpdatingStatus = <span class="keyword">false</span>;</div><div class="line"></div><div class="line">        MountServiceHandler(Looper l) {</div><div class="line">            <span class="keyword">super</span>(l);</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span>(Message msg) {</div><div class="line">	        ... ...</div><div class="line"></div><div class="line">                <span class="keyword">case</span> H_UNMOUNT_PM_DONE: {</div><div class="line">                    <span class="keyword">if</span> (DEBUG_UNMOUNT) Slog.i(TAG, <span class="string">"H_UNMOUNT_PM_DONE"</span>);</div><div class="line">                    <span class="keyword">if</span> (DEBUG_UNMOUNT) Slog.i(TAG, <span class="string">"Updated status. Processing requests"</span>);</div><div class="line">                    mUpdatingStatus = <span class="keyword">false</span>;</div><div class="line">                    <span class="keyword">int</span> size = mForceUnmounts.size();</div><div class="line">                    <span class="keyword">int</span> sizeArr[] = <span class="keyword">new</span> <span class="keyword">int</span>[size];</div><div class="line">                    <span class="keyword">int</span> sizeArrN = <span class="number">0</span>;</div><div class="line">                    <span class="comment">// Kill processes holding references first</span></div><div class="line">                    ActivityManagerService ams = (ActivityManagerService)</div><div class="line">                    ServiceManager.getService(<span class="string">"activity"</span>);</div><div class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++) {</div><div class="line">                        UnmountCallBack ucb = mForceUnmounts.get(i);</div><div class="line">                        String path = ucb.path;</div><div class="line">                        <span class="keyword">boolean</span> done = <span class="keyword">false</span>;</div><div class="line">                        <span class="keyword">if</span> (!ucb.force) {</div><div class="line">                            done = <span class="keyword">true</span>;</div><div class="line">                        } <span class="keyword">else</span> {</div><div class="line">                            <span class="comment">// 这里重新向 vold 获取了一次正在访问磁盘的进程的 pid</span></div><div class="line">                            <span class="keyword">int</span> pids[] = getStorageUsers(path);</div><div class="line">                            <span class="keyword">if</span> (pids == <span class="keyword">null</span> || pids.length == <span class="number">0</span>) {</div><div class="line">                                done = <span class="keyword">true</span>;</div><div class="line">                            } <span class="keyword">else</span> {</div><div class="line">                                <span class="comment">// 调用 am killPids 去杀正在访问磁盘的进程</span></div><div class="line">                                <span class="comment">// Eliminate system process here?</span></div><div class="line">                                ams.killPids(pids, <span class="string">"unmount media"</span>, <span class="keyword">true</span>);</div><div class="line">                                <span class="comment">// Confirm if file references have been freed.</span></div><div class="line">                                pids = getStorageUsers(path);</div><div class="line">                                <span class="keyword">if</span> (pids == <span class="keyword">null</span> || pids.length == <span class="number">0</span>) {</div><div class="line">                                    done = <span class="keyword">true</span>;</div><div class="line">                                }</div><div class="line">                            }</div><div class="line">                        }</div><div class="line">                        <span class="keyword">if</span> (!done && (ucb.retries &lt; MAX_UNMOUNT_RETRIES)) {</div><div class="line">                            <span class="comment">// Retry again</span></div><div class="line">                            Slog.i(TAG, <span class="string">"Retrying to kill storage users again"</span>);</div><div class="line">                            mHandler.sendMessageDelayed(</div><div class="line">                                    mHandler.obtainMessage(H_UNMOUNT_PM_DONE,</div><div class="line">                                            ucb.retries++),</div><div class="line">                                    RETRY_UNMOUNT_DELAY);</div><div class="line">                        } <span class="keyword">else</span> {</div><div class="line">                            <span class="keyword">if</span> (ucb.retries &gt;= MAX_UNMOUNT_RETRIES) {</div><div class="line">                                Slog.i(TAG, <span class="string">"Failed to unmount media inspite of "</span> +</div><div class="line">                                        MAX_UNMOUNT_RETRIES + <span class="string">" retries. Forcibly killing processes now"</span>);</div><div class="line">                            }</div><div class="line">                            sizeArr[sizeArrN++] = i;</div><div class="line">                            mHandler.sendMessage(mHandler.obtainMessage(H_UNMOUNT_MS,</div><div class="line">                                    ucb));</div><div class="line">                        }</div><div class="line">                    }</div><div class="line">                    <span class="comment">// Remove already processed elements from list.</span></div><div class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> i = (sizeArrN-<span class="number">1</span>); i &gt;= <span class="number">0</span>; i--) {</div><div class="line">                        mForceUnmounts.remove(sizeArr[i]);</div><div class="line">                    }</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                }</div><div class="line">                .... ...</div><div class="line">            }</div><div class="line">      }</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Framework/">Android Framework</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2015/01/28/vold share 操作清理正在使用磁盘的进程分析/" data-title="vold share 操作清理正在使用磁盘的进程分析 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/28/Android 开机启动画面分析/" title="Android 开机启动画面分析">
+  <strong>上一篇:</strong><br/>
+  <span>
+  Android 开机启动画面分析</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/28/forceStopPackage 的副作用/"  title="forceStopPackage 的副作用">
+ <strong>下一篇:</strong><br/> 
+ <span>forceStopPackage 的副作用
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#2种_usb_模式"><span class="toc-number">1.</span> <span class="toc-text">2种 usb 模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#访问磁盘的进程检测"><span class="toc-number">2.</span> <span class="toc-text">访问磁盘的进程检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#杀死访问磁盘的进程"><span class="toc-number">3.</span> <span class="toc-text">杀死访问磁盘的进程</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>
