@@ -44,7 +44,7 @@
 
 			<div id="textlogo">
 				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
-				<h2 class="blog-motto">〜(￣△￣〜) 三月学长的根据地 (〜￣△￣)〜</h2>
+				<h2 class="blog-motto">三月学长的小站</h2>
 			</div>
 
 			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
@@ -79,159 +79,6 @@
     <div id="container">
       <div id="main">
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/11/02/Android 应用内存泄漏分析/" title="Android 应用内存泄漏问题分析" itemprop="url">
-  
-    <h1 itemprop="name">Android 应用内存泄漏问题分析</h1>
-    
-     
-           <p itemprop="description" >Java 真的有内存泄漏问题么
-会 java 的人都知道 java 没有 delete 也没有 free 方法，只有 new，java 的内存是虚拟机来自动管理的，程序员不需要关心内存回收，虚拟机会自动管理。所以大家都认为 java 开发比 C/C++ 方便很多，因为再也不用关心</p>
-        
-    
-    <time datetime="2015-11-01T16:35:16.000Z" itemprop="datePublished">2015 11月 2</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2016/03/13/使用 Android 性能分析工具优化性能/" title="使用 Android 性能分析工具优化性能" itemprop="url">
-  
-    <h1 itemprop="name">使用 Android 性能分析工具优化性能</h1>
-    
-     
-           <p itemprop="description" >之前公司基于 android 6.0 的短信开发了一个短信 app，但是 android 原生的短信滑动很卡，刚开始怀疑是头像处理图片的问题，但是把头像去掉后，滑动依旧卡。感觉很奇怪，于是就尝试使用 DDMS 自带的几个工具分析了一下，发现竟然是由于一个 String 使用的问题</p>
-        
-    
-    <time datetime="2016-03-13T08:11:16.000Z" itemprop="datePublished">2016 3月 13</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2016/12/06/工作小笔记——提升 Application 存活概率/" title="工作小笔记——提升 Application 存活概率" itemprop="url">
-  
-    <h1 itemprop="name">工作小笔记——提升 Application 存活概率</h1>
-    
-     
-           <p itemprop="description" >之前由于工作上的原因需要提升应用切换到后台后存活的概率，也就是切换到后台后，不被系统杀掉的概率。这么做的目的是为了能够接收到某些 broadcast，因为某些国产系统（miui，flyme 等），限制了程序自动启动的能力。在这些系统上如果你的程序没有运行，那么 broadcast</p>
-        
-    
-    <time datetime="2016-12-06T08:37:16.000Z" itemprop="datePublished">2016 12月 6</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2016/12/06/工作小笔记——提升应用启动速度/" title="工作小笔记——提升应用启动速度" itemprop="url">
-  
-    <h1 itemprop="name">工作小笔记——提升应用启动速度</h1>
-    
-     
-           <p itemprop="description" >应用开发了几个版本，功能越来越多，集成的 sdk 也越来越多，突然发现，在应用冷启动速度很慢，特别在某些手机上，特别是第一次安装的时候。严重的时候从点击图标启动应用，到看到第一个页面，有些时候需要 6、7s，所以就需要优化一下。
-这里优化的是优化冷启动需要的时间，android </p>
-        
-    
-    <time datetime="2016-12-06T09:46:16.000Z" itemprop="datePublished">2016 12月 6</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/22/Android Broadcast 分析——注册/" title="Android Broadcast 分析——注册" itemprop="url">
-  
-    <h1 itemprop="name">Android Broadcast 分析——注册</h1>
-    
-     
-           <p itemprop="description" >背景
-我们的平板增加了一个关机闹钟的功能。就是设备在关机的情况也能唤醒然后响闹钟。实现方法是：在 kernel 中增加一个 RTC 时钟（关机情况下，板载的 RTC 时钟还在运行的，所以你关机一段时间发现电池会变少），然后提前一段时间开机（我们设定的是1分钟，得给点时间给开机，我</p>
-        
-    
-    <time datetime="2015-01-22T02:07:16.000Z" itemprop="datePublished">2015 1月 22</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/22/Android Broadcast 分析——发送、处理/" title="Android Broadcast 分析——发送、处理" itemprop="url">
-  
-    <h1 itemprop="name">Android Broadcast 分析——发送、处理</h1>
-    
-     
-           <p itemprop="description" >上一篇分析了广播的注册流程，这篇来分析下广播的发送、处理流程。这里为什么把发送和处理和来一起说咧，那是因为其实这是一个过程，发送接口里面差不多就是处理过程了。我们先照例把相关代码位置啰嗦一下（4.2.2）：
-123456789101112131415161718192021222</p>
-        
-    
-    <time datetime="2015-01-22T02:15:16.000Z" itemprop="datePublished">2015 1月 22</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/22/Android Broadcast 分析——超时或异常/" title="Android Broadcast 分析——超时或异常" itemprop="url">
-  
-    <h1 itemprop="name">Android Broadcast 分析——超时或异常</h1>
-    
-     
-           <p itemprop="description" >上一篇（处理篇）最后留了一个问题：串行广播需要一个接着一个执行，如果其中某一个接收器处理的时候挂掉了，或者耗时很长还没处理完，是不是后面的接收器就无法处理了呢。我们在这里看一下 android 是不是已经想到这些了。我们先照例把相关代码位置啰嗦一下（4.2.2）：
-12345# </p>
-        
-    
-    <time datetime="2015-01-22T02:17:16.000Z" itemprop="datePublished">2015 1月 22</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/28/Android Binder 分析——原理/" title="Android Binder 分析——原理" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——原理</h1>
-    
-     
-           <p itemprop="description" >分析之前说一下原理。为要 android 要搞这么复杂的一个东西。那是因为 android 是个多进程的系统，进程间的数据交换、相互调用（某几个程序配合完成某些业务）就涉及跨进程通信。2个进程不能直接访问数据的原因：
-
-每个进程的地址空间的独立的，所以进程A中某个数据的地址在进程</p>
-        
-    
-    <time datetime="2015-01-28T12:17:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/28/Android Binder 分析——通信模型/" title="Android Binder 分析——通信模型" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——通信模型</h1>
-    
-     
-           <p itemprop="description" >通信就要搞一些协议，binder 的比较简单，但是也有一个基本的模型，这里以最基本的一次 IPC 调用来说明一下。然后涉及的代码主要在（这里不列 java 层的代码了，java 层的代码前面原理篇分析过了，主要是挂马甲调用 native 的方法的）：
-123456789# nat</p>
-        
-    
-    <time datetime="2015-01-28T12:29:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/28/Android Binder 分析——数据传递者[Parcel]/" title="Android Binder 分析——数据传递者（Parcel）" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——数据传递者（Parcel）</h1>
-    
-     
-           <p itemprop="description" >前面 binder 原理和通信模型中在接口实现部分（Bp 和 Bn）中应该看到很多地方都有使用 parcel。这个 android 专门设计用来跨进程传递数据的，实现在 native，java 层有接口（基本上是 jni 马甲）。照例先说下源代码位置（4.4 的）：
-123456</p>
-        
-    
-    <time datetime="2015-01-28T12:41:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
-
-  <nav id="page-nav" class="clearfix">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
-  </nav>
 
 </div>
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
@@ -241,69 +88,16 @@
 <aside class="clearfix">
 
   
-<div class="categorieslist">
-	<p class="asidetitle">分类</p>
-		<ul>
-		
-			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
-		
-			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>47</sup></a></li>
-		
-			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
-		
-			<li><a href="/categories/Linux/" title="Linux">Linux<sup>25</sup></a></li>
-		
-			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
-		
-			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
-		
-			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
-		
-			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
-		
-		</ul>
-</div>
-
 
   
-<div class="tagslist">
-	<p class="asidetitle">标签</p>
-		<ul class="clearfix">
-		
-			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
-		
-			<li><a href="/tags/android/" title="android">android<sup>82</sup></a></li>
-		
-			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
-		
-			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
-		
-			<li><a href="/tags/linux/" title="linux">linux<sup>28</sup></a></li>
-		
-			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
-		
-			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
-		
-			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
-		
-			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
-		
-			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
-		
-			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
-		
-		</ul>
-</div>
-
 
   <div class="linkslist">
-  <p class="asidetitle">哥的后勤处 o(^▽^)o</p>
+  <p class="asidetitle">我的链接</p>
     <ul>
-      <li><i class="fa fa-qqzone"></i> <a href="http://user.qzone.qq.com/544630305" target="_blank">QQ 空间</a></li>
       <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
       
         
-          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">战斗力</a></li>
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
         
       
       <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
@@ -311,35 +105,8 @@
 </div>
 
 
-  <div class="commentlist">
-  <p class="asidetitle">最近冒泡的小伙伴 ╰(●&#39;◡&#39;●)╮</p>
-    <ul>
-      <ul class="ds-recent-comments" 
-        data-num-items="6" 
-        data-show-avatars="1" 
-        data-show-title="1"   
-        data-show-time="1" 
-        data-show-admin="1" 
-        data-excerpt-length="30">
-      </ul>
-      <!-- duoshou js begin load, one page only load once -->
-      <script type="text/javascript">
-      var duoshuoQuery = {short_name:"mingming"};
-      (function() {
-        var ds = document.createElement('script');
-        ds.type = 'text/javascript';ds.async = true;
-        ds.src = 'http://static.duoshuo.com/embed.js';
-        ds.charset = 'UTF-8';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
-      })();
-      </script>
-      <!-- duoshou js load end -->
-    </ul>
-</div>
-
-
   <div class="linkslist">
-  <p class="asidetitle">友情链接 o(^▽^)o</p>
+  <p class="asidetitle">友情链接</p>
     <ul>
       <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
       <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
@@ -373,13 +140,11 @@
 		
 		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
 		
-        	
-		<a href="http://user.qzone.qq.com/544630305" target="_blank" title="qqzone"></a>
-		         
+        	         
 	</div>
 -->
 
-		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2019 
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
 		
 		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
 		
