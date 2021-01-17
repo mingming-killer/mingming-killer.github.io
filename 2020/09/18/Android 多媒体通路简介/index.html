@@ -1,0 +1,575 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>Android 多媒体通路简介 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="MediaPlayer
+Sample Code
+官方文档的状态机如下图：
+
+按照官网状态机，一般 MediaPlayer 使用代码如下：
+1234567891011// 1. new MediaPlayer 对象MediaPlayer mp = new MediaPlayer();// 2. set">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/09/18/Android 多媒体通路简介/" title="Android 多媒体通路简介" itemprop="url">Android 多媒体通路简介</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2020-09-18T04:00:00.000Z" itemprop="datePublished">2020 9月 18</time>
+    更新日期:<time datetime="2021-01-17T10:30:00.000Z" itemprop="dateModified">2021 1月 17</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#MediaPlayer"><span class="toc-number">1.</span> <span class="toc-text">MediaPlayer</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Sample_Code"><span class="toc-number">1.1.</span> <span class="toc-text">Sample Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据通路"><span class="toc-number">1.2.</span> <span class="toc-text">数据通路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#应用层（App）"><span class="toc-number">1.2.1.</span> <span class="toc-text">应用层（App）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Application_Framework（Java）"><span class="toc-number">1.2.2.</span> <span class="toc-text">Application Framework（Java）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Application_Framework（JNI）"><span class="toc-number">1.2.3.</span> <span class="toc-text">Application Framework（JNI）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Binder_IPC_Proxy（Native）"><span class="toc-number">1.2.4.</span> <span class="toc-text">Binder IPC Proxy（Native）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MediaPlayerService（Native）"><span class="toc-number">1.2.5.</span> <span class="toc-text">MediaPlayerService（Native）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AwPlayer（Native）"><span class="toc-number">1.2.6.</span> <span class="toc-text">AwPlayer（Native）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MediaCodec"><span class="toc-number">2.</span> <span class="toc-text">MediaCodec</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Sample_Code-1"><span class="toc-number">2.1.</span> <span class="toc-text">Sample Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据通路-1"><span class="toc-number">2.2.</span> <span class="toc-text">数据通路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MediaCodecService"><span class="toc-number">2.2.1.</span> <span class="toc-text">MediaCodecService</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#应用层（App）-1"><span class="toc-number">2.2.2.</span> <span class="toc-text">应用层（App）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Application_Framework（Java）-1"><span class="toc-number">2.2.3.</span> <span class="toc-text">Application Framework（Java）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Application_Framework（JNI）-1"><span class="toc-number">2.2.4.</span> <span class="toc-text">Application Framework（JNI）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stagefright_Engine（Client）"><span class="toc-number">2.2.5.</span> <span class="toc-text">Stagefright Engine（Client）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stagefright_Engine（Service）"><span class="toc-number">2.2.6.</span> <span class="toc-text">Stagefright Engine（Service）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OMX_Plugin"><span class="toc-number">2.2.7.</span> <span class="toc-text">OMX Plugin</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OMX_IL_Component"><span class="toc-number">2.2.8.</span> <span class="toc-text">OMX IL Component</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MediaRecoder"><span class="toc-number">3.</span> <span class="toc-text">MediaRecoder</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Sample_Code-1"><span class="toc-number">3.1.</span> <span class="toc-text">Sample Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据通路-2"><span class="toc-number">3.2.</span> <span class="toc-text">数据通路</span></a></li></ol></li></ol>
+		</div>
+		
+		<h1 id="MediaPlayer">MediaPlayer</h1>
+<h2 id="Sample_Code">Sample Code</h2>
+<p>官方文档的状态机如下图：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/media-framework/know_mediaflow_mp_state.png.png" alt="MediaPlayer状态机"></p>
+<p>按照官网状态机，一般 MediaPlayer 使用代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 1. new MediaPlayer 对象</span></div><div class="line">MediaPlayer mp = <span class="keyword">new</span> MediaPlayer();</div><div class="line"><span class="comment">// 2. setDataSource 设置视频源（真正初始化多媒体组件）</span></div><div class="line">mp.setDataSource(video_url);</div><div class="line"><span class="comment">// 3. 设置 surface（解码显示用）</span></div><div class="line">mp.setSurface(surface);</div><div class="line"><span class="comment">// 4. 多媒体组件 prepare（有异步接口，使用回调通知准备完成）</span></div><div class="line">mp.prepare();</div><div class="line"><span class="comment">// 5. 开始播放</span></div><div class="line">mp.start();</div><div class="line"></div></pre></td></tr></table></figure>
+
+<h2 id="数据通路">数据通路</h2>
+<p>官网的多媒体框架介绍（本文中的 android framework 代码基于 Android 10 其他版本可能会有一些差异）：</p>
+<p><img src="figures/know_mediaflow_ape_fwk_media.png" alt="Media框架"></p>
+<p>MediaPlayer 数据通路时序图如下：</p>
+<p><img src="figures/know_mediaflow_mp_flow.png" alt="MediaPlayer时序图"></p>
+<p>上面的数据通路可以分为6个部分：</p>
+<h3 id="应用层（App）">应用层（App）</h3>
+<p>这部分主要是上层 apk 自己的代码。</p>
+<h3 id="Application_Framework（Java）">Application Framework（Java）</h3>
+<ol>
+<li><p>这部分代码在：</p>
+<p>framework/base/media/java/android/media/MediaPlayer.java<br>/system/framework/framework.jar</p>
+</li>
+<li><p>framework.jar 中代码就是应用调用 sdk 里面的 android.jar。这部分的核心功能是调用 jni 实现的，jni 中有一个 native class 的 MediaPlayer 的。java 的 MediaPlayer 对象中有一个 long mNativeContext 的变量是保存 jni 中 native 对象 MediaPlayer 的指针的，用于 jni 调用；它会在 jni 的 native_init() 中初始化 java 层的 class 还有各种变量的引用，并且在 MediaPlayer.java 的 static 代码段中调用 System.loadLibrary(media_jni) 加载 jni so 和调用 native_init() 初始化。然后在 native_setup()  中将 new 出来的 native MediaPlayer 对象（指针）保存在 java 对象的 mNativeContext 字段中（这个变量是 long，指针本质就是一个地址）。基本上 Android 的多媒体的 api 框架都是这个套路，这个设计框架可以学习一下。</p>
+</li>
+</ol>
+<h3 id="Application_Framework（JNI）">Application Framework（JNI）</h3>
+<ol>
+<li><p>这部分代码在：</p>
+<p>framework/base/media/jni/android_media_MediaPlayer.cpp<br>/system/framework/lib/libmedia_jni.so</p>
+</li>
+<li><p>MediaPlayer framework jni 中也没什么实际工作，主要就是 new 了 native MediaPlayer 对象，调用 native MediaPlayer 接口。</p>
+</li>
+</ol>
+<h3 id="Binder_IPC_Proxy（Native）">Binder IPC Proxy（Native）</h3>
+<ol>
+<li><p>这部分代码在：</p>
+<p>frameworks/av/media/libmedia/mediaplayer.cpp<br>/system/framework/lib/libmedia.so</p>
+</li>
+<li><p>av 下面这个 libmedia.so 会去和 MediaPlayerService 连接（创维 MediaPlayerService 的 Client），主要都是通过 Binder 去调用 MediaPlayerService 的接口，功能都在 MediaPlayerService 里面实现。这个 native 的类里面会持有 MediaPlayerService Client 的 Bp 端。所以这个 so 还是属于 App 进程空间的。主要功能实现都是调用 MediaPlayerService Client 的接口，转发到 MediaPlayerService 中调用。sdk 文档中的状态机是在这个类里维护的，所以状态仅仅在 App 端维护，Service 端没有这些状态机的概念。</p>
+</li>
+</ol>
+<h3 id="MediaPlayerService（Native）">MediaPlayerService（Native）</h3>
+<ol>
+<li><p>这部分代码在：</p>
+<p>frameworks/av/media/libmediaplayerservice/MediaPlayerService.cpp<br>/system/framework/lib/libmediaplayerservice.so</p>
+</li>
+<li><p>MediaPlayerService 是一个 native 的系统服务。它的服务的 bin 在 frameworks/av/media/mediaserver，进程是 mediaserver，服务接口是：media.player: [android.media.IMediaPlayerService]。它主要是维护一个 mClients 的列表（SortedVector）。当有客户端（上面 libmedia.so）连接的时候会创建 Client（Bn 端）对象，然后保存到列表里面，当客户端销毁的时候就会清掉这个 Client。当 App 调用 setDataSource 的时候，MediaPlayerService 会通过 MediaPlayerFactory 创建方案商自己的 Player（方案商的解码器是硬解，要是 AOSP 原生的就是软解），我们这边就是 AwPlayer。每一个 Client 中都会有一个 AwPlayer。App MediaPlayer 各种接口调用最后都会调用到解码器的同名接口。</p>
+</li>
+</ol>
+<h3 id="AwPlayer（Native）">AwPlayer（Native）</h3>
+<ol>
+<li><p>这部分代码在：</p>
+<p>frameworks/av/media/libcedarx/android_adapter/awplayer/awplayer.cpp<br>/system/framework/lib/libawplayer.so</p>
+</li>
+<li><p>其实这部分代码远不止这里列出来的这些。这部分就是方案商硬解的解码器的代码实现了。这里可以看到方案商的解码器需要适配 android 的 MediaPlayer 的接口。这里面有一堆解码器的库（例如上面列出来的 libcdx_ 开头的这些库），这部分就是多媒体那边负责了的，当然有兴趣的也可以看看代码，但是有一部分是不开源的。</p>
+</li>
+</ol>
+<h1 id="MediaCodec">MediaCodec</h1>
+<h2 id="Sample_Code-1">Sample Code</h2>
+<p>简单来说 MediaCodec 比 MediaPlayer 更加灵活，更加底层，这表明 MediaCodec 使用上会更加复杂。MediaPlayer 帮我们把视频解析、音视频解码以及同步、状态管理之类的都做了，开发者基本上只需要设置视频源，就可以开始播放了。而 MediaCodec 需要做大量的工作。当然好处就是实现一些视觉处理逻辑，例如图像识别啊、视觉算法之类的。下面的 sample code 只是为了简单说明 MediaCodec 的使用流程，省略了视频解析的流程，并且没有处理音频。android 上除了使用 MediaPlayer、MediaCodec 处理多媒体以外，还有一种更灵活的方式，那就是自己移植解码器，例如说 ffmpeg；当然这种就更加复杂，一般一些复杂的直播或者短视频软件才会这么干。</p>
+<p>看看官方的框架介绍：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/media-framework/know_mediaflow_mcodec_usage_1.png" alt="MediaCodec框架"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/media-framework/know_mediaflow_mcodec_usage_2.png" alt="MediaPlayer状态机"></p>
+<p>下面是 MediaCodec 的一般用法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// MediaCodec 是异步架构的:</span></div><div class="line"><span class="comment">// 创建 MediaCodec：</span></div><div class="line"><span class="comment">// avc: h264 decoder, byCodecName 可以通过 MediaCodecList 获取（一般获取硬解的）</span></div><div class="line">MediaCodec decoder = MediaCodec.createByCodecName(<span class="string">"OMX.allwinner.video.decoder.avc"</span>);</div><div class="line">MediaCodec decoder = MediaCodec.createDecoderByType(<span class="string">"video/avc"</span>);</div><div class="line"></div><div class="line"><span class="comment">// 配置 codec</span></div><div class="line">String videoFormat = <span class="string">"video/avc"</span>;</div><div class="line">MediaFormat format = MediaFormat.createVideoFormat(videoFormat, VIDEO_WIDTH, VIDEO_HEIGHT);</div><div class="line">format.setString(<span class="string">"KEY_MIME"</span>, videoFormat);</div><div class="line">format.setInteger(MediaFormat.KEY_BIT_RATE, <span class="number">30000000</span>);</div><div class="line"><span class="comment">// must provide a surface for fast decode</span></div><div class="line">decoder.configure(format, surface, <span class="keyword">null</span>, <span class="number">0</span>);</div><div class="line"></div><div class="line"><span class="comment">// 设置回调：</span></div><div class="line"><span class="comment">// MediaCodec 是异步的，通过回调来告诉调用者 输入/输出 buffer 可用， </span></div><div class="line"><span class="comment">// 开发者可以给解码器送输入/输出数据流。至于自己的业务逻辑怎么管理 buffer，同步之类的，</span></div><div class="line"><span class="comment">// 都需要开发者自己设计，实现</span></div><div class="line">decoder.setCallback(<span class="keyword">new</span> Callback() {</div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onInputBufferAvailable</span>(MediaCodec codec, <span class="keyword">int</span> index) {</div><div class="line">            <span class="comment">// 这个回调告诉开发者有输入 buffer 可以用了：</span></div><div class="line">            <span class="comment">// 获取 codec 输入 buffer</span></div><div class="line">            ByteBuffer inputBuffer = codec.getInputBuffer(outputBufferId);</div><div class="line"></div><div class="line">            <span class="comment">// 一般是通过 MediaExtractor（parser）提取出多媒体码流送给输入 buffer</span></div><div class="line">            inputBuffer.put(xx);</div><div class="line"></div><div class="line">            <span class="comment">// 返还输出缓冲给 codec</span></div><div class="line">            codec.queueInputBuffer(inputBufferId, ...);</div><div class="line">        }</div><div class="line"></div><div class="line">        <span class="annotation">@Override</span></div><div class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onOutputBufferAvailable</span>(MediaCodec codec, <span class="keyword">int</span> index, MediaCodec.BufferInfo info) {</div><div class="line">            <span class="comment">// 这个回调告诉开发者有输出 buffer 可以用了，一般这就代表一帧数据解码好了：</span></div><div class="line">            <span class="comment">// 获取输出 buffer (其中包含编解码后数据)</span></div><div class="line">            ByteBuffer outputBuffer = codec.getOutputBuffer(outputBufferId);</div><div class="line">            MediaFormat bufferFormat = codec.getOutputFormat(outputBufferId); </div><div class="line"></div><div class="line">            <span class="comment">// 处理编解码后的数据：这里就可以做一些自己的业务操作，例如说图像识别之类的</span></div><div class="line">            …</div><div class="line"></div><div class="line">            <span class="comment">// 返还输出 buffer 给 codec</span></div><div class="line">            codec.releaseOutputBuffer(outputBufferId, ...);</div><div class="line">        }</div><div class="line">}, ...);</div><div class="line"></div><div class="line"><span class="comment">// 开始解码</span></div><div class="line">decoder.start();</div><div class="line"></div></pre></td></tr></table></figure>
+
+<h2 id="数据通路-1">数据通路</h2>
+<h3 id="MediaCodecService">MediaCodecService</h3>
+<p>MediaCodecService 启动时序图：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/media-framework/know_mediaflow_mcs_init_flow.png" alt="MediaCodecService启动时序图"></p>
+<ol>
+<li><p>先来说一下 MediaCodecService 启动流程。MediaCodecService 和 MediaPlayerService 不一样，它属于 HIDL 服务，使用 Android 新的 HIDL 框架编写。一般 HIDL 的 Services 进程名字都叫 android.hardware.xx.xx@version-service。本来 MediaCodecService 的进程名也是叫 android.hardware.media.omx@1.0-service 的（编译出的bin文件都是 /vendor/bin/hw/android.hardware.media.omx@1.0-service），但是在 main 函数里面手动把进程名字改成 media.codec 了，所以 ps 看到的还是以前 android 版本的进程名字。media.codec 是硬解的 codec，另外一个 media.swcodec 是软解的 codec，这里暂时不分析系统自带的软解 codec。 </p>
+</li>
+<li><p>上面可以看到 media.codec 的服务名字其实是叫 omx，而且它的组件也是 omx 之类的代码。MediaCodec 使用的是 OpenOmx（Android 上简称 omx） 的框架，OpenOmx 是由 Khronos Group 提出的一个开源跨平台多媒体框架，Android 主要使用 omx 来实现多媒体编解码硬件加速。omx 基于插件（Plugin）形式来实现编解码，芯片厂商只需要将自己的解码器包装成 omx 的 Plugin 就能实现解码硬件加速（硬解）。omx 用 node 代表一种解码器（例如说 h264、h265、mjpeg 等），node 的 instance 代表这种解码器的一个实例（例如说应用要创建一个 h264 的解码器，就需要实例化一个 h264 node 的 instance）。由 master 来管理 node。</p>
+</li>
+<li>media.codec bin 的代码在 frameworks/av/services/mediacodec，IOmx 接口定义在 hardware/interfaces/media/omx/1.0/ 。media.codec 的 main 其实实现了 2个 hidl 接口，一个 IOmx，一个 IOmxStore。IOmx 就是 omx 实现，我们主要说这个，IOmxStore 暂时还没了解是干什么的，暂时先不说。main 函数整个流程很简单：new 了 Omx 之后，注册 hidl services 之后一直等待连接了。</li>
+<li>Omx.cpp 代码在 frameworks/av/media/libstagefright/omx/ （/system/lib/libstagefright_omx.so）。它的初始化流程也比较简单，new 了 一个 OMXMaster，然后在 xml 中加载了一些 Parser（parser 时序图里没画出来，这里略过）。主要初始化在 OMXMaster.cpp 里面（上面介绍了 master 主要是管理 omx 的 plugin 的）。</li>
+<li>OMXMaster 的初始化主要是加载 plugin。主要是函数 addVendorPlugin，这个函数是加载芯片原厂的解码器插件也就是硬解插件，还有一个 addPlatformPlugin 是加载 android 自带的软解的解码器插件，这里主要介绍硬解的插件加载过程，软解的先不说。插件加载是通过动态加载 libstagefrighthw.so 来实现的。通过查找并调用 so 中的 createOMXPlugin 函数来初始化硬解解码器插件。</li>
+<li>libstagefrighthw.so （/vendor/lib/libstagefrighthw.so） 相关源码在 frameworks/av/media/libcedarc/openomx/libstagefrighthw/ 。这个库里面有一个 c 函数，就是上面提到的 createOMXPlugin，它就 new 了一个 AwOMXPlugin 返回给 media.codec 服务，这是一个继承了 OMXPluginBase  的类，也是按照 android 定义的接口实现的。AwOMXPlugin 是在初始化函数里面初始化的，它也加载了另外一个库：libOmxCore.so 。然后 AddVDLib 中连续调用了 InitVDLIb 加载各个解码器模块（例如 libawh265.so、libawh264.so、libawmjpeg.so 等）。InitVDLib 里面也是 dlopen 打开 so，然后查找 一个叫 CedarPluginVDInit 的函数，并调用，就去初始化对应的解码器模块了。但是这些 libawxx.so 的库多媒体部门并不开源（这些 so 在 /frameworks/av/media/libcedarc/library/ 下面，分平台放置），所以我们无法看到具体的初始化代码。然后查找并调用了 libOmxCore.so 中的  OMX_Init 函数，不过这个函数目前是空函数，并没有时间处理逻辑。</li>
+<li>libOmxCore.so（/vendor/lib/libOmxCore.so） 相关源码在 frameworks/av/media/libcedarc/openomx/omxcore/。上面创建的 AwOMXPlugin 的对象之后，会接着调用 AwOMXPlugin 里面的 enumerateComponents 函数去枚举所有的插件里面所有的解码器组件（这是个 while 循环，当枚举函数返回 0 就表示组件已经加载完了）。AwOMXPlugin 会进一步调用到 aw_omx_core.c 里面的 OMX_ComponetNameEnum，而这个函数就是通过 index 在一个全局的数组 OmxCoreType core[] 里面获取编号 index 的解码器的名字。这个 OmxCoreType 是一个我们定义的结构体，里面有解码器的名字、so 的 fp handle、一些函数指针。这个数组的作用是定义所支持的解码器列表。这个变量定义在 aw_registry_table.c 文件中静态初始化（so 被 load 的时候就初始化了），aw_registry_table.c 是分平台放置的（有多份，不同平台支持的解码器不一样，分 IC），可以在这个文件里面看到平台支持的解码器情况。枚举完之后，会把初始化的解码器组件信息按名字保存在一个列表里面：mPluginByComponentName。这个列表在后面创建解码器（实例化解码器 Node 实例）的时候会用到。</li>
+<li>上面能看到 OMX 的 Plugin 通过 so 的形式存在，通过定义好 函数接口，通过 dlopen、load、查找函数来实现 plugin 加载、交互。这个框架我们也可以学习一下。</li>
+</ol>
+<p>接下来看看 MediaCodec 应用端这边的时序图： </p>
+<p><img src="figures/know_mediaflow_mc_flow.png" alt="MediaCodec时序图"></p>
+<p>可以看到 MediaCodec 比 MediaPlayer 要复杂很多（上面的时序已经简化过了）。</p>
+<h3 id="应用层（App）-1">应用层（App）</h3>
+<p>这部分主要是上层 apk 自己的代码。</p>
+<h3 id="Application_Framework（Java）-1">Application Framework（Java）</h3>
+<ol>
+<li><p>这部分代码在：</p>
+<p>framework/base/media/java/android/media/MediaCodec.java<br>/system/framework/framework.jar</p>
+</li>
+<li><p>这部分代码套路和 MediaPlayer 一样，不过多说明。</p>
+</li>
+</ol>
+<h3 id="Application_Framework（JNI）-1">Application Framework（JNI）</h3>
+<ol>
+<li><p>这部分代码在：</p>
+<p>framework/base/media/jni/android_media_MediaCodec.cpp<br>/system/framework/lib/libmedia_jni.so</p>
+</li>
+<li><p>这部分代码套路也和 MediaPlayer 一样，不过多说明。</p>
+</li>
+</ol>
+<h3 id="Stagefright_Engine（Client）">Stagefright Engine（Client）</h3>
+<ol>
+<li><p>这部分代码在：</p>
+<p>frameworks/av/media/libstagefright/MediaCodec.cpp<br>frameworks/av/media/libstagefright/ACodec.cpp<br>/system/framework/lib/libstagefright.so</p>
+</li>
+<li><p>这里主要是 media.codec 的 client 端，主要业务逻辑都是通过 media.codec 创建插件的解码器（node）的 instance，然后转由不同解码器的 instance 调用到解码器内部实现。MediaCodec 有2个静态创建 MediaCodec 的函数：一个 createByCodecName，一个 createDecoderByType。createByCodecName 传递的是解码器的名字，这个名字在 vendor 的 插件（我们这里就是前面说的那个 core[] 数组里面定义的）里面定义。当然 app 可以通过 MediaCodecList 罗列出所有支持指定类型的解码器的名字，例如说需要 “avc”（H264） 的解码器，一般返回的列表的第一个就是平台的硬解的解码器（例如说 SampleCode 里面 allwinner 开头的解码器）。当然你也可以根据平台自己写死解码器名字。第二个 createDecoderByType 传递的是需要解码器类型，例如说 “video/avc” ，内部也是通过 MediaCodecList 罗列出所有支持的解码器，然后取第一个。这个2个函数最终通路都是一样的，所以时序图只画了 createByCodecName，最后都是通过名字来创建解码器实例的。</p>
+</li>
+<li><p>MediaCodec 又包了一个 ACodec 的结构，真正处理逻辑的是 ACodec。ACodec 会连接 media.codec 服务，在服务端通过 omx master 创建对应 node（解码器）的 instance。</p>
+</li>
+<li><p>MediaCodec 和 ACodec 采用消息处理机制，分别有2个消息处理线程和队列。MediaCodec 的消息线程在 jni com_android_MediaCodec 的 JMediaCodec 构造函数里面创建，ACodec 则是在 MediaCodec 的 init 函数中创建。注意这里使用的 ALooper、AMessage 并不是 native ndk 那套 looper、message，而是自己 libstagefright 中 foundation 里面自己实现的一套（其实 android 里面也有一些重复的轮子）。一个 ALooper 都是一个 Thread 的封装，所以有处理消息的线程就有2个。</p>
+</li>
+<li><p>MediaCodec 和 ACodec 都采用状态机来处理逻辑，而且是各自独立管理的，也就是说有2套状态。MediaCodec 的状态官方用图表示出来了，就是前面贴的 MediaCodec 的框架图的那个状态图。而 ACodec 相当于是内部实现，官方并没有说明其状态变化，不过基本上套路也差不多。状态机基本上都是设置一个初始化状态，然后从一个状态迁合法的移到另外一个状态，如果当前状态不对的话，则会抛出错误。可以让复杂的逻辑有迹可循，可以借鉴学习一下。 </p>
+</li>
+<li><p>MediaCodec 初始状态为 UNINITIALIZED， 创建 ACodec 对象（ACodec 对应初始状态为：UninitializedState） 。然后 MediaCodec 变成 INITIALIZING 调用 ACodec 的  initiateAllocateComponent。initiateAllocateComponent 会去连 meida.codec  创建对应的 node instance。这个时候 ACodec 会变成 Loaded 状态，然后通过回调通知 MediaCodec 变成 INITIALIZED 状态。</p>
+</li>
+<li><p>后续要调用 configure 进行配置，configure 套路和前面初始化基本一致，它主要是给 omx 配置 surface（buffer）。这里可以看到 omx 一般有2个端口，input port 和 output port，调用的时候需要指出是 input 还是 output，omx 的机制还不是很熟，这里不过多介绍。调用 configure 之后，MediaCodec 会从 INITIALIZED  —&gt; CONFIGURING —&gt; CONFIGURED。ACodec 状态不变。</p>
+</li>
+<li><p>最后调用 start 让解码器开始工作。</p>
+</li>
+</ol>
+<h3 id="Stagefright_Engine（Service）">Stagefright Engine（Service）</h3>
+<ol>
+<li><p>这部分代码在：</p>
+<p>frameworks/av/media/libstagefright/omx/1.0/Omx.cpp<br>frameworks/av/media/libstagefright/omx/1.0/OMXMaster.cpp<br>frameworks/av/media/libstagefright/omx/1.0/OMXNodeInstance.cpp<br>/system/framework/lib/libstagefright_omx.so</p>
+</li>
+<li><p>这部前面介绍过服务初始的流程。 承接前面，当 app 要创建指定的解码器，client 那边会调用 allocateNode 让服务创建指定解码器的 instance。service 这边会先 new 一个 OMXNodeInstance， 然后在前面加载好的mPluginByComponetName 列表中找到对应的 vendor plugin（我们这里是 AwOMXPlugin），然后调用 plugin 的 OMX_GetHandle 函数（这里就是 AwOmxComponentCreate）。这个函数里面会查找前面说的 core[] 这个数组，这个数组里面定义了解码器对应实现的 so：</p>
+</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#<span class="keyword">define</span> OMX_VDEC_LIB_NAME  "libOmxVdec.so"</span></div><div class="line"><span class="preprocessor">#<span class="keyword">define</span> OMX_VENC_LIB_NAME  "libOmxVenc.so"</span></div><div class="line"><span class="preprocessor">#<span class="keyword">define</span> OMX_ADEC_LIB_NAME  "libOmxAdec.so"</span></div><div class="line"></div><div class="line">    <span class="comment">//*18. avc decoder</span></div><div class="line">    {</div><div class="line">        <span class="string">"OMX.allwinner.video.decoder.avc"</span>,</div><div class="line">        NULL,</div><div class="line">        {</div><div class="line">            NULL,NULL,NULL,NULL</div><div class="line">        },</div><div class="line">        NULL,</div><div class="line">        OMX_VDEC_LIB_NAME,</div><div class="line">        {</div><div class="line">            <span class="string">"video_decoder.avc"</span></div><div class="line">        }</div><div class="line">    },</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>​       例如说这个 H264 的解码器对应实现的 so 就是 libOmxVdec.so 。然后会在这个 so 中查找 OMXNode 的接口     函数，并调用。</p>
+<ol>
+<li>service 这边的逻辑就是上面那样，创建了 node 的对象（就是 node 的实例），然后调用 node 的方法。通过这里可以看到 omx 的结构是：master 管理（创建） plugin，一般 android 自带一个 soft plugin，vendor 带一个硬件 plugin；plugin 里面有一系列 node（一个 node 就是一个解码器），一个 node 可以创建多个实例（instance）。app 通过解码器的名字（node 的名字）创建 node 的 instance。当然了 vendor 的 plugin 和 node 都要实现 android 定义的 omx 相关的接口。</li>
+</ol>
+<h3 id="OMX_Plugin">OMX Plugin</h3>
+<ol>
+<li><p>这部分代码在：</p>
+<p>frameworks/av/media/libcederc/openomx/libstagefrighthw/AwOMXPlugin.cpp<br>/vendor/lib/libstagefrighthw.so</p>
+</li>
+<li><p>这部分前面已经介绍过了。这里可以发现一个规律，android 框架代码的 so，都是在 /system/lib/ 下面的，vnedor 自己实现的 so 都是 /vendor/lib/ 下面的。</p>
+</li>
+</ol>
+<h3 id="OMX_IL_Component">OMX IL Component</h3>
+<ol>
+<li><p>这部分代码在：</p>
+<p>frameworks/av/media/libcederc/openomx/omxcore/aw_omx_core.c<br>frameworks/av/media/libcederc/openomx/omxcore/aw_omx_component.c<br>frameworks/av/media/libcederc/openomx/vdec/omx_vdec.c<br>/vendor/lib/libOmxCore.so<br>/vendor/lib/libOmxVdec.so</p>
+</li>
+<li><p>这里接着前面 plugin 创建 node 那里。H264 实现的 so 是 libOmxVdec 。在 OMX_GerHandle 函数里面，回去 libOmxVdec.so 里面查找加载 node 的初始化函数 AwOmxComponentCreate（对应实现函数 __AwOmxComponentCreate），这个函数里面会先 new 一个 AwOmxVdec 的对象（这个应该是对应解码器的对象了，也可以说是 node 的对象），然后初始化 AwOmxVdec，把接口的函数指针都赋值。这样后续就能通过接口调用到解码器内部的函数了。至于这个 so 里面的实现目前还没细看（应该和 AwPlayer 一样，后面关键的代码都是二进制的 so 里面的）。</p>
+</li>
+<li><p>时序图可以看到创建 MediaCodec 是创建解码器对象，configure 是配置 surface（MediaCodec 的 configure 流程很复杂，有600多行，这里只选了我感兴趣的看），start 是申请了 buffer。start 之后解码器内部应该运转起来了。解码器内部可以通过 send event 的方式来通知 client 端的 ACodec（MediaCodec），运转起来之后应该状态会变成官网描述的 Flushed。</p>
+</li>
+<li><p>MediaCodec 还是比 MediaPlayer 复杂很多（当然 AwPlayer 的具体实现应该也挺复杂的），但是给予更多的灵活性。android 多媒体编解码的这2条通路的设计思路还是值得学习的。</p>
+</li>
+</ol>
+<h1 id="MediaRecoder">MediaRecoder</h1>
+<h2 id="Sample_Code-1">Sample Code</h2>
+<p>待补充</p>
+<h2 id="数据通路-2">数据通路</h2>
+<p>待补充</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Framework/">Android Framework</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2020/09/18/Android 多媒体通路简介/" data-title="Android 多媒体通路简介 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/11/02/Android 应用内存泄漏分析/"  title="Android 应用内存泄漏问题分析">
+ <strong>下一篇:</strong><br/> 
+ <span>Android 应用内存泄漏问题分析
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#MediaPlayer"><span class="toc-number">1.</span> <span class="toc-text">MediaPlayer</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Sample_Code"><span class="toc-number">1.1.</span> <span class="toc-text">Sample Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据通路"><span class="toc-number">1.2.</span> <span class="toc-text">数据通路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#应用层（App）"><span class="toc-number">1.2.1.</span> <span class="toc-text">应用层（App）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Application_Framework（Java）"><span class="toc-number">1.2.2.</span> <span class="toc-text">Application Framework（Java）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Application_Framework（JNI）"><span class="toc-number">1.2.3.</span> <span class="toc-text">Application Framework（JNI）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Binder_IPC_Proxy（Native）"><span class="toc-number">1.2.4.</span> <span class="toc-text">Binder IPC Proxy（Native）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MediaPlayerService（Native）"><span class="toc-number">1.2.5.</span> <span class="toc-text">MediaPlayerService（Native）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AwPlayer（Native）"><span class="toc-number">1.2.6.</span> <span class="toc-text">AwPlayer（Native）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MediaCodec"><span class="toc-number">2.</span> <span class="toc-text">MediaCodec</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Sample_Code-1"><span class="toc-number">2.1.</span> <span class="toc-text">Sample Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据通路-1"><span class="toc-number">2.2.</span> <span class="toc-text">数据通路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MediaCodecService"><span class="toc-number">2.2.1.</span> <span class="toc-text">MediaCodecService</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#应用层（App）-1"><span class="toc-number">2.2.2.</span> <span class="toc-text">应用层（App）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Application_Framework（Java）-1"><span class="toc-number">2.2.3.</span> <span class="toc-text">Application Framework（Java）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Application_Framework（JNI）-1"><span class="toc-number">2.2.4.</span> <span class="toc-text">Application Framework（JNI）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stagefright_Engine（Client）"><span class="toc-number">2.2.5.</span> <span class="toc-text">Stagefright Engine（Client）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stagefright_Engine（Service）"><span class="toc-number">2.2.6.</span> <span class="toc-text">Stagefright Engine（Service）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OMX_Plugin"><span class="toc-number">2.2.7.</span> <span class="toc-text">OMX Plugin</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OMX_IL_Component"><span class="toc-number">2.2.8.</span> <span class="toc-text">OMX IL Component</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MediaRecoder"><span class="toc-number">3.</span> <span class="toc-text">MediaRecoder</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Sample_Code-1"><span class="toc-number">3.1.</span> <span class="toc-text">Sample Code</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#数据通路-2"><span class="toc-number">3.2.</span> <span class="toc-text">数据通路</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>35</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>48</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>8</sup></a></li>
+		
+			<li><a href="/categories/Server/" title="Server">Server<sup>1</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>83</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>3</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>
