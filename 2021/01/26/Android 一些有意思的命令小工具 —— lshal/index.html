@@ -1,0 +1,471 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>Android 一些有意思的命令小工具 —— lshal | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="android 自带了很多 cmds 的小工具，都挺用有的，也有些比较有意思。这里介绍的是 lshal 这个工具。说之前先把相关源码位置说下（10.0 的）：
+12345# lshal 源码：frameworks/native/cmds/lshal/# auto vhal 源码：hardware/i">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2021/01/26/Android 一些有意思的命令小工具 —— lshal/" title="Android 一些有意思的命令小工具 —— lshal" itemprop="url">Android 一些有意思的命令小工具 —— lshal</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2021-01-26T10:44:16.000Z" itemprop="datePublished">2021 1月 26</time>
+    更新日期:<time datetime="2021-01-26T10:44:16.000Z" itemprop="dateModified">2021 1月 26</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#作用"><span class="toc-number">1.</span> <span class="toc-text">作用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#list"><span class="toc-number">1.1.</span> <span class="toc-text">list</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#debug"><span class="toc-number">1.2.</span> <span class="toc-text">debug</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#源码分析"><span class="toc-number">2.</span> <span class="toc-text">源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#ListCommand"><span class="toc-number">2.1.</span> <span class="toc-text">ListCommand</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DebugCommand"><span class="toc-number">2.2.</span> <span class="toc-text">DebugCommand</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HelpCommand"><span class="toc-number">2.3.</span> <span class="toc-text">HelpCommand</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+		</div>
+		
+		<p>android 自带了很多 cmds 的小工具，都挺用有的，也有些比较有意思。这里介绍的是 lshal 这个工具。说之前先把相关源码位置说下（10.0 的）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># lshal 源码：</span></div><div class="line">frameworks/native/cmds/lshal/</div><div class="line"><span class="comment"># auto vhal 源码：</span></div><div class="line">hardware/interfaces/automotive/vehicle/<span class="number">2.0</span>/default/</div><div class="line"></div></pre></td></tr></table></figure>
+
+<h1 id="作用">作用</h1>
+<p>之前的文章介绍的：<a href="http://light3moon.com/2015/01/30/Android%20%E4%B8%80%E4%BA%9B%E6%9C%89%E6%84%8F%E6%80%9D%E7%9A%84%E5%91%BD%E4%BB%A4%E5%B0%8F%E5%B7%A5%E5%85%B7%20%E2%80%94%E2%80%94%20dumpsys/" target="_blank" rel="external">Android 一些有意思的命令小工具 —— dumpsys</a> 和 <a href="http://light3moon.com/2015/01/30/Android%20%E4%B8%80%E4%BA%9B%E6%9C%89%E6%84%8F%E6%80%9D%E7%9A%84%E5%91%BD%E4%BB%A4%E5%B0%8F%E5%B7%A5%E5%85%B7%20%E2%80%94%E2%80%94%20service/" target="_blank" rel="external">Android 一些有意思的命令小工具 —— service</a> 。service 的作用在于列出 ServiceManager 中已经注册了的服务，并且可以调用服务的接口来进行调试。而 dumpsys 则是调用指定服务的 dump 接口打印服务中的一些状态，用于调试。</p>
+<p>上面这些工具都是针对系统的 Binder 服务的。从 Android 8.0 开始，Android 在 HAL 层引入了 HIDL 的设计。将 hal 层模块变成类似 Binder 的结构，通过统一的接口，来解耦 hal 层（详细信息可以去看官网的介绍：<a href="https://source.android.com/devices/architecture/hidl?hl=zh-cn" target="_blank" rel="external">HIDL</a>）。这个就相当于是在 hal 层也跑一些系统服务，只不过为了安全考虑，Android 把 hal 层的服务和 java 层的 SystemService 区分开了，hal 层使用的 binder 设备是 /dev/hwbinder（java 层的是 /dev/binder），hal 层的是 hwservicemanager（java 层的是 ServiceManager，不过这2个进程代码是一样的，就是启动的时候传入参数不一样，使用的 binder 设备节点不一样而已）。 </p>
+<p>lshal 就是针对 hidl 的 service 和 dumpsys 的集合。当然它的功能不止这些，看官方介绍，还能生成兼容性矩阵描述信息之类的（官方的介绍：<a href="https://source.android.com/devices/architecture/vintf/resources?hl=zh-cn" target="_blank" rel="external">LSHAL</a>）。但是我们这里主要是介绍类似 service 和 dumpsys 的功能：</p>
+<h2 id="list">list</h2>
+<p>list 命令会列出所有的 HIDL 服务（不加 list 也行，默认空参数就是 list 命令）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">| All binderized services (registered with hwservicemanager)</div><div class="line">VINTF R Interface                                                                 Thread Use Server Clients</div><div class="line">FM    Y android.frameworks.cameraservice.service@<span class="number">2.0</span>::ICameraService/default      <span class="number">0</span>/<span class="number">3</span>        <span class="number">1896</span>   <span class="number">1709</span></div><div class="line">FM    Y android.frameworks.displayservice@<span class="number">1.0</span>::IDisplayService/default            <span class="number">0</span>/<span class="number">1</span>        <span class="number">1862</span>   <span class="number">1709</span></div><div class="line">DC,FM Y android.frameworks.schedulerservice@<span class="number">1.0</span>::ISchedulingPolicyService/default <span class="number">0</span>/<span class="number">5</span>        <span class="number">2032</span>   <span class="number">1709</span></div><div class="line">FM    Y android.frameworks.sensorservice@<span class="number">1.0</span>::ISensorManager/default              <span class="number">0</span>/<span class="number">5</span>        <span class="number">2032</span>   <span class="number">1709</span></div><div class="line">FM    Y android.frameworks.stats@<span class="number">1.0</span>::IStats/default                              <span class="number">0</span>/<span class="number">1</span>        <span class="number">1908</span>   <span class="number">1709</span></div><div class="line">DM,FC Y android.hardware.audio.effect@<span class="number">5.0</span>::IEffectsFactory/default                <span class="number">0</span>/<span class="number">4</span>        <span class="number">1831</span>   <span class="number">1846</span> <span class="number">1709</span></div><div class="line">DM,FC Y android.hardware.audio@<span class="number">5.0</span>::IDevicesFactory/default                       <span class="number">0</span>/<span class="number">4</span>        <span class="number">1831</span>   <span class="number">1846</span> <span class="number">1709</span></div><div class="line">DM    N android.hardware.automotive.evs@<span class="number">1.0</span>::IEvsEnumerator/EvsEnumeratorHw       <span class="number">0</span>/<span class="number">1</span>        <span class="number">1832</span>   <span class="number">1709</span></div><div class="line">DM,FC N android.hardware.automotive.vehicle@<span class="number">2.0</span>::IVehicle/default                 <span class="number">0</span>/<span class="number">3</span>        <span class="number">12682</span>  <span class="number">1709</span></div><div class="line">DM,FC Y android.hardware.camera.provider@<span class="number">2.4</span>::ICameraProvider/legacy/<span class="number">0</span>            <span class="number">0</span>/<span class="number">4</span>        <span class="number">2112</span>   <span class="number">1896</span> <span class="number">1709</span></div><div class="line">...</div><div class="line"></div><div class="line">| All interfaces that getService() has ever returned as a passthrough interface;</div><div class="line">| PIDs / processes shown below might be inaccurate because the process</div><div class="line">| might have relinquished the interface or might have died.</div><div class="line">| The Server / Server CMD column can be ignored.</div><div class="line">| The Clients / Clients CMD column shows all process that have ever dlopen<span class="string">'ed </span></div><div class="line"><span class="string">| the library and successfully fetched the passthrough implementation.</span></div><div class="line"><span class="string">VINTF R Interface                                                      Thread Use Server Clients</span></div><div class="line"><span class="string">FC    ? android.hardware.audio.effect@5.0::IEffectsFactory/default     N/A        1831   1831</span></div><div class="line"><span class="string">FC    ? android.hardware.audio@5.0::IDevicesFactory/default            N/A        1831   1831</span></div><div class="line"><span class="string">FC    ? android.hardware.camera.provider@2.4::ICameraProvider/legacy/0 N/A        2112   2112</span></div><div class="line"><span class="string">X     ? android.hardware.gnss@1.0::IGnss/default                       N/A        1836   1836</span></div><div class="line"><span class="string">FC    ? android.hardware.graphics.allocator@2.0::IAllocator/default    N/A        1837   1837</span></div><div class="line"><span class="string">FC    ? android.hardware.graphics.composer@2.1::IComposer/default      N/A        1838   1838</span></div><div class="line"><span class="string">...</span></div><div class="line"><span class="string"></span></div><div class="line"><span class="string">| All available passthrough implementations (all -impl.so files).</span></div><div class="line"><span class="string">| These may return subclasses through their respective HIDL_FETCH_I* functions.</span></div><div class="line"><span class="string">VINTF R Interface                                                       Thread Use Server Clients</span></div><div class="line"><span class="string">FC    ? android.hardware.audio.effect@5.0::I*/* (/vendor/lib/hw/)       N/A        N/A    1831</span></div><div class="line"><span class="string">FC    ? android.hardware.audio@5.0::I*/* (/vendor/lib/hw/)              N/A        N/A    1831</span></div><div class="line"><span class="string">FC    ? android.hardware.camera.provider@2.4::I*/* (/vendor/lib/hw/)    N/A        N/A    2112</span></div><div class="line"><span class="string">FC    ? android.hardware.drm@1.0::I*/* (/vendor/lib/hw/)                N/A        N/A    </span></div><div class="line"><span class="string">X     ? android.hardware.gnss@1.0::I*/* (/vendor/lib/hw/)               N/A        N/A    1836</span></div><div class="line"><span class="string">FC    ? android.hardware.graphics.allocator@2.0::I*/* (/vendor/lib/hw/) N/A        N/A    1837</span></div><div class="line"><span class="string">FC    ? android.hardware.graphics.composer@2.1::I*/* (/vendor/lib/hw/)  N/A        N/A    1838</span></div><div class="line"><span class="string">...</span></div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>这里分了几个类别把所有的 hidl 都列了出来，从源码里面可以看得到所有类别，对应类别没有的就没列：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">mServicesTable.setDescription(</div><div class="line">        <span class="string">"| All binderized services (registered with hwservicemanager)"</span>);</div><div class="line">mPassthroughRefTable.setDescription(</div><div class="line">        <span class="string">"| All interfaces that getService() has ever returned as a passthrough interface;\n"</span></div><div class="line">        <span class="string">"| PIDs / processes shown below might be inaccurate because the process\n"</span></div><div class="line">        <span class="string">"| might have relinquished the interface or might have died.\n"</span></div><div class="line">        <span class="string">"| The Server / Server CMD column can be ignored.\n"</span></div><div class="line">        <span class="string">"| The Clients / Clients CMD column shows all process that have ever dlopen'ed \n"</span></div><div class="line">        <span class="string">"| the library and successfully fetched the passthrough implementation."</span>);</div><div class="line">mImplementationsTable.setDescription(</div><div class="line">        <span class="string">"| All available passthrough implementations (all -impl.so files).\n"</span></div><div class="line">        <span class="string">"| These may return subclasses through their respective HIDL_FETCH_I* functions."</span>);</div><div class="line">mManifestHalsTable.setDescription(</div><div class="line">        <span class="string">"| All HALs that are in VINTF manifest."</span>);</div><div class="line">mLazyHalsTable.setDescription(</div><div class="line">        <span class="string">"| All HALs that are declared in VINTF manifest:\n"</span></div><div class="line">        <span class="string">"|    - as hwbinder HALs but are not registered to hwservicemanager, and\n"</span></div><div class="line">        <span class="string">"|    - as hwbinder/passthrough HALs with no implementation."</span>);</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong>(1). 绑定式HAL：</strong> 使用 hwbinder IPC 通讯实现的 hal。mServicesTable 属于这一类。这也是 8.0 之后的新 hal 架构，大多数的 hal 是这种类型（上面我没贴完整所有的 hidl）。<br>&nbsp;&nbsp;&nbsp;&nbsp;<strong>(2). 直通式HAL：</strong> 又分2种：一种是以 HIDL 分装的传统的 hal，这个是 mImplementationsTable 类别；另一种就是完全传统的 hal，这个是  mPassthroughRefTable 类别。这2类的比较少，应该是要慢慢淘汰掉的。</p>
+<p>还有剩下2个类别：mManifestHalsTable 好像是单纯的 VINTF manifest 文件，mLazyHalsTable 好像是使用了 HIDL 框架的但是没在 hwservicemanager 中注册的和没有真正实现的。这2类目前都没有，先暂时不管先。详细的 hal 分类可以看官网说明：<a href="https://source.android.com/devices/architecture/hal-types?hl=zh-cn" target="_blank" rel="external">HAL 类型</a>。</p>
+<p>下面列出来每一列的含义：<br>&nbsp;&nbsp;&nbsp;&nbsp;<strong>(1). VINTF:</strong> 这个叫供应商接口（Vendor  Interface），主要是用于描述 hal 的接口信息的，现在 hal interface 也分版本了，就涉及到兼容性。具体的可以看官网说明：<a href="https://source.android.com/devices/architecture/vintf?hl=zh-cn" target="_blank" rel="external">供应商接口对象</a> 。列出的一些 FM、DC、FC 我暂时还没去搞明白是啥意思，以后再说。<br>&nbsp;&nbsp;&nbsp;&nbsp;<strong>(2). R:</strong> 这个 R 我也暂时还没去搞明白是啥意思，以后再说。<br>&nbsp;&nbsp;&nbsp;&nbsp;<strong>(3). Interface:</strong> 这个就是 hidl 向 hwservicemanager 注册服务的接口名字，client 需要通过名字来获取对应的服务对象。这个和 java 的 SystemService 是类似的。例如说 ActivityManager 的接口名字叫 activity，WindowManager 的叫 window，只不过 hidl 的名字普遍比较长（包名）还带版本。<br>&nbsp;&nbsp;&nbsp;&nbsp;<strong>(4). Thread:</strong> 应该是 hidl 中运行的服务线程数量，但是有2个，我猜测应该第一个是正在响应服务调用的，后面那个应该是线程池的数量。具体我还没去核对源码，后面再说。<br>&nbsp;&nbsp;&nbsp;&nbsp;<strong>(5). Use:</strong> 空的，好像没啥用<br>&nbsp;&nbsp;&nbsp;&nbsp;<strong>(6). Server:</strong> 服务运行的进程 pid<br>&nbsp;&nbsp;&nbsp;&nbsp;<strong>(7). Clients:</strong> 连接的 client 的进程的 pid</p>
+<p>lshal 列出的信息比 service 多很多。虽然有些含义目前还没明白是什么意思，但是用来确认 hal 服务有没有在运行已经足够了。</p>
+<h2 id="debug">debug</h2>
+<p>lshal debug xx :<br>(待补充)</p>
+<h1 id="源码分析">源码分析</h1>
+<p>lshal 的源码目录结构如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Android.bp        DebugCommand.h   libprocpartition  Lshal.cpp  NullableOStream.h  PipeRelay.h     test.cpp       Timeout.h</div><div class="line">Command.h         HelpCommand.cpp  ListCommand.cpp   Lshal.h    OWNERS             TableEntry.cpp  TextTable.cpp  utils.cpp</div><div class="line">DebugCommand.cpp  HelpCommand.h    ListCommand.h     main.cpp   PipeRelay.cpp      TableEntry.h    TextTable.h    utils.h</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>lshal 是一个 bin 文件，程序入口在 Lshal.cpp 的 mian 函数里面。命令处理的方式采用了面向对象的设计思想：可以看到源码目录下有下面几个文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Command.h</div><div class="line">HelpCommand.h</div><div class="line">ListCommand.h</div><div class="line">DebugCommand.h</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>Command 是基类，定义了命令的基本接口，Help、List、Debug 分别实现了  “help”, “list”, “debug” 命令。现在连小工具都采用 c++ 面向对象了，am 命令也是这样了，以前还都是 c ，面向结构的。在 Lshal.cpp 里面有讲这些命令的对象加入到命令列表里面：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Lshal::Lshal(std::ostream &out, std::ostream &err,</div><div class="line">            sp&lt;hidl::manager::V1_0::IServiceManager&gt; serviceManager,</div><div class="line">            sp&lt;hidl::manager::V1_0::IServiceManager&gt; passthroughManager)</div><div class="line">    : mOut(out), mErr(err),</div><div class="line">      mServiceManager(serviceManager),</div><div class="line">      mPassthroughManager(passthroughManager) {</div><div class="line"></div><div class="line">    <span class="comment">// 加入3个支持的命令，后面如果要支持其他命令只要扩展实现了 Command，直接添加就行了，不用改程序流程结构</span></div><div class="line">    mRegisteredCommands.push_back({std::make_unique&lt;ListCommand&gt;(*<span class="keyword">this</span>)});</div><div class="line">    mRegisteredCommands.push_back({std::make_unique&lt;DebugCommand&gt;(*<span class="keyword">this</span>)});</div><div class="line">    mRegisteredCommands.push_back({std::make_unique&lt;HelpCommand&gt;(*<span class="keyword">this</span>)});</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>通过 Command 的名字来匹配要执行的命令：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">Command* Lshal::selectCommand(<span class="keyword">const</span> std::<span class="built_in">string</span>& command) <span class="keyword">const</span> {</div><div class="line">    <span class="comment">// 空参数就是 list 命令</span></div><div class="line">    <span class="keyword">if</span> (command.empty()) {</div><div class="line">        <span class="keyword">return</span> selectCommand(ListCommand::GetName());</div><div class="line">    }</div><div class="line">    <span class="comment">// 根据参数字符串匹配命令池中匹配的命令</span></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>& e : mRegisteredCommands) {</div><div class="line">        <span class="keyword">if</span> (e-&gt;getName() == command) {</div><div class="line">            <span class="keyword">return</span> e.get();</div><div class="line">        }</div><div class="line">    }</div><div class="line">    <span class="keyword">return</span> <span class="keyword">nullptr</span>;</div><div class="line">}</div><div class="line"></div><div class="line">Status Lshal::main(<span class="keyword">const</span> Arg &arg) {</div><div class="line">    <span class="comment">// Allow SIGINT to terminate all threads.</span></div><div class="line">    signal(SIGINT, signalHandler);</div><div class="line"></div><div class="line">    Status status = parseArgs(arg);</div><div class="line">    <span class="keyword">if</span> (status != OK) {</div><div class="line">        usage();</div><div class="line">        <span class="keyword">return</span> status;</div><div class="line">    }</div><div class="line">    <span class="keyword">auto</span> c = selectCommand(mCommand);</div><div class="line">    <span class="keyword">if</span> (c == <span class="keyword">nullptr</span>) {</div><div class="line">        <span class="comment">// unknown command, print global usage</span></div><div class="line">        usage();</div><div class="line">        <span class="keyword">return</span> USAGE;</div><div class="line">    }</div><div class="line">    status = c-&gt;main(arg);</div><div class="line">    ...</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<h2 id="ListCommand">ListCommand</h2>
+<p>这个源码比较复杂（获取的信息很多，所以列出的信息也多），暂时没分析。</p>
+<h2 id="DebugCommand">DebugCommand</h2>
+<p>debug 命令的调用流程：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// DebugCommand.cpp:</span></div><div class="line"><span class="comment">// -------------------------------</span></div><div class="line">Status DebugCommand::main(<span class="keyword">const</span> Arg &arg) {</div><div class="line">    Status status = parseArgs(arg);</div><div class="line">    <span class="keyword">if</span> (status != OK) {</div><div class="line">        <span class="keyword">return</span> status;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">auto</span> pair = splitFirst(mInterfaceName, <span class="string">'/'</span>);</div><div class="line"></div><div class="line">    FQName fqName;</div><div class="line">    <span class="keyword">if</span> (!FQName::parse(pair.first, &fqName) || fqName.isIdentifier() || !fqName.isFullyQualified()) {</div><div class="line">        mLshal.err() &lt;&lt; <span class="string">"Invalid fully-qualified name '"</span> &lt;&lt; pair.first &lt;&lt; <span class="string">"'\n\n"</span>;</div><div class="line">        <span class="keyword">return</span> USAGE;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">return</span> mLshal.emitDebugInfo(</div><div class="line">            pair.first, pair.second.empty() ? <span class="string">"default"</span> : pair.second, mOptions,</div><div class="line">            mExcludesParentInstances,</div><div class="line">            mLshal.out().buf(),</div><div class="line">            mLshal.err());</div><div class="line">}</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// lshal.cpp:</span></div><div class="line"><span class="comment">// -------------------------------</span></div><div class="line">Status Lshal::emitDebugInfo(</div><div class="line">        <span class="keyword">const</span> std::<span class="built_in">string</span> &interfaceName,</div><div class="line">        <span class="keyword">const</span> std::<span class="built_in">string</span> &instanceName,</div><div class="line">        <span class="keyword">const</span> std::<span class="stl_container"><span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;</span> &options,</div><div class="line">        <span class="keyword">bool</span> excludesParentInstances,</div><div class="line">        std::ostream &out,</div><div class="line">        NullableOStream&lt;std::ostream&gt; err) <span class="keyword">const</span> {</div><div class="line">    <span class="keyword">using</span> android::hidl::base::V1_0::IBase;</div><div class="line">    <span class="keyword">using</span> android::hardware::details::getDescriptor;</div><div class="line"></div><div class="line">    <span class="comment">// 通过接口名字获取 hidl Client对象，接口名字list命令可以列出来</span></div><div class="line">    hardware::Return&lt;sp&lt;IBase&gt;&gt; retBase = serviceManager()-&gt;get(interfaceName, instanceName);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (!retBase.isOk()) {</div><div class="line">        std::<span class="built_in">string</span> msg = <span class="string">"Cannot get "</span> + interfaceName + <span class="string">"/"</span> + instanceName + <span class="string">": "</span></div><div class="line">                + retBase.description();</div><div class="line">        err &lt;&lt; msg &lt;&lt; std::endl;</div><div class="line">        LOG(ERROR) &lt;&lt; msg;</div><div class="line">        <span class="keyword">return</span> TRANSACTION_ERROR;</div><div class="line">    }</div><div class="line"></div><div class="line">    sp&lt;IBase&gt; base = retBase;</div><div class="line">    <span class="keyword">if</span> (base == <span class="keyword">nullptr</span>) {</div><div class="line">        std::<span class="built_in">string</span> msg = interfaceName + <span class="string">"/"</span> + instanceName + <span class="string">" does not exist, or "</span></div><div class="line">                + <span class="string">"no permission to connect."</span>;</div><div class="line">        err &lt;&lt; msg &lt;&lt; std::endl;</div><div class="line">        LOG(ERROR) &lt;&lt; msg;</div><div class="line">        <span class="keyword">return</span> NO_INTERFACE;</div><div class="line">    }</div><div class="line">    </div><div class="line">    <span class="keyword">if</span> (excludesParentInstances) {</div><div class="line">        <span class="keyword">const</span> std::<span class="built_in">string</span> descriptor = getDescriptor(base.get());</div><div class="line">        <span class="keyword">if</span> (descriptor.empty()) {</div><div class="line">            std::<span class="built_in">string</span> msg = interfaceName + <span class="string">"/"</span> + instanceName + <span class="string">" getDescriptor failed"</span>;</div><div class="line">            err &lt;&lt; msg &lt;&lt; std::endl;</div><div class="line">            LOG(ERROR) &lt;&lt; msg;</div><div class="line">        }</div><div class="line">        <span class="keyword">if</span> (descriptor != interfaceName) {</div><div class="line">            <span class="keyword">return</span> OK;</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div><div class="line">    PipeRelay relay(out);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (relay.initCheck() != OK) {</div><div class="line">        std::<span class="built_in">string</span> msg = <span class="string">"PipeRelay::initCheck() FAILED w/ "</span> + std::to_string(relay.initCheck());</div><div class="line">        err &lt;&lt; msg &lt;&lt; std::endl;</div><div class="line">        LOG(ERROR) &lt;&lt; msg;</div><div class="line">        <span class="keyword">return</span> IO_ERROR;</div><div class="line">    }</div><div class="line"></div><div class="line">    deleted_unique_ptr&lt;native_handle_t&gt; fdHandle(</div><div class="line">        native_handle_create(<span class="number">1</span> <span class="comment">/* numFds */</span>, <span class="number">0</span> <span class="comment">/* numInts */</span>),</div><div class="line">        native_handle_delete);</div><div class="line"></div><div class="line">    <span class="comment">// 这个 fd 是传给 hidl 用于打印的 fd，可以用 dprintf 打印在 shell 里面</span></div><div class="line">    fdHandle-&gt;data[<span class="number">0</span>] = relay.fd();</div><div class="line"></div><div class="line">    <span class="comment">// 调用 hidl 的 debug 接口，需要 hidl 自行实现</span></div><div class="line">    hardware::Return&lt;<span class="keyword">void</span>&gt; ret = base-&gt;debug(fdHandle.get(), convert(options));</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (!ret.isOk()) {</div><div class="line">        std::<span class="built_in">string</span> msg = <span class="string">"debug() FAILED on "</span> + interfaceName + <span class="string">"/"</span> + instanceName + <span class="string">": "</span></div><div class="line">                + ret.description();</div><div class="line">        err &lt;&lt; msg &lt;&lt; std::endl;</div><div class="line">        LOG(ERROR) &lt;&lt; msg;</div><div class="line">        <span class="keyword">return</span> TRANSACTION_ERROR;</div><div class="line">    }</div><div class="line">    <span class="keyword">return</span> OK;</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>debug 命令最后是调用到了指定 hidl 的 debug 接口，debug 这个接口是 hidl 基类里面定义的，可以实现，也可以不实现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">virtual</span> ::android::hardware::Return&lt;<span class="keyword">void</span>&gt; debug(<span class="keyword">const</span> ::android::hardware::hidl_handle& fd, <span class="keyword">const</span> ::android::hardware::hidl_vec&lt;::android::hardware::hidl_string&gt;& optio</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>这个是由 hidl 的接口定义文件 .hal 自动生成的，生成的文件在: out/.intermediates/hardware/interfaces/xx/xx_genc++_headers/gen/xx/xx.h。和 aidl 类似，都是由一个工具在编译的时候自动生成源码（aidl 可以参看以前的分析文章：<a href="http://light3moon.com/2015/01/28/Android%20Binder%20%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E6%87%92%E4%BA%BA%E7%9A%84%E5%B7%A5%E5%85%B7[AIDL]/" target="_blank" rel="external">Android Binder 分析——懒人的工具（AIDL）</a>）。</p>
+<p>例如说我们可以在 hidl 的 debug 接口里面实现打印一些关键变量信息（就变成了 dumpsys），它还可以接收参数，我们也可以用来做一些调试接口（dumpsys 也可以接受参数，但是 lshal 没法自由的直接调用所有接口，和 service 的 call 命令还是有点区别）。</p>
+<h2 id="HelpCommand">HelpCommand</h2>
+<p>这个很简单了，就是简单的打印帮助信息，不分析了。</p>
+<h1 id="总结">总结</h1>
+<p>我在接触 hidl 的时候，就在想有没有类似 SS 的 dumpsys 和 service 命令，然后看官方介绍，还真的有。这个工具在调试 hidl 还是挺好用的。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Android-Framework/">Android Framework</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2021/01/26/Android 一些有意思的命令小工具 —— lshal/" data-title="Android 一些有意思的命令小工具 —— lshal | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/12/07/Android 内存优化方法/" title="Android 内存优化方法">
+  <strong>上一篇:</strong><br/>
+  <span>
+  Android 内存优化方法</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2020/09/18/Android 多媒体通路简介/"  title="Android 多媒体通路简介">
+ <strong>下一篇:</strong><br/> 
+ <span>Android 多媒体通路简介
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#作用"><span class="toc-number">1.</span> <span class="toc-text">作用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#list"><span class="toc-number">1.1.</span> <span class="toc-text">list</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#debug"><span class="toc-number">1.2.</span> <span class="toc-text">debug</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#源码分析"><span class="toc-number">2.</span> <span class="toc-text">源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#ListCommand"><span class="toc-number">2.1.</span> <span class="toc-text">ListCommand</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DebugCommand"><span class="toc-number">2.2.</span> <span class="toc-text">DebugCommand</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HelpCommand"><span class="toc-number">2.3.</span> <span class="toc-text">HelpCommand</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>32</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>49</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>9</sup></a></li>
+		
+			<li><a href="/categories/Performance/" title="Performance">Performance<sup>4</sup></a></li>
+		
+			<li><a href="/categories/VR/" title="VR">VR<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		
+			<li><a href="/tags/android/" title="android">android<sup>85</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>27</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>5</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/vr/" title="vr">vr<sup>4</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

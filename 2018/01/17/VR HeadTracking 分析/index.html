@@ -257,8 +257,7 @@ pose.Orientation = pose.Orientation * Quatf(angularVelocity, angularSpeed * dyna
 <p>限制了预测的时间范围（不允许过大），根据当前速度和加速进行限制。不过我们现在加速度没有计算，所以限制只和速度有关。</p>
 <h1 id="Sensor_hub_gyro_偏移校准">Sensor hub gyro 偏移校准</h1>
 <p>一般来说如果把设备静止放置，理想情况下，gyro 上报的数据应该是 0，但是真实的情况是会存在误差的。一般来说在某些外界因素下，底层采集的原始数据有可能存在一定情况的偏移，例如说下面这种情况（静置情况下）：</p>
-<font color="#ff0000">待插入图片</font>
-
+<p><img src="https://mingming-killer.github.io/img/pics/android/vr-headtracking/sensorhub_draft.png" alt="插图"></p>
 <p>可以看到 gyro 底层采集到的数据很明显的偏移了一个数值（均值大概 0.02 rad/s 转化为角度大概是 1.14 deg/s），偏移很明显，这种情况下，头部跟踪融合出来的朝向数据，是会慢慢的超一个方向转动的。前面的 tile correct 和 yaw correct 均无法消除这种级别的偏差。</p>
 <p>这种情况下，就需要底层采样上报的时候进行偏移校准。虽然这部分不属于上次头部跟踪，但是会影响到最后头部跟踪的最终效果，所以这里也调试分析了一下。google 提供的 contexthub（sensorhub）自带了一个动态的校准算法。</p>
 <p>从上面的图可以看出来，其实校准的核心在于补偿静置时候的偏移误差。 就是计算出静置时候的 gyro 的数值（理论上来说这个时候 gyro 的值应该是0），然后在上报的时候减去这个补偿值就可以了。</p>
@@ -335,10 +334,10 @@ pose.Orientation = pose.Orientation * Quatf(angularVelocity, angularSpeed * dyna
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2020/09/18/Android 多媒体通路简介/" title="Android 多媒体通路简介">
+ <a href="/2019/12/30/OpenGLES 入门学习/" title="OpenGLES 入门学习">
   <strong>上一篇:</strong><br/>
   <span>
-  Android 多媒体通路简介</span>
+  OpenGLES 入门学习</span>
 </a>
 </div>
 
@@ -375,7 +374,7 @@ pose.Orientation = pose.Orientation * Quatf(angularVelocity, angularSpeed * dyna
 		
 			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>32</sup></a></li>
 		
-			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>48</sup></a></li>
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>49</sup></a></li>
 		
 			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
 		
@@ -387,7 +386,7 @@ pose.Orientation = pose.Orientation * Quatf(angularVelocity, angularSpeed * dyna
 		
 			<li><a href="/categories/Performance/" title="Performance">Performance<sup>4</sup></a></li>
 		
-			<li><a href="/categories/VR/" title="VR">VR<sup>1</sup></a></li>
+			<li><a href="/categories/VR/" title="VR">VR<sup>2</sup></a></li>
 		
 			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
 		
@@ -402,7 +401,7 @@ pose.Orientation = pose.Orientation * Quatf(angularVelocity, angularSpeed * dyna
 		
 			<li><a href="/tags/Linux/" title="Linux">Linux<sup>1</sup></a></li>
 		
-			<li><a href="/tags/android/" title="android">android<sup>84</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>85</sup></a></li>
 		
 			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
 		
@@ -412,7 +411,7 @@ pose.Orientation = pose.Orientation * Quatf(angularVelocity, angularSpeed * dyna
 		
 			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
 		
-			<li><a href="/tags/opengl/" title="opengl">opengl<sup>4</sup></a></li>
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>5</sup></a></li>
 		
 			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
 		
@@ -420,7 +419,7 @@ pose.Orientation = pose.Orientation * Quatf(angularVelocity, angularSpeed * dyna
 		
 			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
 		
-			<li><a href="/tags/vr/" title="vr">vr<sup>1</sup></a></li>
+			<li><a href="/tags/vr/" title="vr">vr<sup>4</sup></a></li>
 		
 			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
 		
