@@ -100,7 +100,7 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#OpenGLES简介"><span class="toc-number">1.</span> <span class="toc-text">OpenGLES简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本三维概念"><span class="toc-number">2.</span> <span class="toc-text">基本三维概念</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#投影"><span class="toc-number">2.1.</span> <span class="toc-text">投影</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#图元"><span class="toc-number">2.2.</span> <span class="toc-text">图元</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#纹理坐标"><span class="toc-number">2.3.</span> <span class="toc-text">纹理坐标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#深度"><span class="toc-number">2.4.</span> <span class="toc-text">深度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#右手坐标系"><span class="toc-number">2.5.</span> <span class="toc-text">右手坐标系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#着色器"><span class="toc-number">2.6.</span> <span class="toc-text">着色器</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本图形绘制"><span class="toc-number">3.</span> <span class="toc-text">基本图形绘制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本绘制流程"><span class="toc-number">3.1.</span> <span class="toc-text">基本绘制流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置_Camera"><span class="toc-number">3.2.</span> <span class="toc-text">配置 Camera</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#物体建模"><span class="toc-number">3.2.1.</span> <span class="toc-text">物体建模</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#物体变化"><span class="toc-number">3.2.2.</span> <span class="toc-text">物体变化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#绘制图元"><span class="toc-number">3.2.3.</span> <span class="toc-text">绘制图元</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#进阶技巧"><span class="toc-number">4.</span> <span class="toc-text">进阶技巧</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#调试手段"><span class="toc-number">5.</span> <span class="toc-text">调试手段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Mali_graphic_debug_tool"><span class="toc-number">5.0.1.</span> <span class="toc-text">Mali graphic debug tool</span></a></li></ol></li></ol></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#OpenGLES简介"><span class="toc-number">1.</span> <span class="toc-text">OpenGLES简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本三维概念"><span class="toc-number">2.</span> <span class="toc-text">基本三维概念</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#投影"><span class="toc-number">2.1.</span> <span class="toc-text">投影</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#图元"><span class="toc-number">2.2.</span> <span class="toc-text">图元</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#纹理坐标"><span class="toc-number">2.3.</span> <span class="toc-text">纹理坐标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#深度"><span class="toc-number">2.4.</span> <span class="toc-text">深度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#右手坐标系"><span class="toc-number">2.5.</span> <span class="toc-text">右手坐标系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#着色器"><span class="toc-number">2.6.</span> <span class="toc-text">着色器</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本图形绘制"><span class="toc-number">3.</span> <span class="toc-text">基本图形绘制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本绘制流程"><span class="toc-number">3.1.</span> <span class="toc-text">基本绘制流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置_Camera"><span class="toc-number">3.2.</span> <span class="toc-text">配置 Camera</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#物体建模"><span class="toc-number">3.2.1.</span> <span class="toc-text">物体建模</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#物体变化"><span class="toc-number">3.2.2.</span> <span class="toc-text">物体变化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#绘制图元"><span class="toc-number">3.2.3.</span> <span class="toc-text">绘制图元</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#进阶技巧"><span class="toc-number">4.</span> <span class="toc-text">进阶技巧</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#调试手段"><span class="toc-number">5.</span> <span class="toc-text">调试手段</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Mali_graphic_debug_tool"><span class="toc-number">5.1.</span> <span class="toc-text">Mali graphic debug tool</span></a></li></ol></li></ol>
 		</div>
 		
 		<h1 id="OpenGLES简介">OpenGLES简介</h1>
@@ -161,10 +161,10 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <p>从上面的解释就能看到，我们要想正确的渲染出图像，就需要得到 MVP 矩阵。下面我们就来看看怎么得到 MVP 矩阵：</p>
 <p><strong>(1). 投影矩阵</strong></p>
 <p>首先配置的就是投影矩阵，因为一般拍摄也都是先把摄像机位置摆好的。在这之前接着前面介绍投影的，说明 OpenGL 的2种投影方式（可以参看前面的2.1投影的图理解）：</p>
-<p>​    (a). <strong>透视投影（Perspective Projection）</strong>：视景体是一个锥形，<strong>物体的深度（远近）会影响到最终在2D显示平面上的大小</strong>（图中红球和黄球最终在显示平面上的大小是不一样的）。一般来说这种投影能呈现出3D效果，比较适合于VR场景、3D游戏等。例如说 VR9 中的 VrDesktop（VR定制的SurfaceFlinger）就是这种投影。</p>
-<p>​    (b). <strong>正交投影（Orthographic Projection）</strong>：视景体是一个方形，<strong>物体的深度（远近）不会影响到最终在2D显示平面的大小，只会影响遮挡</strong>（图中红球和黄球最终在显示平面上的大小是一样的）。就是说不管物体在三维空间中的远近，最终显示都是一样大的，看不出3D景深效果。这种投影比较适合2D图像显示、2D游戏等。例如说原生的 SurfaceFlinger 就是这种投影。</p>
+<p>​&nbsp;&nbsp;&nbsp;&nbsp;(a). <strong>透视投影（Perspective Projection）</strong>：视景体是一个锥形，<strong>物体的深度（远近）会影响到最终在2D显示平面上的大小</strong>（图中红球和黄球最终在显示平面上的大小是不一样的）。一般来说这种投影能呈现出3D效果，比较适合于VR场景、3D游戏等。例如说 VR9 中的 VrDesktop（VR定制的SurfaceFlinger）就是这种投影。</p>
+<p>​&nbsp;&nbsp;&nbsp;&nbsp;(b). <strong>正交投影（Orthographic Projection）</strong>：视景体是一个方形，<strong>物体的深度（远近）不会影响到最终在2D显示平面的大小，只会影响遮挡</strong>（图中红球和黄球最终在显示平面上的大小是一样的）。就是说不管物体在三维空间中的远近，最终显示都是一样大的，看不出3D景深效果。这种投影比较适合2D图像显示、2D游戏等。例如说原生的 SurfaceFlinger 就是这种投影。</p>
 <p>在 Native 中可以直接调用 OpenGL 的 api 设置 OpenGL 的当前矩阵，但是在 Java 中，我推荐使用 <strong>android.opengl.Matrix</strong> 包的对应的矩阵运算相关 api 来进行矩阵运算：</p>
-<p>​    <strong>(a). 配置透视投影：</strong></p>
+<p><strong>(1.1). 配置透视投影：</strong></p>
 <p>配置透视有2个 api 可以使用，参数形式不一样，我们先说其中一个： </p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Matrix.frustumM(<span class="keyword">float</span>[] m, <span class="keyword">int</span> offset, <span class="keyword">float</span> left, <span class="keyword">float</span> right, <span class="keyword">float</span> bottom, <span class="keyword">float</span> top, <span class="keyword">float</span> near, <span class="keyword">float</span> far).</div><div class="line"></div></pre></td></tr></table></figure>
 
@@ -173,14 +173,10 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <p>这里先说明一下，这里说配置投影矩阵的 api 是仅仅是配置 Camera 的空间视景体的大小，就是图中蓝色那个锥形空间大小（后面还会介绍还有其他因素会影响视景体的）。落在这个空间里的物体才会被投影到2D屏幕上，落在外面的就会别剔除掉。left, right, bottom, top 分别表示锥形横截面的大小，near, far 分别表示远近横截面距离相机的位置：</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_frustum_2.png" alt="插图"></p>
 <p>因此 left, right, bottom, top, near, far 6个参数就能配置锥形空间的大小。OpenGL 的官方文档规定：</p>
-<p>​        <strong><font color="ff0000">(1). near 和 far 必须为正数</font></strong></p>
-<p>​        <strong><font color="ff0000">(2). far 不能等于 near</font></strong></p>
-<p>​        <strong><font color="ff0000">(3). near 不能等于 0</font></strong></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong><font color="ff0000">(1). near 和 far 必须为正数</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong><font color="ff0000">(2). far 不能等于 near</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong><font color="ff0000">(3). near 不能等于 0</font></strong></p>
 <p>这里需要注意一下，由于 OpenGL 的坐标是右手坐标系，所以其实远近横截面的 z 轴坐标值是负数（-near，-far）：</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_coordinate_1.png" alt="插图"></p>
-<p><strong><font color="0070d5">*编程建议（我会结合我的经验给出一些个人推荐的 OpenGL 编程建议）：</font></strong></p>
-<p>​        (1). <strong>left, right, bottom, top</strong> 建议设置为规格化设备坐标系（NDC：Normalized Device Coordinates）大小，即：<strong><font color="ff0000">-1, 1, -1, 1</font></strong>。这样正好能够和投影之后的坐标系对上，即你配置模型的坐标：x 轴 -1 就是屏幕的最左边，1 就是屏幕的最右边；y 轴 -1 就是屏幕的最下边，1 就是屏幕的最上边。对于控制位置会比较方便。（这里补充一下，规范化其实也叫做归一化，下面贴一下和投影视景体和 NDC 的关系）</p>
-<p>​        (2). <strong>near, far</strong> 建议配置为 <strong><font color="ff0000">1, 1000</font></strong>。首选 near, far 必须为正数，near 不能为 0；其次，far - near 的差值尽量大一些，因为这样就能避免 float 的精度问题，导致临近剪裁面（就是前面说的横截面）的物体会别剪裁掉的情况。当然 far 并不一定要是 1000，只要 far - near 足够大就行。至于 near 为什么建议设置为 1，后面说视图矩阵的时候再解释。</p>
+<p><strong><font color="0070d5">*编程建议（我会结合我的经验给出一些个人推荐的 OpenGL 编程建议）：</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;(1). <strong>left, right, bottom, top</strong> 建议设置为规格化设备坐标系（NDC：Normalized Device Coordinates）大小，即：<strong><font color="ff0000">-1, 1, -1, 1</font></strong>。这样正好能够和投影之后的坐标系对上，即你配置模型的坐标：x 轴 -1 就是屏幕的最左边，1 就是屏幕的最右边；y 轴 -1 就是屏幕的最下边，1 就是屏幕的最上边。对于控制位置会比较方便。（这里补充一下，规范化其实也叫做归一化，下面贴一下和投影视景体和 NDC 的关系）<br>&nbsp;&nbsp;&nbsp;&nbsp;(2). <strong>near, far</strong> 建议配置为 <strong><font color="ff0000">1, 1000</font></strong>。首选 near, far 必须为正数，near 不能为 0；其次，far - near 的差值尽量大一些，因为这样就能避免 float 的精度问题，导致临近剪裁面（就是前面说的横截面）的物体会别剪裁掉的情况。当然 far 并不一定要是 1000，只要 far - near 足够大就行。至于 near 为什么建议设置为 1，后面说视图矩阵的时候再解释。</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_coordinate_2.png" alt="插图"></p>
 <p>获取透视投影矩阵的另外一个 api 是：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Matrix.perspectiveM(<span class="keyword">float</span>[] m, <span class="keyword">int</span> offset, <span class="keyword">float</span> fovy, <span class="keyword">float</span> aspect, <span class="keyword">float</span> zNear, <span class="keyword">float</span> zFar).</div><div class="line"></div></pre></td></tr></table></figure>
@@ -188,18 +184,14 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <p>Matrix 这些 api 前2个参数就不解释，和前面是一样的。这个 api 也是配置锥形投影，但是参数和 frustumM 不太一样，它的参数表示：</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_perspective_2.png" alt="插图"></p>
 <p>fovy 表示 Camera 的 fov，aspect 表示横截面的宽高比，near 和 far 和 frustum 是一样的。由于是使用 fov 来控制横截面大小的，所以精准程度上比 frustum 差一些。但是对于某些本身就是使用 fov 来描述的场景（例如说 VR）还是比较合适的。</p>
-<p><strong><font color="0070d5">*编程建议：</font></strong></p>
-<p>​        (1). fovy 建议配置得和逻辑上的一样，例如说 VR 中的 fov。</p>
-<p>​        (2). aspect 建议配置得和 ViewPort（后面会介绍）的比例一样，避免最终图像比例变形。</p>
-<p><strong>(b). 配置正交投影：</strong></p>
+<p><strong><font color="0070d5">*编程建议：</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;(1). fovy 建议配置得和逻辑上的一样，例如说 VR 中的 fov。<br>&nbsp;&nbsp;&nbsp;&nbsp;(2). aspect 建议配置得和 ViewPort（后面会介绍）的比例一样，避免最终图像比例变形。</p>
+<p><strong>(1.2). 配置正交投影：</strong></p>
 <p>设置正交投影的 api 只有一个：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Matrix.orthoM(<span class="keyword">float</span>[] m, <span class="keyword">int</span> mOffset, <span class="keyword">float</span> left, <span class="keyword">float</span> right, <span class="keyword">float</span> bottom, <span class="keyword">float</span> top, <span class="keyword">float</span> near, <span class="keyword">float</span> far).</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>正交投影配置的投影视景体是一个矩形，这6个参数含义和透视投影的 frustum 是一样的：</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_ortho.png" alt="插图"></p>
-<p><strong><font color="0070d5">*编程建议：</font></strong></p>
-<p>​       (1). left, right, bottom, top 也是建议配置为 -1, 1, -1, 1。</p>
-<p>​       (2). near, far 也是建议配置为 1, 1000。虽然 near, far 没有说强制要求必须为正数，也没说 near 不能等于 0，但是为了保持统一，建议还是配置为 1, 1000。</p>
+<p><strong><font color="0070d5">*编程建议：</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;(1). left, right, bottom, top 也是建议配置为 -1, 1, -1, 1。<br>&nbsp;&nbsp;&nbsp;&nbsp;(2). near, far 也是建议配置为 1, 1000。虽然 near, far 没有说强制要求必须为正数，也没说 near 不能等于 0，但是为了保持统一，建议还是配置为 1, 1000。</p>
 <p><strong>(2). 视图矩阵</strong></p>
 <p>通过前面的 api 得到了投影矩阵，但是光有投影矩阵还是没办法正确渲染空间中的物体的。因为投影矩阵表示的是 Camera 视景体的大小，空间中视景体的位置还受一个因素的影响：<strong>Camera 的位置和朝向</strong>。这个变化可以用视图矩阵来表示，同样也有 api 可以配置获取。但是我们还是先继续看几张图片理解一下：</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_view_matrix_1.png" alt="插图"></p>
@@ -213,28 +205,24 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <p><strong>center：</strong>Camera 引用点的位置。所谓的引用点（reference point），就是 eye point 看向 reference point，可以理解为从 eye poinit 拉一条直接指向 reference point（图中已经很明显了，红色的直线）。这个可以决定 Camera 的水平朝向（左摆还是右摆）。</p>
 <p><strong>up：</strong>Camera 抬头方向（Up Vector）。这个是一个三维向量，简单可以理解为 Camera 的竖直朝向（上摆还是下摆）。图二就很明显了（up 的那个指向）。</p>
 <p>通过 setLookAtM 函数获取到视图矩阵之后，我们就有了投影矩阵和视图矩阵了。还差模型矩阵，我们就凑齐了 MVP 矩阵了。模型矩阵是在物体变化的阶段配置的，这个我们后面再说。这里说下 <strong>OpenGL 矩阵乘法运算需要注意的一些事情，</strong>因为当我们有个多个矩阵之后，就要进行矩阵的乘法运算了：</p>
-<p>​    (1). OpenGL 的矩阵乘法运算顺序是<strong>从右往左</strong>的。例如说，按照我们前面介绍的3D空间投影到2D屏幕，需要经过：模型矩阵 ——&gt; 视图矩阵 ——&gt; 投影矩阵，因此从逻辑上来说运算顺序应该是：</p>
-<p>Model Matrix <em> View Matrix </em> Projection Matrix</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;(1). OpenGL 的矩阵乘法运算顺序是<strong>从右往左</strong>的。例如说，按照我们前面介绍的3D空间投影到2D屏幕，需要经过：模型矩阵 ——&gt; 视图矩阵 ——&gt; 投影矩阵，因此从逻辑上来说运算顺序应该是：</p>
+<p><code>Model Matrix * View Matrix * Projection Matrix</code></p>
 <p>但是在 OpenGL 的运算中，需要反过来：</p>
-<p>Project Matrix <em> View Matrix </em> Model Matrix</p>
+<p><code>Project Matrix * View Matrix * Model Matrix</code></p>
 <p>因为它的顺序是从右往左的，需要这么写才符合逻辑上的运算顺序。所以调用 OpenGL 的矩阵乘法运算 api 的时候一定要注意<strong><font color="ff0000">左乘</font></strong>和<strong><font color="ff0000">右乘</font></strong>的区别。例如说 Matrix 的乘法 api：</p>
 <figure class="highlight jav"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="type">Matrix</span>.multiplyMM (<span class="type">float</span>[] <span class="literal">result</span>, <span class="type">int</span> resultOffset, <span class="type">float</span>[] lhs, <span class="type">int</span> lhsOffset, <span class="type">float</span>[] rhs, <span class="type">int</span> rhsOffset).</div></pre></td></tr></table></figure>
 
-<p>这个 api 是 lhs <em> rhs（注意左右），然后结果输出到 result。上面的 MVP 矩阵的连乘（某些平台 OpenGL 的数学库重载了 </em> 运算符，可以直接像上面那样写连乘，注意顺序即可），使用 multiplyMM 可以这样写：</p>
+<p>这个 api 是 <code>lhs * rhs</code>（注意左右），然后结果输出到 result。上面的 MVP 矩阵的连乘（某些平台 OpenGL 的数学库重载了 * 运算符，可以直接像上面那样写连乘，注意顺序即可），使用 multiplyMM 可以这样写：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">float</span>[] viewMat, projectMat, modelMat;</div><div class="line"><span class="keyword">float</span>[] mvp, itemMat;</div><div class="line"><span class="comment">// mvp = projectMat * viewMat</span></div><div class="line">Matrix.multiplyMM(mvp, <span class="number">0</span>, projectMat, <span class="number">0</span>, viewMat, <span class="number">0</span>);</div><div class="line"><span class="comment">// itemMat = projectMat * viewMat * modelMat</span></div><div class="line">Matrix.multiplyMM(itemMat, <span class="number">0</span>, mvp, <span class="number">0</span>, modelMat);</div><div class="line"></div></pre></td></tr></table></figure>
 
-<p>​    (2). OpenGL 的中的 4x4 矩阵是按<strong><font color="ff0000">列顺序（column-major）</font></strong>存储的：</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;(2). OpenGL 的中的 4x4 矩阵是按<strong><font color="ff0000">列顺序（column-major）</font></strong>存储的：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">  m[offset +  <span class="number">0</span>] m[offset +  <span class="number">4</span>] m[offset +  <span class="number">8</span>] m[offset + <span class="number">12</span>]</div><div class="line">  m[offset +  <span class="number">1</span>] m[offset +  <span class="number">5</span>] m[offset +  <span class="number">9</span>] m[offset + <span class="number">13</span>]</div><div class="line">  m[offset +  <span class="number">2</span>] m[offset +  <span class="number">6</span>] m[offset + <span class="number">10</span>] m[offset + <span class="number">14</span>]</div><div class="line">  m[offset +  <span class="number">3</span>] m[offset +  <span class="number">7</span>] m[offset + <span class="number">11</span>] m[offset + <span class="number">15</span>]</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>这个就和我们计算机中 float 数组的存储顺序不对了，默认的 float 数组是按行顺序存储的。因此 Matrix 里面有一个矩阵行列转置（就是将行列的顺序倒过来）的 api：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Matrix.transposeM(<span class="keyword">float</span>[] mTrans, <span class="keyword">int</span> mTransOffset, <span class="keyword">float</span>[] m, <span class="keyword">int</span> mOffset)</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>如果是手动构造 4x4 矩阵的，最后要传入 OpenGL 或者和使用 Matrix api 得到的矩阵进行运算的时候记得要进行<strong><font color="ff0000">行列转置</font></strong>。</p>
-<p><strong><font color="0070d5">*编程建议：</font></strong></p>
-<p>​        (1). 建议投影矩阵和视图矩阵配合设置，将 z 轴原点设置在 0。也就是说 z 轴 0 就表示是在2D屏幕上显示的大小正好就是模型的大小。如果按照前面投影矩阵的设置建议，选择 frustumM 按 <strong>left, right, bottom, top, near, far: -1, 1, -1, 1, 1, 1000</strong> 来设置的话。setLookAtM 就可以按照下面的值配置：</p>
-<p>​        <strong>eye: 0, 0, 1</strong></p>
-<p>​        <strong>center: 0, 0, 0</strong></p>
-<p>​        <strong>up: 0, 1, 0</strong></p>
+<p><strong><font color="0070d5">*编程建议：</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;(1). 建议投影矩阵和视图矩阵配合设置，将 z 轴原点设置在 0。也就是说 z 轴 0 就表示是在2D屏幕上显示的大小正好就是模型的大小。如果按照前面投影矩阵的设置建议，选择 frustumM 按 <strong>left, right, bottom, top, near, far: -1, 1, -1, 1, 1, 1000</strong> 来设置的话。setLookAtM 就可以按照下面的值配置：<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>eye: 0, 0, 1</strong><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>center: 0, 0, 0</strong><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>up: 0, 1, 0</strong></p>
 <p>这样投影矩阵和视图矩阵运算得到的 Camera 在空间的方位就是：相机在 (0,0,1) 的位置朝 (0,0,0) 方向（也就是沿z轴负方向），竖直方向与水平方向垂直；横截面大小为 [-1,1]，近横截面的 z 为0，远横截面的 z 为 -1000：（这样配置的好处在建模那一章就能体会到了）</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_view_matrix_4.png" alt="插图"></p>
 <p><strong>(3). Viewport</strong></p>
@@ -247,9 +235,7 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <figure class="highlight jav"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GLES20.glScissor(<span class="keyword">int</span> x, <span class="keyword">int</span> y, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</div></pre></td></tr></table></figure>
 
 <p>glScissor 这个 api 是设置一个剪裁窗口，超出这个区域的像素将不会显示。glScissor 和 glViewport 的区别在于：glViewport 是影响 OpenGL 的投影算法的，但是 glScissor 不会，glScissor 只是单纯的在屏幕上剪出一片区域而已。一般来说 glScissor 是设置得和 glViewport 一样大，但是某些时候也会有一些特殊用法。</p>
-<p><strong><font color="0070d5">*编程建议：</font></strong></p>
-<p>​        (1). 一般 Viewport 都会配置和屏幕分辨率一样大，这样逻辑上比较简单。当然某些场景会不太一样，例如说 VR 中每一只眼睛的 Viewport 是配置成半屏大小的。</p>
-<p>​        (2). 这里我们涉及到了第一次调用到了 GLESx0（GLES10, GLES20, GLES30） 下的 api（都是以 gl 开头的）。直接调用 OpenGL 的 api 就相当于操作 OpenGL 的状态。这里有个需要注意的是：<strong><font color="ff0000">OpenGL 是单线程的，它的所有操作（api 调用）都只能在 GL 线程中进行，否则就会报错</font></strong>。GL 线程就是指挂载了 GL 上下文（Context）的线程。在 Java 中很好区分，凡是 GLSurfaceView 的回调函数（包括 Renderer 的）都是 GL 线程，这些函数里面可以调用 OpenGL 的 api。至于 Native 的，本身 GL 上下文都是自己挂载的，在哪个线程挂载的自己应该很清楚了。</p>
+<p><strong><font color="0070d5">*编程建议：</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;(1). 一般 Viewport 都会配置和屏幕分辨率一样大，这样逻辑上比较简单。当然某些场景会不太一样，例如说 VR 中每一只眼睛的 Viewport 是配置成半屏大小的。<br>&nbsp;&nbsp;&nbsp;&nbsp;(2). 这里我们涉及到了第一次调用到了 GLESx0（GLES10, GLES20, GLES30） 下的 api（都是以 gl 开头的）。直接调用 OpenGL 的 api 就相当于操作 OpenGL 的状态。这里有个需要注意的是：<strong><font color="ff0000">OpenGL 是单线程的，它的所有操作（api 调用）都只能在 GL 线程中进行，否则就会报错</font></strong>。GL 线程就是指挂载了 GL 上下文（Context）的线程。在 Java 中很好区分，凡是 GLSurfaceView 的回调函数（包括 Renderer 的）都是 GL 线程，这些函数里面可以调用 OpenGL 的 api。至于 Native 的，本身 GL 上下文都是自己挂载的，在哪个线程挂载的自己应该很清楚了。</p>
 <h3 id="物体建模">物体建模</h3>
 <p>上一章介绍的是如果摆（配置） Camera，这章我们就要介绍如何给物体建模（可以理解为如何摆物体以及摆多大的物体）。前面也介绍了，OpenGL 中的图形都是由三角形构成的，而3个点（也可以叫做顶点Vertex）可以构成一个三角形，所以建模其实就是计算顶点的三维坐标（x，y，z）。</p>
 <p>我们以最简单的摆一个三角形为例。例如说要想要在<strong>屏幕中间摆一个全屏的三角形</strong>。如果是按照上面一章编程建议的方式配置 Camera、LookAt 和 Viewport 的话（假设我们选择使用 frustumM 配置正交投影）。那么我们要计算的3个顶点的坐标其实很简单：</p>
@@ -257,9 +243,7 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_wind.png" alt="插图"></p>
 <p>图中可以看到，在规范化的坐标系中要定这3个顶点其实很简单（上图中只标注了 x，y 坐标，z 都是 0 就没标注了）。</p>
-<p><strong><font color="0070d5">*编程建议：</font></strong></p>
-<p>​        (1). 建议物体建模的时候，大小按照全屏来建，z 轴放到屏幕最前面，也就是前面建议配置的 0 位置。然后再使用平移、缩小等变化将物体变到自己想到的位置。这样排查问题比较方便，因为不加变化的话，物体肯定是在屏幕正中间的，而且是铺满整个屏幕的。</p>
-<p>​        (2). 关于物体顶点的组成顺序（环绕顺序），有2种不同的顺序：顺时针（CW）和逆时针（CCW）。例如例子里面的就是 CCW（v0 -&gt; v1 -&gt; v2）。2种顺序都可以，但是强烈建议所有的图形都采用<strong>一样的环绕顺序</strong>，要么都是 CW，要么都是 CCW，混合着一起用，可能会造成一些问题。</p>
+<p><strong><font color="0070d5">*编程建议：</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;(1). 建议物体建模的时候，大小按照全屏来建，z 轴放到屏幕最前面，也就是前面建议配置的 0 位置。然后再使用平移、缩小等变化将物体变到自己想到的位置。这样排查问题比较方便，因为不加变化的话，物体肯定是在屏幕正中间的，而且是铺满整个屏幕的。<br>&nbsp;&nbsp;&nbsp;&nbsp;(2). 关于物体顶点的组成顺序（环绕顺序），有2种不同的顺序：顺时针（CW）和逆时针（CCW）。例如例子里面的就是 CCW（v0 -&gt; v1 -&gt; v2）。2种顺序都可以，但是强烈建议所有的图形都采用<strong>一样的环绕顺序</strong>，要么都是 CW，要么都是 CCW，混合着一起用，可能会造成一些问题。</p>
 <h3 id="物体变化">物体变化</h3>
 <p>按照上一章的编程建议，需要移动、缩放、旋转物体。完成这些操作，可以使用矩阵运算来实现（这个就是上面提到的模型矩阵了）。当然 Matrix 里都有对应的 api：</p>
 <p><strong>(1). 变化 API</strong></p>
@@ -268,8 +252,7 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">{</div><div class="line">    <span class="number">1</span>,   <span class="number">0</span>,  <span class="number">0</span>,  <span class="number">0</span>,</div><div class="line">    <span class="number">0</span>,   <span class="number">1</span>,  <span class="number">0</span>,  <span class="number">0</span>,</div><div class="line">    <span class="number">0</span>,   <span class="number">0</span>,  <span class="number">1</span>,  <span class="number">0</span>,</div><div class="line">    <span class="number">0</span>,   <span class="number">0</span>,  <span class="number">0</span>,  <span class="number">1</span>,</div><div class="line">};</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>任何矩阵乘以单位矩阵还是等于自身，所以可以简单的理解单位矩阵相当于<strong>矩阵的初始化状态</strong>。进行任何矩阵运算前，可以先将要进行的运算的矩阵还远程单位矩阵，避免之前的影响。</p>
-<p><strong>(1.2). Matrix.rotateM(float[] m, int mOffset, float a, float x, float y, float z):</strong></p>
-<p>​        <strong>Matrix.rotateM(float[] rm, int rmOffset, float[] m, float a, float x, float y, float z):</strong></p>
+<p><strong>(1.2). Matrix.rotateM(float[] m, int mOffset, float a, float x, float y, float z):</strong><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Matrix.rotateM(float[] rm, int rmOffset, float[] m, float a, float x, float y, float z):</strong></p>
 <p>将当前矩阵进行旋转运算：绕坐标轴（x, y, z）旋转 a 角度（<strong><font color="ff0000">单位是度，方向为 CCW</font></strong>，所以我之前也建议缠绕方向也是选择 CCW）。例如说想沿y轴旋转45度那么 x,y,z/a 应该为：0,1,0/45。2个 api 的区别在于：参数少的，直接作用到给的矩阵上；参数多的，在 m 基础上进行旋转运算，然后结果输出到 rm 中。下面的平移、缩放 api 都是有2个版本的，后面就说第一个简单版本的了。</p>
 <p><strong>(1.3). Matrix.translateM(float[] m, int mOffset, float x, float y, float z):</strong></p>
 <p>将当前矩阵进行平移运算：平移的距离分别是 x轴，y轴，z轴上的距离，例如说沿x轴正方向平移1个位置（这个移动的距离和Camera的配置是有关系的，例如说如果Camera是按建议的配置来设置，那么平移1个位置，就相当于移动了半个屏幕的距离，建议的0点在屏幕中间），x,y,z 就是 1,0,0。</p>
@@ -295,8 +278,7 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_transform_order_3.png" alt="插图"></p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_transform_order_4.png" alt="插图"></p>
 <p>从图上可以直观看得出对调了变化顺序的最终结果是不一样的。原因在于旋转的轴不一样。一般来说在原点旋转（先旋转），可以绕物体自身的中心点旋转。大家要想清楚自己的逻辑需求，然后再选择合适的变化方式。</p>
-<p><strong><font color="0070d5">*编程建议：</font></strong></p>
-<p>​        (1). 建议所有的<strong>旋转、缩放变化放到原点进行</strong>（也就是上面例子中的先旋转再平移）。如果物体不在原点，可以先把物体移动回原点，变化完之后，再移回去。理由从上面的对比就能看得出来，非原点的旋转不是很好控制，除非你本身就需要这种效果。</p>
+<p><strong><font color="0070d5">*编程建议：</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;(1). 建议所有的<strong>旋转、缩放变化放到原点进行</strong>（也就是上面例子中的先旋转再平移）。如果物体不在原点，可以先把物体移动回原点，变化完之后，再移回去。理由从上面的对比就能看得出来，非原点的旋转不是很好控制，除非你本身就需要这种效果。</p>
 <h3 id="绘制图元">绘制图元</h3>
 <p>根据前面 OpenGL 程序的流程，Camera 配置好，物体模型建好，每帧变化算好，那就终于到最后一步了：渲染（绘制）。其实前面的几部已经完成了 80% 了工作了，剩下的绘制反而没多少工作了。前面介绍了，OpenGL 的基本图元就是点、线、三角形。绘制就是让模型的顶点按照基本图元渲染。</p>
 <p><strong>(1). Shader 编程</strong></p>
@@ -310,14 +292,14 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <p>可以看到基本绘制功能的 Shader 很简单，代码并不多。我们先来看 Vertex Shader：它和 C 很像，程序的执行入口是 main 函数，代码顺序执行，函数外面的是变量定义。</p>
 <p>这里先来介绍一下变量定义。变量前面的 uniform, attribute, varying 叫限定符，mat4, vec4 是类型，uMvpMat 是变量的名字。我们先来看看数据类型：</p>
 <p><strong>(1.1). 数据类型</strong></p>
-<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_shader_data-_type.png" alt="插图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_shader_data_type.png" alt="插图"></p>
 <p>除此之外 GSLS 还支持结构体和数组，结构体、数组都和C语言的很像：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 结构体定义和声明: </span></div><div class="line"><span class="keyword">struct</span> info { </div><div class="line">  vec3 color; </div><div class="line">  vec3 position; </div><div class="line">  vec2 textureCoor; </div><div class="line">} </div><div class="line">info CubeInfo;</div><div class="line"></div><div class="line"><span class="comment">// 数组声明:  </span></div><div class="line">vec3 position[<span class="number">20</span>];</div><div class="line"><span class="keyword">float</span> x[] = <span class="keyword">float</span>[<span class="number">2</span>](<span class="number">1.0</span>,<span class="number">2.0</span>);</div><div class="line"><span class="keyword">float</span> y[] = <span class="keyword">float</span>[](<span class="number">1.0</span>,<span class="number">2.0</span>,<span class="number">3.0</span>);</div><div class="line"></div></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 结构体定义和声明: </span></div><div class="line"><span class="keyword">struct</span> info { </div><div class="line">  vec3 color; </div><div class="line">  vec3 position; </div><div class="line">  vec2 textureCoor; </div><div class="line">} </div><div class="line">info CubeInfo;</div><div class="line"></div><div class="line"><span class="comment">// 数组声明:</span></div><div class="line">vec3 position[<span class="number">20</span>];</div><div class="line"><span class="keyword">float</span> x[] = <span class="keyword">float</span>[<span class="number">2</span>](<span class="number">1.0</span>,<span class="number">2.0</span>);</div><div class="line"><span class="keyword">float</span> y[] = <span class="keyword">float</span>[](<span class="number">1.0</span>,<span class="number">2.0</span>,<span class="number">3.0</span>);</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p><strong>(1.2). 内建变量</strong></p>
 <p>我们看到上面的 Vertex 和 Fragment Shader 有2个很特殊的变量，以 gl<em> 开头的。**所有以 <font color="ff0000">gl</font></em> 开头的变量都是 GLSL 里面的内建变量**。内建变量可以在 Vertex 和 Fragment 中使用，不需要自己声明。内建变量都有自己的特殊含义，一般表示管线渲染的输入或者是输出，这里我们只介绍我们模板里面出现的2个：</p>
-<p>​    <strong>gl_Posistion</strong>: vec4，输出属性，变换后的顶点的位置，用于后面的固定的裁剪等操作。所有的顶点着色器都必须写这个值。简单的理解：这个变量需要我们赋值，赋的值就是顶点坐标。当然是经过变化之后的顶点坐标（例如说上面程序里面就经过了 mvp 矩阵的运算）。</p>
-<p>​    <strong>gl_FragColor</strong>: vec4，输出属性，输出的颜色用于随后的像素操作。简单的理解：这个变量也需要我们复制，赋的值就是颜色值，颜色值可以是纹理的像素，也可以是我们自己指定的颜色值。当然不管是纹理的像素还是颜色值都是可以经过运算的（上面的程序比较简单，就没经过运算了。所以从这里就能看得出 Shader 的作用了，它可以编程操作着色过程）。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong>gl_Posistion</strong>: vec4，输出属性，变换后的顶点的位置，用于后面的固定的裁剪等操作。所有的顶点着色器都必须写这个值。简单的理解：这个变量需要我们赋值，赋的值就是顶点坐标。当然是经过变化之后的顶点坐标（例如说上面程序里面就经过了 mvp 矩阵的运算）。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong>gl_FragColor</strong>: vec4，输出属性，输出的颜色用于随后的像素操作。简单的理解：这个变量也需要我们复制，赋的值就是颜色值，颜色值可以是纹理的像素，也可以是我们自己指定的颜色值。当然不管是纹理的像素还是颜色值都是可以经过运算的（上面的程序比较简单，就没经过运算了。所以从这里就能看得出 Shader 的作用了，它可以编程操作着色过程）。</p>
 <p><strong>(1.2). 内建函数</strong></p>
 <p>既然有内建变量，也就有内建函数。GLSL 的内建函数可以理解为类似C的C库带的函数，是实现了一些常用操作的函数。上面我们用到的函数 texture2D 就是。我们这里也不全面介绍，详细的同样《OpenGLES 编程指南》和官网都有。我们这里就只是简单说明一下我们用到的这个内建函数：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">gvec4 texture(gsampler2D sampler, vec2 P, [<span class="keyword">float</span> bias]);</div><div class="line"></div></pre></td></tr></table></figure>
@@ -325,50 +307,34 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <p>这个函数输入的是：Sample2D 是一个纹理采样器，简单的理解就是当前绑定的纹理（后面会具体说明纹理如何使用）。P 就是传入的纹理坐标。这个函数的作用就是从当前绑定的纹理中按传入的纹理坐标获取纹理的像素值，它的返回值是vec4的向量，正好可以用于 gl_FragColor 的输出。</p>
 <p><strong>(1.3). 限定符</strong></p>
 <p>限定符是表示数据在 GPU 内存当中的存储特性，不同的限定符有不同的用处：</p>
-<p>​    <strong>unifrom（统一变量）</strong>: <strong>它可以在 Vertex 和 Fragment Shader 中同时使用</strong>，如果 Vertex 和 Fragment 中定义的 uniform变量名字一样的话，那么可以实现共享。它通过 OpenGL 的 api 由外部程序绑定数值，<strong>无法被 Shader 程序改变（相当于const）</strong>。uniform一般用于表示变化矩阵，光照等。 </p>
-<p>​    <strong>attribute（属性）</strong>: <strong>它只能在 Vertex 中使用，不能在 Fragment 中使用</strong>。它也是通过 OpenGL 的 api 由外部程序绑定数值，<strong>无法被 Shader 程序改变</strong>。attribute无法修饰数组或是结构体。attribute一般用于表示顶点坐标数组、纹理坐标数组、顶点颜色数组、法线数组等。它在 OpenGL 3.0 中被关键字 “in” 代替了，当然你可以继续使用 attribute。</p>
-<p>​    <strong>varying（变量）</strong>: <strong>它可以在 Vertex 和 Fragment 中同时使用。</strong>它存在的目的在于在 Vertex 中进行运算，然后传递给 Fragment 使用。所以一般来说<strong>需要**</strong>在 Vertex 和 Fragment 中声明成同样的变量名**。在 Vertex 中可读、可写（需要运算），在 Fragment 中只读（负责传递）。它无法被外部程序绑定数值（没有绑定的 api 可用），只是在 Shader 之间传递数据而已。一般来在 Vertex 中使用 varying 进行一些顶点坐标、纹理坐标或者是颜色的运算，然后在 Fragment 中直接使用。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong>unifrom（统一变量）</strong>: <strong>它可以在 Vertex 和 Fragment Shader 中同时使用</strong>，如果 Vertex 和 Fragment 中定义的 uniform变量名字一样的话，那么可以实现共享。它通过 OpenGL 的 api 由外部程序绑定数值，<strong>无法被 Shader 程序改变（相当于const）</strong>。uniform一般用于表示变化矩阵，光照等。 </p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong>attribute（属性）</strong>: <strong>它只能在 Vertex 中使用，不能在 Fragment 中使用</strong>。它也是通过 OpenGL 的 api 由外部程序绑定数值，<strong>无法被 Shader 程序改变</strong>。attribute无法修饰数组或是结构体。attribute一般用于表示顶点坐标数组、纹理坐标数组、顶点颜色数组、法线数组等。它在 OpenGL 3.0 中被关键字 “in” 代替了，当然你可以继续使用 attribute。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong>varying（变量）</strong>: <strong>它可以在 Vertex 和 Fragment 中同时使用。</strong>它存在的目的在于在 Vertex 中进行运算，然后传递给 Fragment 使用。所以一般来说<strong>需要**</strong>在 Vertex 和 Fragment 中声明成同样的变量名**。在 Vertex 中可读、可写（需要运算），在 Fragment 中只读（负责传递）。它无法被外部程序绑定数值（没有绑定的 api 可用），只是在 Shader 之间传递数据而已。一般来在 Vertex 中使用 varying 进行一些顶点坐标、纹理坐标或者是颜色的运算，然后在 Fragment 中直接使用。</p>
 <p>通过上面数据类型、内建变量、内建函数以及限定符的说明，回头再去看本章开头给出的 Shader 程序，配合注释应该就能看明白这2段代码的含义了。如果要自己扩展实现其它功能，可以参照官网 API 说明文档，自行编写 Shader 程序。</p>
-<p><strong><font color="0070d5">*编程建议：</font></strong></p>
-<p>​        (1). 建议变量的名字前面的首字母按照限定符来命名。例如说：</p>
-<p>​        unifrom mat4 uMvpMat;</p>
-<p>​        attribute vec4 aPosistion;</p>
-<p>​        varying vec2 vTexCoord;</p>
+<p><strong><font color="0070d5">*编程建议：</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;(1). 建议变量的名字前面的首字母按照限定符来命名。例如说：<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unifrom mat4 uMvpMat;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;attribute vec4 aPosistion;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;varying vec2 vTexCoord;</p>
 <p>这样能从名字上就能更加清晰的看出来该变量的含义和用途。</p>
 <p><strong>(2). Shader 编译、链接</strong></p>
 <p>在 OpenGL 程序中写 Shader 就是写一串字符串。可以直接定义一个 String 类型用字符串拼接的方式来写，也可以拿一个文本写好打包到 apk 里面，然后从文件中读取字符串。这里不讨论哪种方法更好，大家可以根据自己的需求选择。我们下面介绍一下如何编译、链接 Shader 程序。通常来说这个步骤分为下面几个步骤：</p>
 <ol>
-<li><p>创建程序</p>
-</li>
-<li><p>创建 Shader</p>
-</li>
-<li><p>使用 Shader 编译自己写的 Shader 程序</p>
-</li>
-<li><p>绑定 1 创建的程序（将当前激活的程序设置为(a)）</p>
-</li>
-<li><p>将  3 中编译好的 Shader 挂载到 (a) 中的程序上</p>
-</li>
-<li><p>链接 1 中的程序</p>
-</li>
-<li><p>查找（绑定）1 程序中的 uniform 和 attribute</p>
-</li>
-<li><p>解绑 1 中的程序（撤销当前激活程序 1 ）。程序编译、链接完成，等待渲染的时候执行程序。</p>
-</li>
+<li>创建程序</li>
+<li>创建 Shader</li>
+<li>使用 Shader 编译自己写的 Shader 程序</li>
+<li>绑定 1 创建的程序（将当前激活的程序设置为(a)）</li>
+<li>将  3 中编译好的 Shader 挂载到 (a) 中的程序上</li>
+<li>链接 1 中的程序</li>
+<li>查找（绑定）1 程序中的 uniform 和 attribute</li>
+<li>解绑 1 中的程序（撤销当前激活程序 1 ）。程序编译、链接完成，等待渲染的时候执行程序。</li>
 </ol>
 <p>上面这段文字有点不太形象，贴一段代码好了：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// GLProgram 是一个 java 小工具类，用来方便使用 Shader 程序 </span></div><div class="line"><span class="comment">// 程序、Shader的句柄，其实就是一个int整数，由OpenGL分配</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> program;</div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> vertexShader;</div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> fragmentShader;</div><div class="line"></div><div class="line"><span class="comment">// uniform和attribute的位置，也是一个int整数，可以由OpenGL分配，也可以自己指定</span></div><div class="line"><span class="comment">// shader attribute location variable</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> uMvpMat;</div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> aPosition;</div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> uColor;</div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> aTexCoord;</div><div class="line"><span class="comment">// custom params, define according to user</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">int</span>[] params;</div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="title">GLProgram</span>() {</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> GLProgram <span class="title">buildProgram</span>(String vertexSrc, String fragmentSrc, String ... customParams) {</div><div class="line">    GLProgram glProgram = <span class="keyword">new</span> GLProgram();</div><div class="line"></div><div class="line">    <span class="comment">// 创建程序</span></div><div class="line">    glProgram.program = glCreateProgram();</div><div class="line">    <span class="comment">// 创建 Shader，分为 Vertex 和 Fragment 2个</span></div><div class="line">    glProgram.vertexShader = glCreateShader(GL_VERTEX_SHADER);</div><div class="line">    glProgram.fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);</div><div class="line"></div><div class="line">    <span class="comment">// 编译 Shader，也是分为 Vertex 和 Fragment 2个</span></div><div class="line">    <span class="comment">// 传递的源码是字符串</span></div><div class="line">    compileShader(glProgram.vertexShader, vertexSrc);</div><div class="line">    compileShader(glProgram.fragmentShader, fragmentSrc);</div><div class="line"></div><div class="line">    <span class="comment">// 绑定程序</span></div><div class="line">    glUseProgram(glProgram.program);</div><div class="line"></div><div class="line">    <span class="comment">// 挂载 Shader 到程序上</span></div><div class="line">    glAttachShader(glProgram.program, glProgram.vertexShader);</div><div class="line">    glAttachShader(glProgram.program, glProgram.fragmentShader);</div><div class="line"></div><div class="line">    <span class="comment">// 手动指定变量、属性的位置</span></div><div class="line">    <span class="comment">// VERTEX_ATTRIBUTE_LOCATION_POSITION: 0</span></div><div class="line">    <span class="comment">// VERTEX_ATTRIBUTE_LOCATION_UV0: 1</span></div><div class="line">    <span class="comment">// set attributes before linking</span></div><div class="line">    <span class="comment">// TODO: value name must keep same as shader sources</span></div><div class="line">    glBindAttribLocation(glProgram.program, VERTEX_ATTRIBUTE_LOCATION_POSITION,          <span class="string">"aPosition"</span>);</div><div class="line">    glBindAttribLocation(glProgram.program, VERTEX_ATTRIBUTE_LOCATION_UV0,          <span class="string">"aTexCoord"</span>);</div><div class="line"></div><div class="line">    <span class="comment">// 链接程序</span></div><div class="line">    glLinkProgram(glProgram.program);</div><div class="line"></div><div class="line">    <span class="comment">// 获取变量、属性的位置（由OpenGL分配）</span></div><div class="line">    <span class="comment">// TODO: value name must keep same as shader sources</span></div><div class="line">    glProgram.aPosition = glGetAttribLocation(glProgram.program, <span class="string">"aPosition"</span>);</div><div class="line">    glProgram.aTexCoord = glGetAttribLocation(glProgram.program, <span class="string">"aTexCoord"</span>);</div><div class="line">    glProgram.uColor = glGetUniformLocation(glProgram.program, <span class="string">"uColor"</span>);</div><div class="line">    glProgram.uMvpMat = glGetUniformLocation(glProgram.program, <span class="string">"uMvpMat"</span>);</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> != customParams && customParams.length &gt; <span class="number">0</span>) {</div><div class="line">        glProgram.params = <span class="keyword">new</span> <span class="keyword">int</span>[customParams.length];</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; customParams.length; i++) {</div><div class="line">            <span class="keyword">if</span> (customParams[i].startsWith(<span class="string">"a"</span>)) {</div><div class="line">                glProgram.params[i] = glGetAttribLocation(glProgram.program, customParams[i]);</div><div class="line">            } <span class="keyword">else</span> <span class="keyword">if</span> (customParams[i].startsWith(<span class="string">"u"</span>)) {</div><div class="line">                glProgram.params[i] = glGetUniformLocation(glProgram.program, customParams[i]);</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="comment">// 解绑程序</span></div><div class="line">    glUseProgram(<span class="number">0</span>);</div><div class="line">    <span class="keyword">return</span> glProgram;</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>配合上面的代码讲解一下：</p>
-<p>​    (1). 在 OpenGL 中很多句柄（或者你理解为指针也可以）都是一个 <strong>int 整数</strong>：例如说上面的 program、shader、变量的位置等。通过 OpenGL 的 api 来创建，一般如果没有错误的话，返回的句柄都是<strong>非0正数</strong>。而且<strong>一般有创建的都会有对应的销毁（删除）api，不用的时候记得要删除</strong>。这些 api 不细说了，比较简单，或者查阅官网的 api 文档也有详细的说明。</p>
-<p>​    (2). 获取 uniform 的位置，可以使用 glGetUniformLocation；获取 attribute 的位置，可以使用 glGetAttribLocation 。这里需要注意的是：<strong>查找位置是通过名字来查找的，所以一定要和你 Shader 里面写变量名字要对应（所以前面建议命名要规范一些）</strong>。也可以手动指定 uniform 和 attribute 的位置，就是使用上面代码的 api。注意：一般手动指定是从 0 开始，OpenGL 有最大支持的位置范围（这个有 api 可以查得到的，一般至少支持 16 以上）。这里获取的位置很重要，后面的数据绑定需要通过位置信息来绑定。</p>
-<p><strong><font color="0070d5">*编程建议：</font></strong></p>
-<p>​        (1). 注意到前面编程代码里面的这个用法了没：</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;(1). 在 OpenGL 中很多句柄（或者你理解为指针也可以）都是一个 <strong>int 整数</strong>：例如说上面的 program、shader、变量的位置等。通过 OpenGL 的 api 来创建，一般如果没有错误的话，返回的句柄都是<strong>非0正数</strong>。而且<strong>一般有创建的都会有对应的销毁（删除）api，不用的时候记得要删除</strong>。这些 api 不细说了，比较简单，或者查阅官网的 api 文档也有详细的说明。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;(2). 获取 uniform 的位置，可以使用 glGetUniformLocation；获取 attribute 的位置，可以使用 glGetAttribLocation 。这里需要注意的是：<strong>查找位置是通过名字来查找的，所以一定要和你 Shader 里面写变量名字要对应（所以前面建议命名要规范一些）</strong>。也可以手动指定 uniform 和 attribute 的位置，就是使用上面代码的 api。注意：一般手动指定是从 0 开始，OpenGL 有最大支持的位置范围（这个有 api 可以查得到的，一般至少支持 16 以上）。这里获取的位置很重要，后面的数据绑定需要通过位置信息来绑定。</p>
+<p><strong><font color="0070d5">*编程建议：</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;(1). 注意到前面编程代码里面的这个用法了没：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 绑定程序</span></div><div class="line">glUseProgram(glProgram.program);</div><div class="line"></div><div class="line">... ...</div><div class="line"></div><div class="line"><span class="comment">// 解绑程序</span></div><div class="line">glUseProgram(<span class="number">0</span>);</div><div class="line"></div></pre></td></tr></table></figure>
 
-<p>开始的绑定程序，可以理解为是使用当前这个程序或者是当前激活的程序是这个。后面的解绑程序（把激活的程序设置为0），可以理解为是当前没有激活的程序（禁止使用程序）。这个操作要理解好，因为这种操作在 OpenGL 中会大量用到。OpenGL 中有一种编程理念叫：<strong>什么时候用，什么时候开，用完了就要关闭</strong>。这样做的好处在于：</p>
-<p>​            (a). 保证状态的正确性。如果整个程序都是这样做法的话，这就意味着每个小模块（函数），最开始的状态就是原始的，你需要什么功能就打开，例如说开深度检测、激活纹理、激活缓冲区；为了保证这种状态，你也需要在你的小模块完成后，把你一开始打开的状态关掉。这样就能有效的保证渲染的正确性，否则有可能会因为前面某个模块的开关操作，导致本模块的渲染结果不正确。很多刚开始写 OpenGL 的人不注意这个原则，就会导致 OpenGL 的状态比较混乱，排查问题也比较费劲。</p>
-<p>​            (b). OpenGL 是一个状态机，这些开关操作的 api，只是去设置一个标志位而已，因此不需要怕频繁开关状态造成性能压力。</p>
-<p>​            (c). 如果遵守这个编程理念的话，那<strong>么 OpenGL 的这些开关操作都应该是成对出现的</strong>，也方便自己排查问题。</p>
+<p>开始的绑定程序，可以理解为是使用当前这个程序或者是当前激活的程序是这个。后面的解绑程序（把激活的程序设置为0），可以理解为是当前没有激活的程序（禁止使用程序）。这个操作要理解好，因为这种操作在 OpenGL 中会大量用到。OpenGL 中有一种编程理念叫：<strong>什么时候用，什么时候开，用完了就要关闭</strong>。这样做的好处在于：<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(a). 保证状态的正确性。如果整个程序都是这样做法的话，这就意味着每个小模块（函数），最开始的状态就是原始的，你需要什么功能就打开，例如说开深度检测、激活纹理、激活缓冲区；为了保证这种状态，你也需要在你的小模块完成后，把你一开始打开的状态关掉。这样就能有效的保证渲染的正确性，否则有可能会因为前面某个模块的开关操作，导致本模块的渲染结果不正确。很多刚开始写 OpenGL 的人不注意这个原则，就会导致 OpenGL 的状态比较混乱，排查问题也比较费劲。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(b). OpenGL 是一个状态机，这些开关操作的 api，只是去设置一个标志位而已，因此不需要怕频繁开关状态造成性能压力。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(c). 如果遵守这个编程理念的话，那<strong>么 OpenGL 的这些开关操作都应该是成对出现的</strong>，也方便自己排查问题。</p>
 <p><strong>(3). 绑定数据</strong></p>
 <p>我们首先贴一段绘制前面建立矩形的代码，然后以这段代码说明我们接下来要讲解的内容：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="annotation">@Override</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDraw</span>(<span class="keyword">int</span> eye) {</div><div class="line">    <span class="comment">// 绑定当前程序</span></div><div class="line">    glUseProgram(mGLProgram.program);</div><div class="line"></div><div class="line">    <span class="comment">// 使能 shader 中的顶点数组</span></div><div class="line">    glEnableVertexAttribArray(mGLProgram.aPosition);</div><div class="line">    <span class="comment">// 给属性变量绑定数据（赋值）</span></div><div class="line">    <span class="comment">// COORD_PER_VERTEX: 3</span></div><div class="line">    <span class="comment">// VERTEX_STRIDE: 12</span></div><div class="line">    glVertexAttribPointer(mGLProgram.aPosition, COORD_PER_VERTEX,</div><div class="line">        GL_FLOAT, <span class="keyword">false</span>,</div><div class="line">        VERTEX_STRIDE, mVertexBuffer);</div><div class="line"></div><div class="line">    <span class="comment">// rgba（绿色）</span></div><div class="line">    <span class="keyword">float</span> color[] = {<span class="number">0.0</span>f, <span class="number">1.0</span>f, <span class="number">0.0</span>f, <span class="number">1.0</span>f};</div><div class="line">    <span class="comment">// 给统一变量赋值（赋值颜色）</span></div><div class="line">    glUniform4fv(mGLProgram.uColor, <span class="number">1</span>, color, <span class="number">0</span>);</div><div class="line"></div><div class="line">    <span class="comment">// 给统一变量赋值（赋值 mvp 矩阵）</span></div><div class="line">    glUniformMatrix4fv(mGLProgram.uMvpMat, <span class="number">1</span>, <span class="keyword">false</span>, mItemMatrix, <span class="number">0</span>);</div><div class="line"></div><div class="line">    <span class="comment">// 绘制三角形</span></div><div class="line">    <span class="comment">// VERTEX_COUNT: 6</span></div><div class="line">    glDrawArrays(GL_TRIANGLES, <span class="number">0</span>, VERTEX_COUNT);</div><div class="line"></div><div class="line">    <span class="comment">// 关闭前面使能的顶点数组</span></div><div class="line">    glDisableVertexAttribArray(mGLProgram.aPosition);</div><div class="line"></div><div class="line">    <span class="comment">// 解绑当前程序</span></div><div class="line">    glUseProgram(<span class="number">0</span>);</div><div class="line">}</div><div class="line"></div></pre></td></tr></table></figure>
@@ -376,12 +342,7 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <p>前面我们介绍了 uniform 和 attribute 都是通过外部程序绑定数据的，要绑定数据的话，就需要上一章获取到的 uniform 和 attribute 的位置信息。我们想要给之前 Vertex Shader 中的 vec4 aPosistion 赋值的话，首先要激活这个顶点数组（使用 api glEnableVertexAttribArray）。然后使用下面的 api 进行赋值：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">glVertexAttribPointer (<span class="keyword">int</span> indx, <span class="keyword">int</span> size, <span class="keyword">int</span> type, <span class="keyword">boolean</span> normalized, <span class="keyword">int</span> stride, Buffer ptr)</div><div class="line"></div></pre></td></tr></table></figure>
 
-<p><strong>index</strong>：前面获取到的 aPosistion 的位置信息。</p>
-<p><strong>size</strong>: 每一个顶点属性的数量，只能为1,2,3,4，默认值为4。这里给的是3，是因为前面建模的时候每一个顶点是3个坐标（x, y, z）。</p>
-<p><strong>type</strong>: 绑定数值的类型，这里是 float（对应 OpenGL 的就是 GL_FLOAT）</p>
-<p><strong>normalized</strong>: 绑定的数值是否规范化，一般是 false</p>
-<p><strong>stride</strong>: 步进值，意思就是绑定的 buffer 里面每隔多少个字节（byte）是下一个顶点。这里是12，说一下12是怎么来的：每个顶点3个坐标，每个坐标是一个 float（4字节），所以一个顶点占用的字节就是：3*4=12。</p>
-<p><strong>ptr</strong>: 要绑定的数值的 Buffer。</p>
+<p><strong>index</strong>：前面获取到的 aPosistion 的位置信息。<br><strong>size</strong>: 每一个顶点属性的数量，只能为1,2,3,4，默认值为4。这里给的是3，是因为前面建模的时候每一个顶点是3个坐标（x, y, z）。<br><strong>type</strong>: 绑定数值的类型，这里是 float（对应 OpenGL 的就是 GL_FLOAT）<br><strong>normalized</strong>: 绑定的数值是否规范化，一般是 false<br><strong>stride</strong>: 步进值，意思就是绑定的 buffer 里面每隔多少个字节（byte）是下一个顶点。这里是12，说一下12是怎么来的：每个顶点3个坐标，每个坐标是一个 float（4字节），所以一个顶点占用的字节就是：<code>3*4=12</code>。<br><strong>ptr</strong>: 要绑定的数值的 Buffer。</p>
 <p>Native 当中 buffer 是直接传递指针的，这里讲下 Java 里面要怎么传递。Java 里面是没有指针的，是通过 Java 的 java.nio.Buffer 包下面的类来进行构造传递的（所以上面的 gl api 最后一个参数也是 Buffer 这个类的对象）。下面代码参照注释的说明应该就能看懂。这可能就是 Java 和 Native 使用 OpenGL 差别比较大的一个地方，Java 没有指针的概念，有些时候确实不如 C/C++ 方便。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 申请 buffer 大小：6 * 3 * 4：</span></div><div class="line"><span class="comment">//   矩形2个三角形，一共6个顶点，每个顶点3个坐标，float 4个字节</span></div><div class="line"><span class="comment">// VERTEX_COUNT: 6</span></div><div class="line"><span class="comment">// COORD_PER_VERTEX: 3</span></div><div class="line"><span class="comment">// GLCommon.FLOAT_BYTE_SIZE: 4</span></div><div class="line"><span class="comment">// init vertex data</span></div><div class="line">ByteBuffer byteBuffer = ByteBuffer.allocateDirect(</div><div class="line">    VERTEX_COUNT * COORD_PER_VERTEX * GLCommon.FLOAT_BYTE_SIZE);</div><div class="line"><span class="comment">// 使用本机的 native 机器字节序（注意这点很重要！！）</span></div><div class="line">byteBuffer.order(ByteOrder.nativeOrder());</div><div class="line"></div><div class="line"><span class="comment">// 声明为 float buffer</span></div><div class="line">mVertexBuffer = byteBuffer.asFloatBuffer();</div><div class="line"><span class="comment">// 把前面的顶点数据（数组）放入 float buffer 中</span></div><div class="line">mVertexBuffer.put(VERTEXS);</div><div class="line"><span class="comment">// 将 buffer 的游标归零</span></div><div class="line">mVertexBuffer.position(<span class="number">0</span>);</div><div class="line"></div></pre></td></tr></table></figure>
 
@@ -389,19 +350,14 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">glUniform4fv (<span class="keyword">int</span> location, <span class="keyword">int</span> count, <span class="keyword">float</span>[] v, <span class="keyword">int</span> offset)</div><div class="line">glUniformMatrix4fv (<span class="keyword">int</span> location, <span class="keyword">int</span> count, <span class="keyword">boolean</span> transpose, <span class="keyword">float</span>[] value, <span class="keyword">int</span> offset)</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>f 代表的是 float，v 代表的是 vector（向量），前面的4代表的是向量的维度，vec4 还是 vec3。Matrix 代表的是矩阵，4代表的是矩阵的维度，是 4x4 还是 3x3，fv 和前面是一样的。还有其他很多类型的，大家可以自行查阅 api 文档。这些 api 也比较简单：</p>
-<p><strong>location</strong>: 代表 uniform 的位置信息。</p>
-<p><strong>count</strong>: 对于 <code>glUniform*v</code> 来说：1代表的是1个向量（例子中的就是1个rgba颜色值），如果 &gt;1 则代表传入的是向量数组；对于 <code>glUniformMatrix*v</code> 来说：1代表的是1个矩阵（例子中就是1个mvp矩阵），如果 &gt;1 则代表传入的是矩阵数组。</p>
-<p><strong>offset</strong>: 一般传入数据没偏移就是 0。</p>
+<p><strong>location</strong>: 代表 uniform 的位置信息。<br><strong>count</strong>: 对于 <code>glUniform*v</code> 来说：1代表的是1个向量（例子中的就是1个rgba颜色值），如果 &gt;1 则代表传入的是向量数组；对于 <code>glUniformMatrix*v</code> 来说：1代表的是1个矩阵（例子中就是1个mvp矩阵），如果 &gt;1 则代表传入的是矩阵数组。<br><strong>offset</strong>: 一般传入数据没偏移就是 0。</p>
 <p>绑定数据相当于外部程序把数据传递给 OpenGL （GPU），也可以理解为 OpenGL Shader 的对外接口。通过这些接口我们才能给 Shader 程序里面的变量赋值。</p>
-<p><strong><font color="0070d5">*编程建议：</font></strong></p>
-<p>​        (1). 本章绘制矩形的代码段再次展现了之前给出的 OpenGL 的编程理念：<strong><font color="ff0000">什么时候用，什么时候开，用完了就要关闭</font></strong>。glUseProgram 成对使用，glEnableVertexAttribArray, glDisableVertexAttribArray 成对使用。</p>
+<p><strong><font color="0070d5">*编程建议：</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;(1). 本章绘制矩形的代码段再次展现了之前给出的 OpenGL 的编程理念：<strong><font color="ff0000">什么时候用，什么时候开，用完了就要关闭</font></strong>。glUseProgram 成对使用，glEnableVertexAttribArray, glDisableVertexAttribArray 成对使用。</p>
 <p><strong>(4). 绘制图元</strong></p>
 <p>有了前面的一些列操作之后，反而绘制图元是最简单的（当然要想正确渲染出来，前面的操作得保证正确），一个 api 调用就可以：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">glDrawArrays (<span class="keyword">int</span> mode, <span class="keyword">int</span> first, <span class="keyword">int</span> count)</div><div class="line"></div></pre></td></tr></table></figure>
 
-<p><strong>mode</strong>：绘制的图元类型，前面有介绍过，这里使用的是三角形：GL_TRIANGLES。</p>
-<p><strong>first</strong>: 开始绘制的索引，可以理解为绑定的顶点数组的偏移，一般为0。</p>
-<p><strong>count</strong>: 绘制顶点的个数。前面介绍了，一个矩形由2个三角形构成，所以这里是6。</p>
+<p><strong>mode</strong>：绘制的图元类型，前面有介绍过，这里使用的是三角形：GL_TRIANGLES。<br><strong>first</strong>: 开始绘制的索引，可以理解为绑定的顶点数组的偏移，一般为0。<br><strong>count</strong>: 绘制顶点的个数。前面介绍了，一个矩形由2个三角形构成，所以这里是6。</p>
 <p>其实这里的绘制 api 的输入可以理解为 Shader 中的内建变量 gl_Posistion。所以我们绑定的顶点数组，就相当于是这个 api 输入。输出的颜色，Shader 中的内建变量 gl_FragColor 就是颜色输出。我们如果按照绑定颜色的做法，那么上面用 glUniform4fv 给 Shader 里面的颜色赋值，就相当于指定要绘制的颜色（当然颜色也可以有数组，渲染出来的就是渐变色，程序里面给定的是绿色，所以渲染出来的就是一个绿色的矩形）。</p>
 <p><strong>(5). 纹理贴图</strong></p>
 <p>前面有简单介绍过纹理，简单的理解就是 GPU 能识别的图片格式。我们用 OpenGL 的过程中，用得最多也就是贴纹理（贴图）。</p>
@@ -409,8 +365,7 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <p>要想正确的贴纹理，我们先需要了解下纹理的坐标系：</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_texture_1.png" alt="插图"></p>
 <p><strong>st 也可以叫 uv，或者更直接的叫 xy 也行</strong>，本质上就是一个二维坐标。它的范围从 [0, 1]（大家发现没有在哪归一化都是标准）。根据每个顶点的位置给出对应顶点的纹理坐标（一个顶点需要2个纹理坐标：uv），OpenGL 就能在物体上贴纹理了，这个过程叫纹理映射：</p>
-<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_texture_2.png" alt="插图"></p>
-<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_texture_3.png" alt="插图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_texture_2.png" alt="插图"><br><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_texture_3.png" alt="插图"></p>
 <p>所以要贴纹理先要把纹理坐标计算好。虽然纹理坐标的范围是 [0, 1]，但是其实也可以是负数，而且负数会有特殊的用法，这里不做具体展开。例如说拿前面的矩形来说，如果我们要<strong>把一张纹理铺满贴到这个矩形上</strong>（这个其实就是大多数时候我们拿 OpenGL 干的事情，例如说 SurfaceFlinger 就是这么贴图的），对应的纹理坐标数组就是下面这样的：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 按照2个三角形6个顶点依次给出对应的纹理坐标</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">float</span> TEXTURE[] = {</div><div class="line">    <span class="number">0</span>f, <span class="number">1</span>f,</div><div class="line">    <span class="number">0</span>f, <span class="number">0</span>f,</div><div class="line">    <span class="number">1</span>f, <span class="number">0</span>f,</div><div class="line"></div><div class="line">    <span class="number">1</span>f, <span class="number">0</span>f,</div><div class="line">    <span class="number">1</span>f, <span class="number">1</span>f,</div><div class="line">    <span class="number">0</span>f, <span class="number">1</span>f</div><div class="line">};</div><div class="line"></div></pre></td></tr></table></figure>
 
@@ -422,38 +377,20 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <p>这里用了一个 GLUtils 的 texImage2D 函数进行绑定，用这个函数就比较简单了：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">GLUtils.texImage2D(<span class="keyword">int</span> target, <span class="keyword">int</span> level, Bitmap bitmap, <span class="keyword">int</span> border)</div><div class="line"></div></pre></td></tr></table></figure>
 
-<p><strong>target</strong>：纹理的类型，具体的类型可以去查官网或者编程指南，这里我们使用的2D纹理（可以理解为普通的图片），就是：GL_TEXTURE_2D。</p>
-<p><strong>level</strong>: 这个应该是 mipmap 的 level，我们这里不用，就填 0。</p>
-<p><strong>bitmap</strong>: Java 的 bitmap 对象，里面有 pixels 数据。</p>
-<p><strong>border</strong>: 这个必须填0（我也不知道为什么要设计这个参数）。</p>
+<p><strong>target</strong>：纹理的类型，具体的类型可以去查官网或者编程指南，这里我们使用的2D纹理（可以理解为普通的图片），就是：GL_TEXTURE_2D。<br><strong>level</strong>: 这个应该是 mipmap 的 level，我们这里不用，就填 0。<br><strong>bitmap</strong>: Java 的 bitmap 对象，里面有 pixels 数据。<br><strong>border</strong>: 这个必须填0（我也不知道为什么要设计这个参数）。</p>
 <p>当然了你也可以不用 GLUtils 的这个辅助函数（因为 Native 里面也没有这个辅助函数），那么使用 OpenGL 的 api 就要复杂一些：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">glTexImage2D(<span class="keyword">int</span> target, <span class="keyword">int</span> level, <span class="keyword">int</span> internalformat, <span class="keyword">int</span> width, <span class="keyword">int</span> height, <span class="keyword">int</span> border, <span class="keyword">int</span> format, <span class="keyword">int</span> type, Buffer pixels)</div><div class="line"></div></pre></td></tr></table></figure>
 
-<p><strong>target</strong>：同上。</p>
-<p><strong>level</strong>: 同上。</p>
-<p><strong>internalformat</strong>: 我们使用2D纹理，填的是0。</p>
-<p><strong>width</strong>: 图片的宽。</p>
-<p><strong>height</strong>: 图片的高。</p>
-<p><strong>border</strong>: 同上。</p>
-<p><strong>format</strong>: 图片的颜色格式，一般来说不带 alpha 的就是 GL_RGB，带 alpha 就是 GL_RGBA。</p>
-<p><strong>type</strong>: 图片的 pixels 数据的格式，一般来说是：GL_UNSIGNED_BYTE。</p>
-<p><strong>pixels</strong>: 像素数据 buffer，这个前面介绍绑定顶点数据的时候说过了，需要使用 Java 的 Buffer 对象将数据进行封装才能传递。</p>
+<p><strong>target</strong>：同上。<br><strong>level</strong>: 同上。<br><strong>internalformat</strong>: 我们使用2D纹理，填的是0。<br><strong>width</strong>: 图片的宽。<br><strong>height</strong>: 图片的高。<br><strong>border</strong>: 同上。<br><strong>format</strong>: 图片的颜色格式，一般来说不带 alpha 的就是 GL_RGB，带 alpha 就是 GL_RGBA。<br><strong>type</strong>: 图片的 pixels 数据的格式，一般来说是：GL_UNSIGNED_BYTE。<br><strong>pixels</strong>: 像素数据 buffer，这个前面介绍绑定顶点数据的时候说过了，需要使用 Java 的 Buffer 对象将数据进行封装才能传递。</p>
 <p>我们发现 GLUtils 的辅助函数很智能的根据我们传入的 Bitmap 对象的格式自动识别匹配了 OpenGL 的参数。但是这个 api 好像是 Android 写的，其他平台没看到有（Native 就没有），所以大家还是不要对这种辅助函数产生太多的依赖。</p>
 <p>我们也发现这些 api 都叫 Image2D，我们现在使用的叫2D纹理，当然了有2D就有3D。不过我们日常用得最多的还是2D纹理，2D纹理可以简单的理解为了普通的图片。关于3D纹理还有其他高级的纹理这里不展开说明，具体的可以看编程指南和官网文档。</p>
-<p><strong><font color="0070d5">*编程建议：</font></strong></p>
-<p>​        (1). 在程序初始化（loading阶段）的时候加载纹理（绑定纹理），而不是在帧渲染的过程中。否则容易造成渲染丢帧。</p>
+<p><strong><font color="0070d5">*编程建议：</font></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;(1). 在程序初始化（loading阶段）的时候加载纹理（绑定纹理），而不是在帧渲染的过程中。否则容易造成渲染丢帧。</p>
 <p><strong>(5.3). 纹理参数</strong></p>
 <p>我们在绑定完纹理之后，还调用了一个 api 进行了纹理的一些参数设置，这里讲解一下纹理有哪些参数可以设置，分别代表什么意思。首先进行纹理设置的 api 是（设置之前需要激活要设置的纹理）：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// target：同上。</span></div><div class="line"><span class="comment">// pname: 参数名字。</span></div><div class="line"><span class="comment">// param：参数类型。</span></div><div class="line">glTexParameterf(<span class="keyword">int</span> target, <span class="keyword">int</span> pname, <span class="keyword">float</span> param)</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>pname 和 param 需要查阅官网 api 文档说明，看支持哪些参数可以设置。这里只说代码里面设置的（也是最常用的）。</p>
-<p>​    <strong>(1). GL_TEXTURE_MIN_FILTER（MAG_FILTER）</strong>：这2个参数分别代表纹理缩小（放大）时候采用的滤波算法。这个比较好理解，例如说一张纹理大小为 512x512，但是物体建模映射到屏幕上的大小为 1024x1024。这个时候就需要把 512x512 的纹理放大贴到 1024x1024 的区域上去。既然有缩放，那就会有滤波算法了，常用的滤波算法为：</p>
-<p>​        <strong>(a). GL_LINEAR</strong>：线性插值滤波。采用最靠近象素中心的四个象素的加权平均值。这个滤波算法比较平滑，视觉效果好，当然运算量比较大。并且这个是 OpenGL 内部实现的（各自Vendor 的 GPU、驱动实现的），所以即使是同样的 GPU 型号，同样的参数，可能 soc 大厂的滤波效果就是比小厂的好（例如说三星的 Mali 和 我们公司的 Mali）。</p>
-<p>​        <strong>(b). GL_NEAREST:</strong> 则是采用坐标最靠近象素中心的纹理像素，这有可能使图像走样。虽然这种算法效果不好，有些时候会有锯齿，但是速度快。</p>
-<p>​    <strong>(2). GL_TEXTURE_WRAP_S（T）</strong>：这2个参数分别代表 st（xy） 方向上的贴图模式。纹理的坐标范围为 [0, 1]，如果超出了 1 的话，那么这些贴图模式就要发挥作用了：</p>
-<p>​        <strong>(a). GL_REPEAT</strong>: 对纹理的默认行为。重复纹理图像。</p>
-<p>​        <strong>(b). GL_MIRRORED_REPEAT</strong>: 和GL_REPEAT一样，但每次重复图片是镜像放置的。</p>
-<p>​        <strong>(c). GL_CLAMP_TO_EDGE</strong>: 纹理坐标会被约束在0到1之间，超出的部分会重复纹理坐标的边缘，产生一种边缘被拉伸的效果。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong>(1). GL_TEXTURE_MIN_FILTER（MAG_FILTER）</strong>：这2个参数分别代表纹理缩小（放大）时候采用的滤波算法。这个比较好理解，例如说一张纹理大小为 512x512，但是物体建模映射到屏幕上的大小为 1024x1024。这个时候就需要把 512x512 的纹理放大贴到 1024x1024 的区域上去。既然有缩放，那就会有滤波算法了，常用的滤波算法为：<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>(a). GL_LINEAR</strong>：线性插值滤波。采用最靠近象素中心的四个象素的加权平均值。这个滤波算法比较平滑，视觉效果好，当然运算量比较大。并且这个是 OpenGL 内部实现的（各自Vendor 的 GPU、驱动实现的），所以即使是同样的 GPU 型号，同样的参数，可能 soc 大厂的滤波效果就是比小厂的好（例如说三星的 Mali 和 我们公司的 Mali）。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>(b). GL_NEAREST:</strong> 则是采用坐标最靠近象素中心的纹理像素，这有可能使图像走样。虽然这种算法效果不好，有些时候会有锯齿，但是速度快。<br>&nbsp;&nbsp;&nbsp;&nbsp;<strong>(2). GL_TEXTURE_WRAP_S（T）</strong>：这2个参数分别代表 st（xy） 方向上的贴图模式。纹理的坐标范围为 [0, 1]，如果超出了 1 的话，那么这些贴图模式就要发挥作用了：<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>(a). GL_REPEAT</strong>: 对纹理的默认行为。重复纹理图像。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>(b). GL_MIRRORED_REPEAT</strong>: 和GL_REPEAT一样，但每次重复图片是镜像放置的。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>(c). GL_CLAMP_TO_EDGE</strong>: 纹理坐标会被约束在0到1之间，超出的部分会重复纹理坐标的边缘，产生一种边缘被拉伸的效果。</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/gl_texture_4.png" alt="插图"></p>
 <p>清楚了参数的含义之后，大家可以根据自己的业务需要选择不同的参数进行设置。</p>
 <p><strong>(5.4). 应用纹理</strong></p>
@@ -468,20 +405,18 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <h1 id="进阶技巧">进阶技巧</h1>
 <p>待补充（数组索引、FBO 等）</p>
 <h1 id="调试手段">调试手段</h1>
-<h3 id="Mali_graphic_debug_tool">Mali graphic debug tool</h3>
+<h2 id="Mali_graphic_debug_tool">Mali graphic debug tool</h2>
 <p>Mali graphic debug tool（MGD）这个工具是 Arm 出的，只能用在 Arm 的 mali GPU 上（高通的也有对应的工具，只是我没用过而已）。官网下载地址：<a href="https://developer.arm.com/tools-and-software/graphics-and-gaming/graphics-development-tools/mali-graphics-debugger/downloads" target="_blank" rel="external">MGD download</a>。下面基于以前在 VR 上调试手段简单说明下怎么使用：</p>
 <p><strong>(1). 使用步骤</strong></p>
-<p>​    (a). 在菜单debug-Open Device Manager弹出Device Manager，检查是否有安装MGD Android App和Root Interceptor，没有的话点击安装。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;(1.1). 在菜单debug-Open Device Manager弹出Device Manager，检查是否有安装MGD Android App和Root Interceptor，没有的话点击安装。</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_1.png" alt="插图"></p>
-<p>​    (b). 将安装目录下的可执行程序 push 到设备中：</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;(1.2). 将安装目录下的可执行程序 push 到设备中：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">C:<span class="command">\Program</span> Files<span class="command">\ARM</span><span class="command">\Mali</span> Developer Tools<span class="command">\Mali</span> Graphics Debugger v4.7.0<span class="command">\target</span><span class="command">\android</span><span class="command">\arm</span><span class="command">\Mgddaemon</span></div></pre></td></tr></table></figure>
 
-<p>​        adb remount</p>
-<p>​        adb push mgddaemon /system/bin</p>
-<p>​    (c). 重定向adb端口，并运行mgddaemon</p>
-<p>​        adb forward tcp:5002 tcp:5002</p>
-<p>​        adb shell mgddaemon</p>
-<p>​    (d). 连接并监控图形调用。Device Manager中连接设备，会在新开启的进程中抓取数据。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adb remount<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adb push mgddaemon /system/bin</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;(1.3). 重定向adb端口，并运行mgddaemon</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adb forward tcp:5002 tcp:5002<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;adb shell mgddaemon</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;(1.4). 连接并监控图形调用。Device Manager中连接设备，会在新开启的进程中抓取数据。</p>
 <p><strong>(2). 基本信息</strong></p>
 <p>查看每帧调用的统计信息，包括顶点数，draw call数目，每个gl调用的参数信息。Trace Outline中可以查看每帧调用了哪些gl函数，顶点数目，draw数目。</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_2.png" alt="插图"></p>
@@ -491,25 +426,23 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_4.png" alt="插图"></p>
 <p>右下窗口，主要是纹理、shader方面的信息，可查看和导出纹理图片，可查看shader的源代码。</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_5.png" alt="插图"></p>
-<p><strong>(2). 分析 RenderPass（渲染通道）</strong></p>
+<p><strong>(3). 分析 RenderPass（渲染通道）</strong></p>
 <p>一个RenderPass一般就是对FrameBuffer的一次输出，即写出到内存，需要GPU完成命令的执行并写出数据，开销会很大。FrameBuffer可以是离线buffer（FrameBuffer i，其中i&gt;0），也可以是用于送显的buffer（FrameBuffer 0)。VR9上为了减少开销，一般需优化为一个图层只有一个RenderPass，即直接绘制到显示Buffer（FrameBuffer 0）。DualLayer实际上每个图层有一个FrameBuffer，因此会有多个RenderPass的情况。</p>
 <p>如某个已经优化过后的VR应用抓取的数据，只有一个RenderPass 0：</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_6.png" alt="插图"></p>
 <p>有2个 RenderPass 的情况：</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_7.png" alt="插图"></p>
-<p><strong>(3).Capture Frames</strong></p>
+<p><strong>(4).Capture Frames</strong></p>
 <p>通过这个方法， 可以保存每次调用的绘制结果，这样可以直观地看到每次调用后画面的变化。抓取一帧需要比较长时间，大概几十秒时间。可以在菜单Debug -&gt; Capture Frames中打开该功能，完整保存的帧前面有一个照相机的图标。</p>
 <p>比如以下选中glClear时，左眼已经画完，正在开始画右眼，绘制目标为Framebuffer 0。</p>
-<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_8.png" alt="插图"></p>
-<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_9.png" alt="插图"></p>
-<p><strong>(4). Fragment Count</strong></p>
+<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_8.png" alt="插图"><br><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_9.png" alt="插图"></p>
+<p><strong>(5). Fragment Count</strong></p>
 <p>抓取过程中，在Debug菜单中打开Fragment Count，可以统计着色器绘制的像素数目及耗费的GPU cycles数，对于分析图形方面的性能比较有用。</p>
 <p>打开Fragment Count时，帧前面会有一个黄色的圆形图标：</p>
 <p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_10.png" alt="插图"></p>
 <p>以下是某个VR应用播视频的数据对比，后者每帧的cycles数为12172332，远大于前者的5814814。后来分析是因为后者overdraw很大，有多余的绘制操作，除了绘制全景视频外还在绘制全景的背景。所以后者在播放视频的时候帧率比较低，这种情况也需要避免。</p>
-<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_11.png" alt="插图"></p>
-<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_12.png" alt="插图"></p>
-<p><strong>(5). Overdraw</strong></p>
+<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_11.png" alt="插图"><br><img src="https://mingming-killer.github.io/img/pics/vr/vr-opengl-learn/debug_mgd_12.png" alt="插图"></p>
+<p><strong>(6). Overdraw</strong></p>
 <p>overdraw说明相同的像素有重复的绘制操作，比如背景图上绘制一个图标，背景部分overdraw为正常的1，而图标部分就为2。</p>
 <p>菜单中打开Overdraw时，在屏幕中会用灰度图像来显示overdraw的程度，黑色的区域为正常的绘制区域，颜色越浅的部分说明overdraw越大。</p>
   
@@ -567,7 +500,7 @@ OpenGL 是由 khronos 组织制定的一套跨平台图形接口（Graphic API�
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#OpenGLES简介"><span class="toc-number">1.</span> <span class="toc-text">OpenGLES简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本三维概念"><span class="toc-number">2.</span> <span class="toc-text">基本三维概念</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#投影"><span class="toc-number">2.1.</span> <span class="toc-text">投影</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#图元"><span class="toc-number">2.2.</span> <span class="toc-text">图元</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#纹理坐标"><span class="toc-number">2.3.</span> <span class="toc-text">纹理坐标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#深度"><span class="toc-number">2.4.</span> <span class="toc-text">深度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#右手坐标系"><span class="toc-number">2.5.</span> <span class="toc-text">右手坐标系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#着色器"><span class="toc-number">2.6.</span> <span class="toc-text">着色器</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本图形绘制"><span class="toc-number">3.</span> <span class="toc-text">基本图形绘制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本绘制流程"><span class="toc-number">3.1.</span> <span class="toc-text">基本绘制流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置_Camera"><span class="toc-number">3.2.</span> <span class="toc-text">配置 Camera</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#物体建模"><span class="toc-number">3.2.1.</span> <span class="toc-text">物体建模</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#物体变化"><span class="toc-number">3.2.2.</span> <span class="toc-text">物体变化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#绘制图元"><span class="toc-number">3.2.3.</span> <span class="toc-text">绘制图元</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#进阶技巧"><span class="toc-number">4.</span> <span class="toc-text">进阶技巧</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#调试手段"><span class="toc-number">5.</span> <span class="toc-text">调试手段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Mali_graphic_debug_tool"><span class="toc-number">5.0.1.</span> <span class="toc-text">Mali graphic debug tool</span></a></li></ol></li></ol></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#OpenGLES简介"><span class="toc-number">1.</span> <span class="toc-text">OpenGLES简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本三维概念"><span class="toc-number">2.</span> <span class="toc-text">基本三维概念</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#投影"><span class="toc-number">2.1.</span> <span class="toc-text">投影</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#图元"><span class="toc-number">2.2.</span> <span class="toc-text">图元</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#纹理坐标"><span class="toc-number">2.3.</span> <span class="toc-text">纹理坐标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#深度"><span class="toc-number">2.4.</span> <span class="toc-text">深度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#右手坐标系"><span class="toc-number">2.5.</span> <span class="toc-text">右手坐标系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#着色器"><span class="toc-number">2.6.</span> <span class="toc-text">着色器</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本图形绘制"><span class="toc-number">3.</span> <span class="toc-text">基本图形绘制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本绘制流程"><span class="toc-number">3.1.</span> <span class="toc-text">基本绘制流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置_Camera"><span class="toc-number">3.2.</span> <span class="toc-text">配置 Camera</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#物体建模"><span class="toc-number">3.2.1.</span> <span class="toc-text">物体建模</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#物体变化"><span class="toc-number">3.2.2.</span> <span class="toc-text">物体变化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#绘制图元"><span class="toc-number">3.2.3.</span> <span class="toc-text">绘制图元</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#进阶技巧"><span class="toc-number">4.</span> <span class="toc-text">进阶技巧</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#调试手段"><span class="toc-number">5.</span> <span class="toc-text">调试手段</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Mali_graphic_debug_tool"><span class="toc-number">5.1.</span> <span class="toc-text">Mali graphic debug tool</span></a></li></ol></li></ol>
   </div>
 
 <div id="asidepart">

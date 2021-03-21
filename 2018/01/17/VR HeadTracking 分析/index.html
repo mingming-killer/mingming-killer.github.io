@@ -304,7 +304,7 @@ pose.Orientation = pose.Orientation * Quatf(angularVelocity, angularSpeed * dyna
 <p>默认的参数，我调试的 VR 平台 gyro 静置的时候变化相对来说比较大，原来默认的参数，在某些机器上经常无法判断静置的条件（静置情况下）。所以经常无法更新校准值，会导致缓慢的偏移。所以我根据实际调试情况，适当的调整了阀值范围，让这套算法适应我调试的 VR 平台。</p>
 <p>google 的 contexthub 其实 accel，mag 也是有校准，不过由于并没有出什么问题，所以就没去研究。而且 google 的 contexthub 也带有 fusion 算法（其实就是 framework sensorservice 的 fusion 算法移过去了），以后也可以研究一下。</p>
 <h1 id="参考资料">参考资料</h1>
-<p>(1). HeadTrackingforOculusRift.pdf<br>(2). Vrbookbig.pdf: Tracking 章节<br>(3). <a href="http://www.opengl-tutorial.org/cn/beginners-tutorials/tutorial-3-matrices/" target="_blank" rel="external">有关 openGL 矩阵变化的原理</a><br>(4). oculus ovr headtracking source code: ovr/VRLib/jni/hmd/sensor （这个是 oculus 早期的一个开源版本的 ovr sdk，后面这部分好像就不开源了）<br>(5). aosp context hub gyro calibrate source code: vr/device/google/contexthub/firmware/src/algos</p>
+<p>(1). HeadTrackingforOculusRift.pdf<br>(2). Vrbookbig.pdf: Tracking 章节<br>(3). <a href="http://www.opengl-tutorial.org/cn/beginners-tutorials/tutorial-3-matrices/" target="_blank" rel="external">有关 openGL 矩阵变化的原理</a><br>(4). oculus ovr headtracking source code: ovr/VRLib/jni/hmd/sensor （这个是 oculus 早期的一个开源版本的 ovr sdk，后面这部分好像就不开源了）<br>(5). aosp context hub gyro calibrate source code: android/device/google/contexthub/firmware/src/algos</p>
   
 	</div>
 		<footer class="article-footer clearfix">

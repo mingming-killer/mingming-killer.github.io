@@ -114,10 +114,10 @@
 <p>所以 VR 场景对系统的性能要求极高。而我开发 VR 的平台是一个 28nm 的 4核 1.8G 的 A53，GPU 也只有 Mali 760 mp2，而我们对标的竞品是 高通骁龙820，简直是青铜对线王者。要让应用达到稳定渲染稳定 60fps 不丢帧（应用渲染 60fps，ATW 插帧插到 70fps），需要极限压榨硬件性能。所以才有了 VR 性能模式这个说法，这个其实是下面几个措施的合称。因为涉及到的代码都是 vendor 的相关实现，所以这里不说具体代码实现，只是介绍一些措施思路而已。</p>
 <h1 id="场景模式">场景模式</h1>
 <p>android 有一个 power hal，在里面可以定义一些 场景模式，不同的场景模式可以通过写硬件的文件节点控制频率，开关核等操作。对应到 PowerManager 接口就是 PowerHit：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="javadoc">/**</span></div><div class="line"><span class="javadoc"> * The hintId sent through this method should be in-line with the</span></div><div class="line"><span class="javadoc"> * PowerHint defined in android/hardware/power/&lt;version 1.0 & up&gt;/IPower.h</span></div><div class="line"><span class="javadoc"> */</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">powerHint</span>(<span class="keyword">int</span> hintId, <span class="keyword">int</span> data);</div><div class="line"></div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="javadoc">/**</span></div><div class="line"><span class="javadoc"> * The hintId sent through this method should be in-line with the</span></div><div class="line"><span class="javadoc"> * PowerHint defined in vr/hardware/power/&lt;version 1.0 & up&gt;/IPower.h</span></div><div class="line"><span class="javadoc"> */</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">powerHint</span>(<span class="keyword">int</span> hintId, <span class="keyword">int</span> data);</div><div class="line"></div></pre></td></tr></table></figure>
 
 <p>hintId 是 场景编号，这个接口不对外公开，只在 SystemService 里调用。框架如下：</p>
-<p><img src="https://mingming-killer.github.io/img/pics/android/vr-power-hal/android_power_hal.png" alt="插图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-power-hal/android_power_hal.png" alt="插图"></p>
 <p>可以在应用使能 VrMode （Vr Mode 是 Android 7.1 的时候加入的）的时候，通过这个接口切换到对应的 场景模式。例如我开发的 VR 平台为了保证性能，VR 的场景模式将 CPU 的最低频率锁定到一个比较高的值；关闭 cpu idle，强制 4核 全部开启；GPU 最低频率也锁定到一个比较高的值。那为什么不直接锁最高频率，因为 soc 的最高频率一般都只是一个理论值（低端 soc 基本适用），最高频率只要保持一段时间，基本上就要温控强制 降频+关核 了。</p>
 <p>这里再多介绍一下，为什么手动锁最低频率，而不是依靠调频策略根据当前负载动态调频。一般调频策略都会有个延后性，一般来说 cpu（gpu）要提频，都要负载高于某个阀值保持一段时间才会提。这个就涉及到调频算法的优劣了，我开发 VR 平台那个算法，额， 就是简单粗错达到了某个点就升，低于那个点了就降。在 VR 场景一会负载高一点，一会又稍微低一点，频率忽高忽低很不稳定，导致应用帧率波动很大。 而我们要求的是稳定 60fps，所以这里就需要手动把最低频率锁定在某个合适的频率。还留有一定的调节空间，兼顾负载峰值和功耗。</p>
 <h1 id="设置渲染线程优先级">设置渲染线程优先级</h1>
@@ -127,8 +127,8 @@
 <h2 id="绑定渲染线程_cpu">绑定渲染线程 cpu</h2>
 <p>linux 有一个叫 cgroup 的概念。就是可以创建一个组别（cpu group），配置这个组别的 cpu 运行资源，其中就可以指定这个组别的任务跑到哪几个 cpu 上面。我们就可以创建一个 VR组别，配置这个组别的任务跑到 2，3 核上。再拉个接口，让 VR 应用把自己的 uid 传过来就行，把 VR 应用加入到 VR组 就能让 VR 应用渲染线程跑到 2、3 核了，不去和其他线程抢 cpu 资源。</p>
 <p>在 开启VR场景模式 + 给渲染线程设置高优先级 + 绑定空闲 cpu 核心 后，VR应用渲染线程的 cpu运行时间 比以前有了很大的改善，帧率稳定了很多。systrace 能看出来（上面是没开启前，下面是开启后的，可以看到 systrace 基本都是绿的 Running 状态，基本没有等待状态了）：</p>
-<p><img src="https://mingming-killer.github.io/img/pics/android/vr-power-hal/systrace_thread_run_normal.png" alt="插图"></p>
-<p><img src="https://mingming-killer.github.io/img/pics/android/vr-power-hal/systrace_thread_run_bind.png" alt="插图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-power-hal/systrace_thread_run_normal.png" alt="插图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/vr/vr-power-hal/systrace_thread_run_bind.png" alt="插图"></p>
 <h2 id="绑定显示中断_cpu">绑定显示中断 cpu</h2>
 <p>有了上面的措施后，在某些场景还是会卡断掉帧。分析过后发现是显示中断受了影响（Vysnc 就是显示中断产生的）。例如 mtp copy 创建，短时间内 mtp 中断频繁发生，抢占了显示中断的 cpu 资源（用户线程是抢占不过中断的，只有中断之间能抢占）。有了上面绑定 cpu 的经验，我们就把显示中断绑到 cpu3 上去，减少其他中断对显示中断的影响。</p>
   
