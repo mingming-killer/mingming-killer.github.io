@@ -81,16 +81,19 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/01/26/dmtracedump 的用法/" title="dmtracedump 的用法" itemprop="url">
+    <a href="/2015/01/26/Android 打印函数调用堆栈调试/" title="Android 打印函数调用堆栈调试" itemprop="url">
   
-    <h1 itemprop="name">dmtracedump 的用法</h1>
+    <h1 itemprop="name">Android 打印函数调用堆栈调试</h1>
     
      
-           <p itemprop="description" >这个东西是 android sdk 中自带的一个开发工具，用来分析程序的性能的，和 traceview 配合使用。这个工具需要使用 Debug 中的 trace 方法来生成 .trace 文件（具体方法看 android 的开发文档）。
-然后通过 .trace 可以生成一个函数调</p>
+           <p itemprop="description" >java 层
+可以利用抛出异常来打印：
+1234RuntimeException here = new RuntimeException(&quot;here&quot;);here.fillInStackTrace();Log.i(TAG, &quot;call statck is&quot;, here);
+
+na</p>
         
     
-    <time datetime="2015-01-26T15:35:16.000Z" itemprop="datePublished">2015 1月 26</time>
+    <time datetime="2015-01-26T15:37:16.000Z" itemprop="datePublished">2015 1月 26</time>
   </a>
 </section>
 
@@ -191,10 +194,9 @@ Android-Universal-Ima</p>
     <h1 itemprop="name">Android OpenGLES 学习笔记</h1>
     
      
-           <p itemprop="description" >GL10
-纹理问题
+           <p itemprop="description" >纹理问题
 贴纹理的时候最好是要 2^n 字节对齐，这里说的是最后绑定到 GL 的那个图片（如果这个图片是由别的图片组合的，则组合的小图片没有这个要求）。还有纹理的大小不能超过 GL 最大纹理大小的限制。查询方法： （这里是 GL 标准的，应该还有些特定硬件的扩展的）
-1</p>
+123456</p>
         
     
     <time datetime="2015-01-25T15:28:16.000Z" itemprop="datePublished">2015 1月 25</time>
@@ -253,7 +255,7 @@ onMeasure
 		
 			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>49</sup></a></li>
 		
-			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>9</sup></a></li>
 		
 			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
 		
@@ -261,7 +263,7 @@ onMeasure
 		
 			<li><a href="/categories/Other/" title="Other">Other<sup>9</sup></a></li>
 		
-			<li><a href="/categories/Performance/" title="Performance">Performance<sup>4</sup></a></li>
+			<li><a href="/categories/Performance/" title="Performance">Performance<sup>6</sup></a></li>
 		
 			<li><a href="/categories/VR/" title="VR">VR<sup>2</sup></a></li>
 		
@@ -276,23 +278,25 @@ onMeasure
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/android/" title="android">android<sup>85</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>88</sup></a></li>
 		
-			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+			<li><a href="/tags/basics/" title="basics">basics<sup>9</sup></a></li>
 		
-			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+			<li><a href="/tags/install/" title="install">install<sup>7</sup></a></li>
 		
 			<li><a href="/tags/linux/" title="linux">linux<sup>28</sup></a></li>
 		
 			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
 		
-			<li><a href="/tags/opengl/" title="opengl">opengl<sup>5</sup></a></li>
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>4</sup></a></li>
 		
 			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
 		
 			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
 		
 			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/tool/" title="tool">tool<sup>10</sup></a></li>
 		
 			<li><a href="/tags/vr/" title="vr">vr<sup>4</sup></a></li>
 		

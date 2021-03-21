@@ -81,6 +81,23 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
+    <a href="/2021/01/19/Activity 启动速度分析方法（启动流程分析）/" title="Activity 启动速度分析方法（启动流程分析）" itemprop="url">
+  
+    <h1 itemprop="name">Activity 启动速度分析方法（启动流程分析）</h1>
+    
+     
+           <p itemprop="description" >统计方法
+按照 Android 官方文档：android_developer: 应用启动时间 ，activity 启动时间的统计方法主要有下面几种：
+logcat: “Displayed”
+在启动 activity 之后抓 logcat，在 log 里面搜 Displayed 关</p>
+        
+    
+    <time datetime="2021-01-19T15:18:16.000Z" itemprop="datePublished">2021 1月 19</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
     <a href="/2020/12/07/Android 内存优化方法/" title="Android 内存优化方法" itemprop="url">
   
     <h1 itemprop="name">Android 内存优化方法</h1>
@@ -93,6 +110,21 @@ dumpsys meminfo 是 Androi</p>
         
     
     <time datetime="2020-12-07T15:18:16.000Z" itemprop="datePublished">2020 12月 7</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2019/06/25/VR 性能模式介绍/" title="VR 性能模式介绍" itemprop="url">
+  
+    <h1 itemprop="name">VR 性能模式介绍</h1>
+    
+     
+           <p itemprop="description" >VR 为何需要性能模式
+由于 VR 这个应用场景的特殊性，它需要极低的显示延迟，否则就会出现眩晕感（VR 这套原理网上有，当然也可看看我写的 headtracking 相关文章：VR HeadTracking 分析）。所以用 android 平台跑 VR 业务，是不能使用 and</p>
+        
+    
+    <time datetime="2019-06-25T10:18:16.000Z" itemprop="datePublished">2019 6月 25</time>
   </a>
 </section>
 
@@ -127,6 +159,49 @@ Sample Code
         
     
     <time datetime="2020-09-18T04:00:00.000Z" itemprop="datePublished">2020 9月 18</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2020/06/10/Android Studio 如何调试 Framework/" title="Android Studio 如何调试 Framework" itemprop="url">
+  
+    <h1 itemprop="name">Android Studio 如何调试 Framework</h1>
+    
+     
+           <p itemprop="description" >Android Studio 调试的优点
+Android Studio 作为 google android 官方开发工具，调试的优点简单来说有：
+
+可以在源码打断点单步调试
+打断点后可以查看各种变量的函数值，而且还支持动态修改
+打断点后可以查看函数调用堆栈
+打断点后可以查看进程线</p>
+        
+    
+    <time datetime="2020-06-10T10:18:16.000Z" itemprop="datePublished">2020 6月 10</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2020/04/10/离线 gradle 工程模板/" title="离线 gradle 工程模板" itemprop="url">
+  
+    <h1 itemprop="name">离线 gradle 工程模板</h1>
+    
+     
+           <p itemprop="description" >整理 Gradle 工程模板的目的
+我之前公司是一家 soc 公司，有下面几个特点：
+
+本地电脑不能上外网，只能上内网
+有 app 开发，但是不是移动互联网公司那种大型的，基本是就是系统自带的一些基础应用
+系统编译、打包在内网编译服务器
+
+我想达到下面几个目的，提升开发效率：
+
+</p>
+        
+    
+    <time datetime="2020-04-10T10:18:16.000Z" itemprop="datePublished">2020 4月 10</time>
   </a>
 </section>
 
@@ -179,64 +254,6 @@ MVP 矩阵
   </a>
 </section>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2016/03/13/使用 Android 性能分析工具优化性能/" title="使用 Android 性能分析工具优化性能" itemprop="url">
-  
-    <h1 itemprop="name">使用 Android 性能分析工具优化性能</h1>
-    
-     
-           <p itemprop="description" >之前公司基于 android 6.0 的短信开发了一个短信 app，但是 android 原生的短信滑动很卡，刚开始怀疑是头像处理图片的问题，但是把头像去掉后，滑动依旧卡。感觉很奇怪，于是就尝试使用 DDMS 自带的几个工具分析了一下，发现竟然是由于一个 String 使用的问题</p>
-        
-    
-    <time datetime="2016-03-13T08:11:16.000Z" itemprop="datePublished">2016 3月 13</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2016/12/06/工作小笔记——提升 Application 存活概率/" title="工作小笔记——提升 Application 存活概率" itemprop="url">
-  
-    <h1 itemprop="name">工作小笔记——提升 Application 存活概率</h1>
-    
-     
-           <p itemprop="description" >之前由于工作上的原因需要提升应用切换到后台后存活的概率，也就是切换到后台后，不被系统杀掉的概率。这么做的目的是为了能够接收到某些 broadcast，因为某些国产系统（miui，flyme 等），限制了程序自动启动的能力。在这些系统上如果你的程序没有运行，那么 broadcast</p>
-        
-    
-    <time datetime="2016-12-06T08:37:16.000Z" itemprop="datePublished">2016 12月 6</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2016/12/06/Android 提升应用启动速度/" title="Android 提升应用启动速度" itemprop="url">
-  
-    <h1 itemprop="name">Android 提升应用启动速度</h1>
-    
-     
-           <p itemprop="description" >应用开发了几个版本，功能越来越多，集成的 sdk 也越来越多，突然发现，在应用冷启动速度很慢，特别在某些手机上，特别是第一次安装的时候。严重的时候从点击图标启动应用，到看到第一个页面，有些时候需要 6、7s，所以就需要优化一下。
-这里优化的是优化冷启动需要的时间，android </p>
-        
-    
-    <time datetime="2016-12-06T09:46:16.000Z" itemprop="datePublished">2016 12月 6</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/22/Android Broadcast 分析——注册/" title="Android Broadcast 分析——注册" itemprop="url">
-  
-    <h1 itemprop="name">Android Broadcast 分析——注册</h1>
-    
-     
-           <p itemprop="description" >背景
-我们的平板增加了一个关机闹钟的功能。就是设备在关机的情况也能唤醒然后响闹钟。实现方法是：在 kernel 中增加一个 RTC 时钟（关机情况下，板载的 RTC 时钟还在运行的，所以你关机一段时间发现电池会变少），然后提前一段时间开机（我们设定的是1分钟，得给点时间给开机，我</p>
-        
-    
-    <time datetime="2015-01-22T02:07:16.000Z" itemprop="datePublished">2015 1月 22</time>
-  </a>
-</section>
-
 
   <nav id="page-nav" class="clearfix">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -258,7 +275,7 @@ MVP 矩阵
 		
 			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>49</sup></a></li>
 		
-			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>9</sup></a></li>
 		
 			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
 		
@@ -266,7 +283,7 @@ MVP 矩阵
 		
 			<li><a href="/categories/Other/" title="Other">Other<sup>9</sup></a></li>
 		
-			<li><a href="/categories/Performance/" title="Performance">Performance<sup>4</sup></a></li>
+			<li><a href="/categories/Performance/" title="Performance">Performance<sup>6</sup></a></li>
 		
 			<li><a href="/categories/VR/" title="VR">VR<sup>2</sup></a></li>
 		
@@ -281,23 +298,25 @@ MVP 矩阵
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/android/" title="android">android<sup>85</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>88</sup></a></li>
 		
-			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+			<li><a href="/tags/basics/" title="basics">basics<sup>9</sup></a></li>
 		
-			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+			<li><a href="/tags/install/" title="install">install<sup>7</sup></a></li>
 		
 			<li><a href="/tags/linux/" title="linux">linux<sup>28</sup></a></li>
 		
 			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
 		
-			<li><a href="/tags/opengl/" title="opengl">opengl<sup>5</sup></a></li>
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>4</sup></a></li>
 		
 			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
 		
 			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
 		
 			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/tool/" title="tool">tool<sup>10</sup></a></li>
 		
 			<li><a href="/tags/vr/" title="vr">vr<sup>4</sup></a></li>
 		

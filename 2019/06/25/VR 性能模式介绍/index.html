@@ -1,0 +1,451 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>VR 性能模式介绍 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="VR 为何需要性能模式
+由于 VR 这个应用场景的特殊性，它需要极低的显示延迟，否则就会出现眩晕感（VR 这套原理网上有，当然也可看看我写的 headtracking 相关文章：VR HeadTracking 分析）。所以用 android 平台跑 VR 业务，是不能使用 android 原来那套显">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/06/25/VR 性能模式介绍/" title="VR 性能模式介绍" itemprop="url">VR 性能模式介绍</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2019-06-25T10:18:16.000Z" itemprop="datePublished">2019 6月 25</time>
+    更新日期:<time datetime="2021-02-07T10:19:16.000Z" itemprop="dateModified">2021 2月 7</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#VR_为何需要性能模式"><span class="toc-number">1.</span> <span class="toc-text">VR 为何需要性能模式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#场景模式"><span class="toc-number">2.</span> <span class="toc-text">场景模式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#设置渲染线程优先级"><span class="toc-number">3.</span> <span class="toc-text">设置渲染线程优先级</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#cpu_绑定"><span class="toc-number">4.</span> <span class="toc-text">cpu 绑定</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#绑定渲染线程_cpu"><span class="toc-number">4.1.</span> <span class="toc-text">绑定渲染线程 cpu</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#绑定显示中断_cpu"><span class="toc-number">4.2.</span> <span class="toc-text">绑定显示中断 cpu</span></a></li></ol></li></ol>
+		</div>
+		
+		<h1 id="VR_为何需要性能模式">VR 为何需要性能模式</h1>
+<p>由于 VR 这个应用场景的特殊性，它需要极低的显示延迟，否则就会出现眩晕感（VR 这套原理网上有，当然也可看看我写的 headtracking 相关文章：<a href="http://light3moon.com/2018/01/17/VR HeadTracking 分析" target="_blank" rel="external">VR HeadTracking 分析</a>）。所以用 android 平台跑 VR 业务，是不能使用 android 原来那套显示框架的。那套 Vysnc + 三重缓冲 的框架，显示延迟至少一个 Vysnc 周期（原因可以看我这篇文章的相关分析：<a href="http://light3moon.com/2021/01/19/Activity 启动速度分析方法[启动流程分析]#Vysnc 简介" target="_blank" rel="external">Activity 启动速度分析方法（启动流程分析）#Vsync简介</a> ）。所以就需要 Single Buffer  + Direct Render。这个就要求在一个 Vsync 周期里完成 应用渲染 + ATW 反畸变，反色差后处理送帧。VR 应用 和 普通 android 应用 的区别：</p>
+<ol>
+<li>VR 应用都是 OpenGL 3D 渲染的（我们用的引擎是 Unity引擎 或是 oculus ovr 那套），而且还是双目渲染，GPU loading 是比普通的 andrid 应用高不少。</li>
+<li>普通 android 平台，应用渲染完 SurfaceFlinger 直接送显就行了，VR 还需要反畸变、反色差后处理（这个原因网上也有，简单的说是由于 VR 的光学镜片造成的畸变，需要图像处理进行矫正）。业界基本上是拿 GPU 做的，这让 GPU loading 进一步提高（我之前开发的平台这块是硬件处理的）。</li>
+<li>我开发 VR 的时候是 2017年 那会，VR 主流分辨率是 2560x1440@70Hz，基本手机的刷新率是 60Hz。这个显示规格明显高了手机一截。不像现在（2019年）手机上有 90Hz、120Hz 了，但是即便手机上有 90Hz 和 120Hz 也不是一直都是这个刷新率（大部分时候还是 60Hz），而且 VR 是一直要保持 70Hz 这个刷新率的（VR 需要高刷新率是为了更低的延迟）。分辨率和刷新率的提升，也加重了系统的负载。</li>
+<li>普通 android 场景偶尔有几次丢帧关系不大，但是在 VR 里面就会对用户造强烈的不舒适。VR 要求不能丢帧。</li>
+</ol>
+<p>所以 VR 场景对系统的性能要求极高。而我开发 VR 的平台是一个 28nm 的 4核 1.8G 的 A53，GPU 也只有 Mali 760 mp2，而我们对标的竞品是 高通骁龙820，简直是青铜对线王者。要让应用达到稳定渲染稳定 60fps 不丢帧（应用渲染 60fps，ATW 插帧插到 70fps），需要极限压榨硬件性能。所以才有了 VR 性能模式这个说法，这个其实是下面几个措施的合称。因为涉及到的代码都是 vendor 的相关实现，所以这里不说具体代码实现，只是介绍一些措施思路而已。</p>
+<h1 id="场景模式">场景模式</h1>
+<p>android 有一个 power hal，在里面可以定义一些 场景模式，不同的场景模式可以通过写硬件的文件节点控制频率，开关核等操作。对应到 PowerManager 接口就是 PowerHit：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="javadoc">/**</span></div><div class="line"><span class="javadoc"> * The hintId sent through this method should be in-line with the</span></div><div class="line"><span class="javadoc"> * PowerHint defined in android/hardware/power/&lt;version 1.0 & up&gt;/IPower.h</span></div><div class="line"><span class="javadoc"> */</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">powerHint</span>(<span class="keyword">int</span> hintId, <span class="keyword">int</span> data);</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>hintId 是 场景编号，这个接口不对外公开，只在 SystemService 里调用。框架如下：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/vr-power-hal/android_power_hal.png" alt="插图"></p>
+<p>可以在应用使能 VrMode （Vr Mode 是 Android 7.1 的时候加入的）的时候，通过这个接口切换到对应的 场景模式。例如我开发的 VR 平台为了保证性能，VR 的场景模式将 CPU 的最低频率锁定到一个比较高的值；关闭 cpu idle，强制 4核 全部开启；GPU 最低频率也锁定到一个比较高的值。那为什么不直接锁最高频率，因为 soc 的最高频率一般都只是一个理论值（低端 soc 基本适用），最高频率只要保持一段时间，基本上就要温控强制 降频+关核 了。</p>
+<p>这里再多介绍一下，为什么手动锁最低频率，而不是依靠调频策略根据当前负载动态调频。一般调频策略都会有个延后性，一般来说 cpu（gpu）要提频，都要负载高于某个阀值保持一段时间才会提。这个就涉及到调频算法的优劣了，我开发 VR 平台那个算法，额， 就是简单粗错达到了某个点就升，低于那个点了就降。在 VR 场景一会负载高一点，一会又稍微低一点，频率忽高忽低很不稳定，导致应用帧率波动很大。 而我们要求的是稳定 60fps，所以这里就需要手动把最低频率锁定在某个合适的频率。还留有一定的调节空间，兼顾负载峰值和功耗。</p>
+<h1 id="设置渲染线程优先级">设置渲染线程优先级</h1>
+<p>android 是 linux 内核的，是一个多任务系统。在 VR 应用前台渲染的时候，还有很多后台任务在跑。所以可以提升渲染线程的优先级（设置线程的 nice 值），让渲染线程更优先得到 cpu 资源。可以拉一个接口，让应用把自己的渲染线程的 tid 传过来，在系统里面进行配置。</p>
+<h1 id="cpu_绑定">cpu 绑定</h1>
+<p>我开发的 VR 平台是 4核 的，我发现大部分任务都默认被分配到了 0，1 核心（4个核心的编号是 cpu0，cpu1，cpu2、cpu3），包括了应用渲染线程。这就造成了渲染线程需要和其他任务强 cpu 资源。但是 2、3 核的任务就比较轻。于是我们就可以设计一下：让渲染线程跑到 2、3 核心。让其有足够的 cpu 资源，充分发挥4核 cpu 的优势（我们的 cpu 是 SMP 架构的，不是现在流行的大小核的，所以4个核的算力是一样的）。</p>
+<h2 id="绑定渲染线程_cpu">绑定渲染线程 cpu</h2>
+<p>linux 有一个叫 cgroup 的概念。就是可以创建一个组别（cpu group），配置这个组别的 cpu 运行资源，其中就可以指定这个组别的任务跑到哪几个 cpu 上面。我们就可以创建一个 VR组别，配置这个组别的任务跑到 2，3 核上。再拉个接口，让 VR 应用把自己的 uid 传过来就行，把 VR 应用加入到 VR组 就能让 VR 应用渲染线程跑到 2、3 核了，不去和其他线程抢 cpu 资源。</p>
+<p>在 开启VR场景模式 + 给渲染线程设置高优先级 + 绑定空闲 cpu 核心 后，VR应用渲染线程的 cpu运行时间 比以前有了很大的改善，帧率稳定了很多。systrace 能看出来（上面是没开启前，下面是开启后的，可以看到 systrace 基本都是绿的 Running 状态，基本没有等待状态了）：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/vr-power-hal/systrace_thread_run_normal.png" alt="插图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/vr-power-hal/systrace_thread_run_bind.png" alt="插图"></p>
+<h2 id="绑定显示中断_cpu">绑定显示中断 cpu</h2>
+<p>有了上面的措施后，在某些场景还是会卡断掉帧。分析过后发现是显示中断受了影响（Vysnc 就是显示中断产生的）。例如 mtp copy 创建，短时间内 mtp 中断频繁发生，抢占了显示中断的 cpu 资源（用户线程是抢占不过中断的，只有中断之间能抢占）。有了上面绑定 cpu 的经验，我们就把显示中断绑到 cpu3 上去，减少其他中断对显示中断的影响。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/vr/">vr</a><a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Performance/">Performance</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2019/06/25/VR 性能模式介绍/" data-title="VR 性能模式介绍 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/12/07/Android 内存优化方法/" title="Android 内存优化方法">
+  <strong>上一篇:</strong><br/>
+  <span>
+  Android 内存优化方法</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2021/01/26/Android 一些有意思的命令小工具 —— lshal/"  title="Android 一些有意思的命令小工具 —— lshal">
+ <strong>下一篇:</strong><br/> 
+ <span>Android 一些有意思的命令小工具 —— lshal
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#VR_为何需要性能模式"><span class="toc-number">1.</span> <span class="toc-text">VR 为何需要性能模式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#场景模式"><span class="toc-number">2.</span> <span class="toc-text">场景模式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#设置渲染线程优先级"><span class="toc-number">3.</span> <span class="toc-text">设置渲染线程优先级</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#cpu_绑定"><span class="toc-number">4.</span> <span class="toc-text">cpu 绑定</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#绑定渲染线程_cpu"><span class="toc-number">4.1.</span> <span class="toc-text">绑定渲染线程 cpu</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#绑定显示中断_cpu"><span class="toc-number">4.2.</span> <span class="toc-text">绑定显示中断 cpu</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>32</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>49</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>9</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>9</sup></a></li>
+		
+			<li><a href="/categories/Performance/" title="Performance">Performance<sup>6</sup></a></li>
+		
+			<li><a href="/categories/VR/" title="VR">VR<sup>2</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>88</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>9</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>7</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>28</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>4</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/tool/" title="tool">tool<sup>10</sup></a></li>
+		
+			<li><a href="/tags/vr/" title="vr">vr<sup>4</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>

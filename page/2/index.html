@@ -81,6 +81,64 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
+    <a href="/2016/03/13/使用 Android 性能分析工具优化性能/" title="使用 Android 性能分析工具优化性能" itemprop="url">
+  
+    <h1 itemprop="name">使用 Android 性能分析工具优化性能</h1>
+    
+     
+           <p itemprop="description" >之前公司基于 android 6.0 的短信开发了一个短信 app，但是 android 原生的短信滑动很卡，刚开始怀疑是头像处理图片的问题，但是把头像去掉后，滑动依旧卡。感觉很奇怪，于是就尝试使用 DDMS 自带的几个工具分析了一下，发现竟然是由于一个 String 使用的问题</p>
+        
+    
+    <time datetime="2016-03-13T08:11:16.000Z" itemprop="datePublished">2016 3月 13</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2016/12/06/工作小笔记——提升 Application 存活概率/" title="工作小笔记——提升 Application 存活概率" itemprop="url">
+  
+    <h1 itemprop="name">工作小笔记——提升 Application 存活概率</h1>
+    
+     
+           <p itemprop="description" >之前由于工作上的原因需要提升应用切换到后台后存活的概率，也就是切换到后台后，不被系统杀掉的概率。这么做的目的是为了能够接收到某些 broadcast，因为某些国产系统（miui，flyme 等），限制了程序自动启动的能力。在这些系统上如果你的程序没有运行，那么 broadcast</p>
+        
+    
+    <time datetime="2016-12-06T08:37:16.000Z" itemprop="datePublished">2016 12月 6</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2016/12/06/Android 提升应用启动速度/" title="Android 提升应用启动速度" itemprop="url">
+  
+    <h1 itemprop="name">Android 提升应用启动速度</h1>
+    
+     
+           <p itemprop="description" >应用开发了几个版本，功能越来越多，集成的 sdk 也越来越多，突然发现，在应用冷启动速度很慢，特别在某些手机上，特别是第一次安装的时候。严重的时候从点击图标启动应用，到看到第一个页面，有些时候需要 6、7s，所以就需要优化一下。
+这里优化的是优化冷启动需要的时间，android </p>
+        
+    
+    <time datetime="2016-12-06T09:46:16.000Z" itemprop="datePublished">2016 12月 6</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/22/Android Broadcast 分析——注册/" title="Android Broadcast 分析——注册" itemprop="url">
+  
+    <h1 itemprop="name">Android Broadcast 分析——注册</h1>
+    
+     
+           <p itemprop="description" >背景
+我们的平板增加了一个关机闹钟的功能。就是设备在关机的情况也能唤醒然后响闹钟。实现方法是：在 kernel 中增加一个 RTC 时钟（关机情况下，板载的 RTC 时钟还在运行的，所以你关机一段时间发现电池会变少），然后提前一段时间开机（我们设定的是1分钟，得给点时间给开机，我</p>
+        
+    
+    <time datetime="2015-01-22T02:07:16.000Z" itemprop="datePublished">2015 1月 22</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
     <a href="/2015/01/22/Android Broadcast 分析——发送、处理/" title="Android Broadcast 分析——发送、处理" itemprop="url">
   
     <h1 itemprop="name">Android Broadcast 分析——发送、处理</h1>
@@ -169,64 +227,6 @@
   </a>
 </section>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/28/Android Binder 分析——内存管理/" title="Android Binder 分析——内存管理" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——内存管理</h1>
-    
-     
-           <p itemprop="description" >android 为了高效的 IPC 通信做了很多工作，内存管理就属于其中之一。传统的 IPC 传递数据，至少需要2次拷贝，一次为进程1到内核，一次为内核到进程2，但是得益 android binder 的内存管理，数据拷贝只有1次，就从这里速度比传统的要快1倍。这里慢慢分析。还是</p>
-        
-    
-    <time datetime="2015-01-28T13:14:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/28/Android Binder 分析——系统服务 Binder 对象的传递/" title="Android Binder 分析——系统服务 Binder 对象的传递" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——系统服务 Binder 对象的传递</h1>
-    
-     
-           <p itemprop="description" >前面 binder 说了那多，但是有一个关键的一点前面忽略掉了，就是 binder 对象是传递给另外一个进程使用的，然后还引伸出一个问题，Proc A 是怎么通过 binder 接口找到 Proc B 进行 IPC 调用的。
-那这篇主要就是分析这些，照例先把源代码位置啰嗦一下（4</p>
-        
-    
-    <time datetime="2015-01-28T13:23:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/28/Android Binder 分析——普通服务 Binder 对象的传递/" title="Android Binder 分析——普通服务 Binder 对象的传递" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——普通服务 Binder 对象的传递</h1>
-    
-     
-           <p itemprop="description" >上一篇把 SS 传递 binder 对象说了， SS 传递是要依靠 SM 的。但是普通应用的服务是没权向 SM 注册的，就是说普通应用获取普通服务的接口不能像 SS 那样，通过 SM 的接口去取。这篇就来讲讲普通应用中 binder 对象的传递。
-那这篇主要就是分析这些，照例先把</p>
-        
-    
-    <time datetime="2015-01-28T13:33:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/28/Android Binder 分析——多线程支持/" title="Android Binder 分析——多线程支持" itemprop="url">
-  
-    <h1 itemprop="name">Android Binder 分析——多线程支持</h1>
-    
-     
-           <p itemprop="description" >前面普通服务篇那里说到 ActivityManager（AM） 里锁的问题，其实不光 AM，WindowManager（WM）、PackageMananger（PM）中基本上很多对外的业务函数里面都是加锁的，所以这些 SS 里面有会有带 Locked 结尾的函数（这些函数都是在锁</p>
-        
-    
-    <time datetime="2015-01-28T13:42:16.000Z" itemprop="datePublished">2015 1月 28</time>
-  </a>
-</section>
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
@@ -248,7 +248,7 @@
 		
 			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>49</sup></a></li>
 		
-			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>11</sup></a></li>
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>9</sup></a></li>
 		
 			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
 		
@@ -256,7 +256,7 @@
 		
 			<li><a href="/categories/Other/" title="Other">Other<sup>9</sup></a></li>
 		
-			<li><a href="/categories/Performance/" title="Performance">Performance<sup>4</sup></a></li>
+			<li><a href="/categories/Performance/" title="Performance">Performance<sup>6</sup></a></li>
 		
 			<li><a href="/categories/VR/" title="VR">VR<sup>2</sup></a></li>
 		
@@ -271,23 +271,25 @@
 	<p class="asidetitle">标签</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/android/" title="android">android<sup>85</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>88</sup></a></li>
 		
-			<li><a href="/tags/basics/" title="basics">basics<sup>11</sup></a></li>
+			<li><a href="/tags/basics/" title="basics">basics<sup>9</sup></a></li>
 		
-			<li><a href="/tags/install/" title="install">install<sup>9</sup></a></li>
+			<li><a href="/tags/install/" title="install">install<sup>7</sup></a></li>
 		
 			<li><a href="/tags/linux/" title="linux">linux<sup>28</sup></a></li>
 		
 			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
 		
-			<li><a href="/tags/opengl/" title="opengl">opengl<sup>5</sup></a></li>
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>4</sup></a></li>
 		
 			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
 		
 			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
 		
 			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/tool/" title="tool">tool<sup>10</sup></a></li>
 		
 			<li><a href="/tags/vr/" title="vr">vr<sup>4</sup></a></li>
 		
