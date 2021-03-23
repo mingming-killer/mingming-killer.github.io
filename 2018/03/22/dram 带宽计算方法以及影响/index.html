@@ -1,0 +1,527 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  
+    <title>dram 带宽计算方法以及影响 | Light.Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="Mingming">
+    
+    <meta name="description" content="什么是 dram 带宽
+一般提到性能优化，或是硬件性能，大多数人的关注点都在 cpu/gpu 的运算能力，关心到内存指标一般也就是看大小。即便是关注到内存的运行频率，很多人也只是知道越高越好，并不理解内存频率是怎么影响整个系统运行的，可能也没想到过内存带宽可能也会成为整个系统的瓶颈。这篇文章我就来简">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/apple_icon.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/apple_icon.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+		<div id="header_author">
+		</div>
+		
+
+         <!--
+         
+           <div id="imglogo">
+           <a href="/"><img src="/img/logo.svg" alt="Light.Moon" title="Light.Moon"/></a>
+           </div>
+         
+         -->
+
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Light.Moon">Light.Moon</a></h1>
+				<h2 class="blog-motto">三月学长的小站</h2>
+			</div>
+
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/1986/12/20/文章索引">索引</a></li>
+					
+						<li><a href="/archives">归档</a></li>
+					
+					<li>
+					
+
+                      <form class="search" action=http://search.light3moon.com/cse/search target="_blank">
+                      <label>搜索</label>
+                      <!--
+                      <input name="s" type="hidden" value="undefined">
+                      -->
+                      <input name="s" type="hidden" value="12628367885198549364">
+                      <input type="text" name="q" size="30" placeholder="搜索"> <br>
+
+                      
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/03/22/dram 带宽计算方法以及影响/" title="dram 带宽计算方法以及影响" itemprop="url">dram 带宽计算方法以及影响</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://www.light3moon.com" title="Mingming">Mingming</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2018-03-22T10:18:16.000Z" itemprop="datePublished">2018 3月 22</time>
+    更新日期:<time datetime="2021-03-22T10:18:16.000Z" itemprop="dateModified">2021 3月 22</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#什么是_dram_带宽"><span class="toc-number">1.</span> <span class="toc-text">什么是 dram 带宽</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总带宽计算公式"><span class="toc-number">2.</span> <span class="toc-text">总带宽计算公式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#模块计算案例"><span class="toc-number">3.</span> <span class="toc-text">模块计算案例</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Launcher_静止界面:_HWC_合成"><span class="toc-number">3.1.</span> <span class="toc-text">Launcher 静止界面: HWC 合成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Launcher_静止界面:_GPU_合成"><span class="toc-number">3.2.</span> <span class="toc-text">Launcher 静止界面: GPU 合成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#60fps_视频播放场景:_HWC_合成"><span class="toc-number">3.3.</span> <span class="toc-text">60fps 视频播放场景: HWC 合成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#60fps_视频播放场景:_GPU_合成"><span class="toc-number">3.4.</span> <span class="toc-text">60fps 视频播放场景: GPU 合成</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+		</div>
+		
+		<h1 id="什么是_dram_带宽">什么是 dram 带宽</h1>
+<p>一般提到性能优化，或是硬件性能，大多数人的关注点都在 cpu/gpu 的运算能力，关心到内存指标一般也就是看大小。即便是关注到内存的运行频率，很多人也只是知道越高越好，并不理解内存频率是怎么影响整个系统运行的，可能也没想到过内存带宽可能也会成为整个系统的瓶颈。这篇文章我就来简单的说明一下内存带宽的影响。</p>
+<p>dram，也就是 ddr，也就是上面说的内存。它的带宽是指：每秒钟提供的数据访问量，单位我们可以用 Mb/s，或是 Gb/s。系统中任何一个模块访问内存，对内存产生读/写操作，就会生产带宽。例如说播放视频的场景，解码器解码，从片源中解出视频帧存放到内存缓冲里面，这个操作就会产生内存带宽。如果某个时刻系统所有模块产生的带宽超过了内存提供的带宽访问量，那么就会产生性能问题。</p>
+<p>分析某个应用场景是否存在带宽问题，只要能罗列出该场景主要模块的内存访问情况，就可以计算出来是否超过了系统内存最大带宽。所以需要对目标场景的数据流动很熟悉，才能做带宽分析。</p>
+<h1 id="总带宽计算公式">总带宽计算公式</h1>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">dram 带宽 = dram 运行频率 * 位宽 * 效率</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p><strong>1 . dram 运行频率：</strong></p>
+<p>这个由 soc 的 ddr 控制模块决定能支持的最高 ddr 运行频率。例如说现在手机上的高通骁龙820，支持最高的 LPDDR4 是 1333MHz。而我开发过的 VR 平台已经是本公司目前为止运行频率最高的了，也就 976MHz。当然实际运行频率还和最终产品选的 ddr 物料有关系，我们这里假设都以最高频率算。</p>
+<p> <strong>2. 位宽：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">位宽 = 上下沿采样数据 * 一次采样数据的宽度</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>一般 ddr 都是上下沿采样数据的，这相当于一次采用都有双倍数据，上升沿一次，下降沿一次（ddr 的全称叫：Double Data Rate SDRAM，双倍数据流 SDRAM）。</p>
+<p>一次采样数据的带宽呢，这个就要去问系统设计 ddr 模块的了。例如说从高通官网可以查看 820 的 Memory 带宽是 4通道16bit 的，所以 820 的位宽是 4x16 = 64bit（8Byte），再乘以上下沿双倍 = 16Byte。</p>
+<p>而我开发过的 VR 平台采用的是本公司高端一点的 ddr 规格，单通道 32bit（低端的就是 16bit 了），最终 位宽 = 32 x 2= 32bit（8Byte）。</p>
+<p> <strong>3. 效率：</strong></p>
+<p>dram 的理论带宽上面已经可以计算得出来了，例如说拿我举例的 高通820 和 我开发过的 VR 平台：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 820：</span></div><div class="line"><span class="number">1333</span>MHz * <span class="number">16</span>Byte = <span class="number">21</span>GB/s</div><div class="line"><span class="comment"># VR:</span></div><div class="line"><span class="number">976</span>MHz * <span class="number">8</span>Byte = <span class="number">7.8</span>GB/s</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>但是实际上存在一个实际利用率，得打个折扣。至于这个折扣是多少，一般 soc 厂家不会公开（这个可能涉及到 IP 设计了），一般业界保守都按 70% 算。例如说上面 820 的，打个 7折 后，实际估算带宽是 14.7GB/s。</p>
+<p>我开发过的 VR 平台，ddr 同事提醒总带宽不要超过 4GB/s ，按这个推算效率大概为 50%。至于为什么，反正也说不清楚，比较玄学，可能是整体系统总线之类的差人家高通一截吧。 </p>
+<h1 id="模块计算案例">模块计算案例</h1>
+<p>上面说了整个 dram 的带宽计算公式。现在以一个简单的场景来说明一下模块的带宽是怎么计算的。例如说我们在 Launcher 界面静止不动情况：</p>
+<h2 id="Launcher_静止界面:_HWC_合成">Launcher 静止界面: HWC 合成</h2>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/shot_launcher.png" alt="插图"></p>
+<p>这个时候用统计带宽的工具看一下各个模块的带宽数值（一般这个工具 soc 厂家都会有，应该都是访问内部节点得到的）：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_hwc_mtop.png" alt="插图"></p>
+<p>简单解释一下这个工具的含义（下面单位都是 MB/s）：</p>
+<ol>
+<li>totddr 是总带宽：685MB/s</li>
+<li>cpudrr 是 cpu 的带宽：53MB/s</li>
+<li>gpuddr 是 gpu 的带宽：是 0</li>
+<li>de_ddr 是 显示模块（hwc 和 一些硬件图像处理等） 的带宽：632MB/s</li>
+<li>ve_ddr 是 解码器 的：是 0</li>
+<li>csi_ddr 先不管吧</li>
+</ol>
+<p>场景是 Launcher 静止界面，我们来分析一下为什么 de 模块（显示模块）会有 632MB/s 的带宽。我们这边把 显示模块，叫 de（display engine），它里面包含了 android 常见的 hwc 功能，还有我们这边特有的一些硬件图像处理功能，例如说 护眼模式（去蓝光），G2D（图像旋转功能）。</p>
+<p>dumpsys SurfaceFlinger 看一下图层信息：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_hwc_layer.png" alt="插图"></p>
+<p>可以看目前的场景有4个图层：</p>
+<ol>
+<li>ImageWallpaper：壁纸</li>
+<li>Launcher3：桌面应用</li>
+<li>StatusBar：状态兰</li>
+<li>NavigationBar：导航栏</li>
+</ol>
+<p>这4个图层都是 hwc 合成方式（Comp Type：DEVICE 代表的就是 hwc 合成）。hwc 合成就是我们说的硬件合成方式，也就是图层直接发下给 hwc，不需要 gpu 处理。hwc 会读取每一个图层的 Buffer 数据，然后送给 LCD 显示。这里我们就能发现了：hwc 存在 dram 访问操作，hwc 合成的时候需要去读取每一个图层的数据。所以就会产生上面的 de 带宽。</p>
+<p>我们来计算一下 632MB/s 是怎么来的。我们看一下目前 LCD 控制器的刷新率（这个每个平台都不太一样，我这里是我们平台提供的节点看到的，当然了一般刷新率可以取 60Hz）：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_refresh_rate.png" alt="插图"></p>
+<p>是 61Hz。也就是说 hwc 每秒要给 LCD 送 61 次图像。虽然图像没有更新，但是 LCD 每秒都是在刷新的。所以这个场景下 de 的带宽计算方法就是：所有图层的数据大小 x 61。</p>
+<p>图层的数据大小为：图层的长 x 高 x 单个像素的字节</p>
+<p>注意：长 x 高 要选 Source Crop 那里的大小，这个才是图层原始的大小，前面那个 Disp Frame 是显示的大小。也就是说图层有可能经过缩放（典型的就是 壁纸 和 视频播放）。单个像素占用的字节和图层的颜色格式有关系。图层格式，dumpsys SurfaceFlinger 里面可以看得到。对应关系在：android/system/core/include/system/graphics.h 里面：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/layer_format.png" alt="插图"></p>
+<p>我们现在就可以计算 de 占用的带宽了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">ImageWallpaper: <span class="number">1600</span>x100x4</div><div class="line">Launcher3: <span class="number">1280</span>x800x4</div><div class="line">StatusBar: <span class="number">1280</span>x24x4</div><div class="line">NavigationBar: <span class="number">1280</span>x48x4</div><div class="line"></div><div class="line">(<span class="number">1600</span>*<span class="number">1000</span>*<span class="number">4</span> + <span class="number">1280</span>*<span class="number">800</span>*<span class="number">4</span> + <span class="number">1280</span>*<span class="number">24</span>*<span class="number">4</span> + <span class="number">1280</span>*<span class="number">48</span>*<span class="number">4</span>) * <span class="number">61</span> / <span class="number">1024</span> / <span class="number">1024</span> = <span class="number">632</span>MB/s</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>结合我之前内存分析的文章：<a href="http://light3moon.com/2020/12/07/Android 内存优化方法/#malloc_debug" target="_blank" rel="external">Android 内存优化方法#malloc_debug</a>，我们发现原生壁纸这玩意又费内存，又费带宽，没什么必要的话，可以考虑去掉。我们试着把合成方式改成 GPU 合成：</p>
+<h2 id="Launcher_静止界面:_GPU_合成">Launcher 静止界面: GPU 合成</h2>
+<p>在 Settings 里面打开 开发者选项，把 强制GPU合成 的开关打开，然后这个时候再回到 Launcher 静止界面，我们用带宽工具看一下：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_gpu_mtop.png" alt="插图"></p>
+<p>会发现 de 的带宽低了很多。这个是怎么回事呢，我们再来分析一下，首选 dumpsys SurfaceFlinger：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_gpu_layer.png" alt="插图"></p>
+<p>这个时候看到图层的合成方式已经变成了 CLIENT 了，这个就代表是 gpu 合成。gpu 合成 SurfaceFlinger 会遍历所有图层，然后把每一个图层用 OpenGL 贴到一个 FrameBuffer Surface 的图层上，然后再把 FrameBuffer Surface 送给 hwc 送显。从上面的数据流向，应该是觉得会有 gpu 带宽的（因为 openGL 贴图相当于是读写了图层的 Buffer 内容），但是需要注意的是：这是静止时候的场景，在没有图像更新的时候，不需要合成图像的；只需要 hwc 给 LCD 送显就行了。由于 SurfaceFlinger 已经把图层合并到 FrameBuffer Surface 这一个图层送下来了，所以此时的 hwc 相当于是只有一个 1280x800（屏幕大小） 的图层需要处理（这里注意看送给 hwc 的 layer 只剩下一个了，就是 h/w composer state 那里标着 HWC LAYER 的，这个就是前面说的 FrameBuffer Surface）。所以这时候 de 的带宽是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">FrameBuffer Surface: <span class="number">1280</span>x800x4</div><div class="line"></div><div class="line">(<span class="number">1280</span>*<span class="number">800</span>*<span class="number">4</span>) * <span class="number">61</span> / <span class="number">1024</span> / <span class="number">1024</span> = <span class="number">238</span>MB/s</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>这个时候大家就发现了，在没有图像更新的场景，使用 gpu 合成反而 hwc 的带宽更低，同时也能降低功耗，所以这其实是一个优化点。但是有图像更新的场景，hwc 合成就能表现出它的优势了：</p>
+<h2 id="60fps_视频播放场景:_HWC_合成">60fps 视频播放场景: HWC 合成</h2>
+<p>例如说我们拿一个播放 1080p@60fps 视频的场景来分析一下。拿 AOSP 的 gallery 播放一个 1080p@60fps 的片源：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/shot_video.png" alt="插图"></p>
+<p>先看一下带宽：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_hwc_video_mtop.png" alt="插图"></p>
+<p>现在可以看到 cpu 和 ve 有带宽了，现在我们不分析这2个，因为解码器的内部流程我不是很熟，所以如果要分析，需要解码器的同事的协助。我们看到现在 de 带宽是 419 MB/s，gpu 是 0。我们 dumpsys SurfaceFlinger 看一下图层：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_hwc_video_layer.png" alt="插图"></p>
+<p>只有2个图层了：</p>
+<ol>
+<li>SurfaecView：视频图像输出图层（</li>
+<li>VideoPlayerActivity：播放界面的图层</li>
+</ol>
+<p>目前这2个图层是用 HWC 合成方式的，所以按上面的计算方式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 解码出来的视频帧是 1080p 的</span></div><div class="line"><span class="comment"># 解码显示的图层是 YUV 格式的（注意看 format 格式），所以一个像素是 1.5字节</span></div><div class="line">SurfaceView: <span class="number">1920</span>x1080x1.<span class="number">5</span></div><div class="line">VdieoPlayerActivity: <span class="number">1280</span>x800x4</div><div class="line"></div><div class="line">(<span class="number">1920</span>*<span class="number">1080</span>*<span class="number">1.5</span> + <span class="number">1280</span>*<span class="number">800</span>*<span class="number">4</span>) * <span class="number">61</span> / <span class="number">1024</span> / <span class="number">1024</span> = <span class="number">419</span>MB/s</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>我们换成 gpu 合成：</p>
+<h2 id="60fps_视频播放场景:_GPU_合成">60fps 视频播放场景: GPU 合成</h2>
+<p>看一下带宽：</p>
+<p><img src="/https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_gpu_video_mtop.png" alt="插图"></p>
+<p>然后再 dumpsys SurfaceFlinger 看一下图层：</p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_gpu_video_layer.png" alt="插图"></p>
+<p>同样是2个图层，gpu 合成，目前 de 的带宽 239MB/s 和前面 Launcher 静止的场景是一样的。然后再来计算下 gpu 的带宽，因为有图像更新了，所以 SurfaceFlinger 需要对每个图层的 Buffer 数据进行一次读操作，然后再贴到 FrameBuffer Surface，也就是要把这些 Buffer 再写到另外一个 Buffer 里面，所以一个图层需要一次读和写内存访问，图层数据得 x 2。前面看到 LCD 的刷新率是 61，但是这里我们其实得看应用的帧率，我们通过抓 systrace，截取 1s 统计 SurfaceFlinger 合成 Layer 的次数（doComposition 的次数），看到 1s 是 60fps：</p>
+<p> <img src="https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_fps.png" alt="插图"></p>
+<p>所以 gpu 带宽的计算为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">SurfaceView: <span class="number">1920</span>x1080x1.<span class="number">5</span></div><div class="line">VdieoPlayerActivity: <span class="number">1280</span>x800x4</div><div class="line"></div><div class="line">(<span class="number">1920</span>*<span class="number">1080</span>*<span class="number">1.5</span> + <span class="number">1280</span>*<span class="number">800</span>*<span class="number">4</span>) * <span class="number">2</span> * <span class="number">60</span> / <span class="number">1024</span> / <span class="number">1024</span> = <span class="number">824</span>MB/s</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>gpu 这边理论的计算和实测有点点差距，不过大体还是接近的。</p>
+<h1 id="总结">总结</h1>
+<p>对比图像有更新的场景能看到，hwc 合成的总带宽为 2.2GB/s，gpu 合成的总带宽为 3GB/s。hwc 合成的优势就体现出来了，这也就是 google 为什么要在 android 上设计这个硬件模块的目的。并且 gpu 合成还需要额外占用 gpu 负载（gpu 工作了）。所以大多数情况下 hwc 合成在 性能 和 功耗上都更具优势（前面说的画面静止场景除外）。</p>
+<p>那什么时候会出现带宽瓶颈呢。例如说：我们公司的某些平台，解码器是支持 4k@30fps（3840x2160@30fps） 解码的。显示用 hwc 合成，gpu 也没负载，cpu 也能扛得动（硬解 cpu 占用率不高的），但是其实这个时候系统是没法给用户以 30fps 的速度播放视频的。因为前面看到 1280x800 的分辨率 hwc 合成下播放 1080p@60fps 的视频都已经是 2.2GB/s 的带宽了，如果同样还是这个平台，此时视频图层的数据量就为 1080p@60fps 的2倍（3840x2160x30 vs 1920x1080x60）。我们来估算一下这个场景下的总带宽：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 假设解码数据量大一倍，cpu，ve 带宽增加一倍：</span></div><div class="line">（<span class="number">225</span> + <span class="number">423</span> + <span class="number">1183</span>） * <span class="number">2</span> = <span class="number">3662</span>MB/s</div><div class="line"><span class="comment"># ve 这边视频图层数据量大2倍；UI 图层数据量不变：</span></div><div class="line">(<span class="number">3180</span>*<span class="number">2160</span>*<span class="number">1.5</span> + <span class="number">1280</span>*<span class="number">800</span>*<span class="number">4</span>) * <span class="number">61</span> / <span class="number">1024</span> / <span class="number">1024</span> = <span class="number">837</span>MB/s</div><div class="line"><span class="comment"># 总带宽：</span></div><div class="line"><span class="number">3662</span> + <span class="number">837</span> = <span class="number">4499</span>MB/s</div><div class="line"></div></pre></td></tr></table></figure>
+
+<p>4.4GB/s，我们的平台基本上抗不住了。这个时候就会出现几个模块争抢带宽的情况。简单的说，如果哪个模块优先级低了，没抢到带宽，那么它就处理不了原来那么多的数据了：</p>
+<ol>
+<li>如果是 de 模块带宽被抢了，造成的后果往往是花屏。所以 de 一般优先级得最高</li>
+<li>如果是 ve 模块带宽被抢了，造成的后果就是解码丢帧。用户看到的情况就是视频播放变卡了。</li>
+</ol>
+<p>所以有些时候我们看到界面卡了，可能瓶颈并不在 cpu、gpu 和 内存占用，可能是带宽不够了。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Performance/">Performance</a>
+</div>
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://www.light3moon.com/2018/03/22/dram 带宽计算方法以及影响/" data-title="dram 带宽计算方法以及影响 | Light.Moon" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/12/07/Android 内存优化方法/" title="Android 内存优化方法">
+  <strong>上一篇:</strong><br/>
+  <span>
+  Android 内存优化方法</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/06/25/VR 性能模式介绍/"  title="VR 性能模式介绍">
+ <strong>下一篇:</strong><br/> 
+ <span>VR 性能模式介绍
+</span>
+</a>
+</div>
+
+</nav>
+
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#什么是_dram_带宽"><span class="toc-number">1.</span> <span class="toc-text">什么是 dram 带宽</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总带宽计算公式"><span class="toc-number">2.</span> <span class="toc-text">总带宽计算公式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#模块计算案例"><span class="toc-number">3.</span> <span class="toc-text">模块计算案例</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Launcher_静止界面:_HWC_合成"><span class="toc-number">3.1.</span> <span class="toc-text">Launcher 静止界面: HWC 合成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Launcher_静止界面:_GPU_合成"><span class="toc-number">3.2.</span> <span class="toc-text">Launcher 静止界面: GPU 合成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#60fps_视频播放场景:_HWC_合成"><span class="toc-number">3.3.</span> <span class="toc-text">60fps 视频播放场景: HWC 合成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#60fps_视频播放场景:_GPU_合成"><span class="toc-number">3.4.</span> <span class="toc-text">60fps 视频播放场景: GPU 合成</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+			<li><a href="/categories/Android-Development/" title="Android Development">Android Development<sup>31</sup></a></li>
+		
+			<li><a href="/categories/Android-Framework/" title="Android Framework">Android Framework<sup>49</sup></a></li>
+		
+			<li><a href="/categories/Basics-Knowledge/" title="Basics Knowledge">Basics Knowledge<sup>9</sup></a></li>
+		
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>24</sup></a></li>
+		
+			<li><a href="/categories/MiniGUI/" title="MiniGUI">MiniGUI<sup>12</sup></a></li>
+		
+			<li><a href="/categories/Other/" title="Other">Other<sup>9</sup></a></li>
+		
+			<li><a href="/categories/Performance/" title="Performance">Performance<sup>6</sup></a></li>
+		
+			<li><a href="/categories/VR/" title="VR">VR<sup>4</sup></a></li>
+		
+			<li><a href="/categories/Window/" title="Window">Window<sup>10</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/android/" title="android">android<sup>89</sup></a></li>
+		
+			<li><a href="/tags/basics/" title="basics">basics<sup>9</sup></a></li>
+		
+			<li><a href="/tags/install/" title="install">install<sup>7</sup></a></li>
+		
+			<li><a href="/tags/linux/" title="linux">linux<sup>28</sup></a></li>
+		
+			<li><a href="/tags/minigui/" title="minigui">minigui<sup>13</sup></a></li>
+		
+			<li><a href="/tags/opengl/" title="opengl">opengl<sup>4</sup></a></li>
+		
+			<li><a href="/tags/other/" title="other">other<sup>5</sup></a></li>
+		
+			<li><a href="/tags/server/" title="server">server<sup>1</sup></a></li>
+		
+			<li><a href="/tags/shell/" title="shell">shell<sup>5</sup></a></li>
+		
+			<li><a href="/tags/tool/" title="tool">tool<sup>10</sup></a></li>
+		
+			<li><a href="/tags/vr/" title="vr">vr<sup>4</sup></a></li>
+		
+			<li><a href="/tags/window/" title="window">window<sup>11</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">我的链接</p>
+    <ul>
+      <li><i class="fa fa-github"></i> <a href="https://github.com/mingming-killer" target="_blank">GitHub</a></li>
+      
+        
+          <li><i class="fa fa-analytics"></i> <a href="http://tongji.baidu.com/web/welcome/ico?s=fa045dbd45ffce238b146e00f91ba6a3" target="_blank">网站数据统计</a></li>
+        
+      
+      <li><i class="fa fa-markdown-help"></i> <a href="http://zh.wikipedia.org/wiki/Markdown" target="_blank">Makrdown</a></li>
+    </ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+      <li><i class="fa fa-book"></i> <a href="http://taoyuanxiaoqi.com" target="_blank">桃园小七的博客</a></li>
+      <li><i class="fa fa-book"></i> <a href="https://dongka.github.io" target="_blank">Dongka的博客</a></li>
+    </ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+<!--
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+-->
+
+     <!-- this is defined in footer.styl, line holder -->
+	<div class="line">
+	</div>
+     
+<!--
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+		<a href="https://github.com/mingming-killer" target="_blank" title="github"></a>
+		
+        	         
+	</div>
+-->
+
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/mingming-killer/Lightmoon" target="_blank" title="Lightmoon">Lightmoon</a> © 2021 
+		
+		<a href="http://www.light3moon.com" target="_blank" title="Mingming">Mingming</a>
+		
+		</p>
+
+  <!-- baidu search verification -->
+  
+    <meta name="baidu-site-verification" content="w1BSX6yZ9k" />
+  
+
+  <!-- swiftype search verification -->
+  
+
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?fa045dbd45ffce238b146e00f91ba6a3";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  </body>
+</html>
