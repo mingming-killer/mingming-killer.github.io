@@ -187,7 +187,7 @@
 <p>我们换成 gpu 合成：</p>
 <h2 id="60fps_视频播放场景:_GPU_合成">60fps 视频播放场景: GPU 合成</h2>
 <p>看一下带宽：</p>
-<p><img src="/https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_gpu_video_mtop.png" alt="插图"></p>
+<p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_gpu_video_mtop.png" alt="插图"></p>
 <p>然后再 dumpsys SurfaceFlinger 看一下图层：</p>
 <p><img src="https://mingming-killer.github.io/img/pics/android/dram-band/dram_band_gpu_video_layer.png" alt="插图"></p>
 <p>同样是2个图层，gpu 合成，目前 de 的带宽 239MB/s 和前面 Launcher 静止的场景是一样的。然后再来计算下 gpu 的带宽，因为有图像更新了，所以 SurfaceFlinger 需要对每个图层的 Buffer 数据进行一次读操作，然后再贴到 FrameBuffer Surface，也就是要把这些 Buffer 再写到另外一个 Buffer 里面，所以一个图层需要一次读和写内存访问，图层数据得 x 2。前面看到 LCD 的刷新率是 61，但是这里我们其实得看应用的帧率，我们通过抓 systrace，截取 1s 统计 SurfaceFlinger 合成 Layer 的次数（doComposition 的次数），看到 1s 是 60fps：</p>
